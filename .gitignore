@@ -1,6 +1,6 @@
 .DS_Store
 .idea/
 Pods/
-UserInterface.xcuserstate
-UserInterfaceState.xcuserstate
-*.xcuserstate
+**/UserInterface.xcuserstate
+**/UserInterfaceState.xcuserstate
+**/*.xcuserstate
