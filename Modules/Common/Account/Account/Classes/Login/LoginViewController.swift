@@ -10,8 +10,12 @@ import PGFoundation
 import UIComponents
 import SnapKit
 import Util
+import Net
+import RxCocoa
 
 class LoginViewController: ViewController<LoginViewModel> {
+    
+    var loginCompletion: (Bool) -> Void = { _ in }
     
     private lazy var loginTitleLabel: UILabel = {
         let label = UILabel()
@@ -41,18 +45,9 @@ class LoginViewController: ViewController<LoginViewModel> {
         return textField
     }()
     
-    private lazy var signUpHintLabel: UILabel = {
-        let label = UILabel()
-        label.text = "还没有注册？"
-        label.textColor = .label
-        label.font = .textFont(for: .caption1, weight: .regular)
-        
-        return label
-    }()
-    
     private lazy var signUpButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("点击这里！", for: .normal)
+        button.setTitle("还没有账号？", for: .normal)
         button.setTitleColor(.link, for: .normal)
         button.titleLabel?.font = .textFont(for: .caption1, weight: .regular)
         
@@ -62,9 +57,25 @@ class LoginViewController: ViewController<LoginViewModel> {
     private lazy var loginButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("登录", for: .normal)
-        button.setTitleColor(.label, for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        button.setTitleColor(.lightText, for: .disabled)
         button.titleLabel?.font = .textFont(for: .title3, weight: .regular)
         button.backgroundColor = .systemBlue
+        
+        return button
+    }()
+    
+    private lazy var cancelButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("一会儿再来...", for: .normal)
+        button.setTitleColor(.lightGray, for: .normal)
+        button.titleLabel?.font = .textFont(for: .caption1, weight: .regular)
+        
+        button.rx.tap.subscribe { [weak self] _ in
+            self?.dismiss(animated: true) {
+                self?.loginCompletion(false)
+            }
+        }.disposed(by: disposeBag)
         
         return button
     }()
@@ -72,16 +83,58 @@ class LoginViewController: ViewController<LoginViewModel> {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        isModalInPresentation = true
+        
         setUpSubviews()
+        
+        bindViewModel()
+    }
+    
+    override func bindViewModel() {
+        guard let viewModel = viewModel else { return }
+        
+        usernameTextField.rx.text.orEmpty
+            .bind(to: viewModel.input.username)
+            .disposed(by: disposeBag)
+        
+        passwordTextField.rx.text.orEmpty
+            .bind(to: viewModel.input.password)
+            .disposed(by: disposeBag)
+        
+        loginButton.rx.tap
+            .bind(to: viewModel.input.loginTap)
+            .disposed(by: disposeBag)
+        
+        let output = viewModel.transformToOutput()
+        
+        output.loginButtonEnabled.asDriver()
+            .drive(loginButton.rx.isEnabled)
+            .disposed(by: disposeBag)
+        
+        output.loginResult
+            .subscribe(onNext: { response in
+                if response == nil {
+                    // 返回为空
+                }
+                guard let token = response?.data?.tokenString else {
+                    // 登录失败
+                    return
+                }
+                let user = UserManager.shared.login(withToken: token)
+                if user == nil {
+                    // token无法解析
+                }
+            })
+            .disposed(by: disposeBag)
     }
     
     private func setUpSubviews() {
         view.addSubview(loginTitleLabel)
         view.addSubview(usernameTextField)
         view.addSubview(passwordTextField)
-        view.addSubview(signUpHintLabel)
         view.addSubview(signUpButton)
         view.addSubview(loginButton)
+        view.addSubview(cancelButton)
         
         loginTitleLabel.snp.makeConstraints { make in
             make.leading.equalTo(view).offset(41)
@@ -100,21 +153,21 @@ class LoginViewController: ViewController<LoginViewModel> {
             make.top.equalTo(usernameTextField.snp.bottom).offset(20)
         }
         
-        signUpHintLabel.snp.makeConstraints { make in
+        signUpButton.snp.makeConstraints { make in
             make.leading.equalTo(passwordTextField)
             make.top.equalTo(passwordTextField.snp.bottom).offset(5)
         }
         
-        signUpButton.snp.makeConstraints { make in
-            make.top.height.equalTo(signUpHintLabel)
-            make.leading.equalTo(signUpHintLabel.snp.trailing)
-        }
-        
         loginButton.layer.cornerRadius = 4
         loginButton.snp.makeConstraints { make in
-            make.top.equalTo(signUpButton.snp.bottom).offset(60)
+            make.top.equalTo(signUpButton.snp.bottom).offset(40)
             make.leading.trailing.equalTo(passwordTextField)
             make.height.equalTo(50)
+        }
+        
+        cancelButton.snp.makeConstraints { make in
+            make.top.equalTo(loginButton.snp.bottom).offset(5)
+            make.leading.equalTo(loginButton)
         }
     }
 

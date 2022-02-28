@@ -28,7 +28,6 @@ TODO: Add long description of the pod here.
   #   'CYFoundation' => ['Net/Assets/*.png']
   # }
   
-  s.dependency 'Util'
-  s.dependency 'Hybrid'
+  s.dependency 'Alamofire'
   
 end

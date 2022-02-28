@@ -1,5 +1,6 @@
 PODS:
   - Account (0.0.1):
+    - Net
     - PGFoundation
     - Provider
     - RxCocoa
@@ -11,8 +12,7 @@ PODS:
   - Hybrid (0.0.1):
     - Util
   - Net (0.0.1):
-    - Hybrid
-    - Util
+    - Alamofire
   - PGFoundation (0.0.1):
     - RxSwift
   - Provider (0.0.1):
@@ -84,10 +84,10 @@ EXTERNAL SOURCES:
     :path: Modules/Common/Util
 
 SPEC CHECKSUMS:
-  Account: 8a55e95ffe2bcd24e39ae8b75f4eb258746f60a7
+  Account: 5d43290fac2bcbc676781dd8161af9489543e555
   Alamofire: f3b09a368f1582ab751b3fff5460276e0d2cf5c9
   Hybrid: f939efddf0a5e3cd6b48961abebdb98cba6add40
-  Net: cb8215ed5ddc9587bd12610a5663b76d25f416ef
+  Net: 080cdb0b67ba7c80c8ae8e5a18552b752290fbc8
   PGFoundation: 3a2a2acad8436e8f8e48a2e8a57ea4ab894c39ef
   Provider: 5a3bedf02e8d1287d7b1da661ca97b440b540491
   Router: d9dfb27ee05c3f6beef3cf1d820d730c87c62a7b

@@ -24,7 +24,7 @@ open class ViewController<VM: ViewModel>: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
-    public func bindViewModel() {
+    open func bindViewModel() {
         fatalError("This method must be overrided.")
     }
     
