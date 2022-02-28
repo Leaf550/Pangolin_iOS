@@ -12,7 +12,6 @@ import SnapKit
 import Util
 import Net
 import RxCocoa
-import Toast_Swift
 
 class LoginViewController: ViewController<LoginViewModel>, UITextFieldDelegate {
     
@@ -56,8 +55,10 @@ class LoginViewController: ViewController<LoginViewModel>, UITextFieldDelegate {
         button.rx.tap.subscribe(onNext: { [weak self] _ in
             let signUpConroller = SignUpViewController(viewModel: SignUpViewModel())
             signUpConroller.signUpCompletion = { completion in
-                self?.dismiss(animated: true) {
-                    self?.loginCompletion(true)
+                if completion {
+                    self?.dismiss(animated: true) {
+                        self?.loginCompletion(true)
+                    }
                 }
             }
             self?.present(signUpConroller, animated: true, completion: nil)
@@ -142,24 +143,24 @@ class LoginViewController: ViewController<LoginViewModel>, UITextFieldDelegate {
         output.loginResult
             .subscribe(onNext: { [weak self] response in
                 guard let response = response else {
-                    self?.view.makeToast("请求失败", position: .center)
+                    Toast.show(text: "请求失败")
                     return
                 }
                 
                 if response.status == LoginStatusCode.pwdErr.rawValue {
-                    self?.view.makeToast("账号或密码错误", position: .center)
+                    Toast.show(text: "账号或密码错误")
                     return
                 }
                 
                 guard let token = response.data?.tokenString else {
-                    self?.view.makeToast("请求失败", position: .center)
+                    Toast.show(text: "请求失败")
                     return
                 }
                 
                 UserManager.shared.login(withToken: token) { user, message in
                     guard user != nil else {
                         // token无法解析
-                        self?.view.makeToast(message, position: .center)
+                        Toast.show(text: message ?? "")
                         return
                     }
                     

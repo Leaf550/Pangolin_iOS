@@ -29,5 +29,7 @@ TODO: Add long description of the pod here.
   # }
   
   s.dependency 'SnapKit'
+  s.dependency 'Toast-Swift'
+  s.dependency 'Util'
   
 end

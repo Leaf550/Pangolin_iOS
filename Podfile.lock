@@ -38,6 +38,8 @@ PODS:
     - Provider
   - UIComponents (0.0.1):
     - SnapKit
+    - Toast-Swift
+    - Util
   - Util (0.0.1)
 
 DEPENDENCIES:
@@ -103,7 +105,7 @@ SPEC CHECKSUMS:
   Starter: dd0337154aa84ff0d149946af8510d6a4a66c5a9
   Toast-Swift: 9b6a70f28b3bf0b96c40d46c0c4b9d6639846711
   ToDo: e5c5e6fc2281e9a5d29c971fb30025dcc1a7ff5e
-  UIComponents: 5448741eb270fd07acc77207b25ba098be1d92ed
+  UIComponents: aca5b0fafbdcc4bdfa33dec0a11326a7d5ed2d87
   Util: 9269aba84bf203b4ea0604aeb60088d757e3e87e
 
 PODFILE CHECKSUM: c88560d8698404e45d1862e0ac3758cf5fb0d58f

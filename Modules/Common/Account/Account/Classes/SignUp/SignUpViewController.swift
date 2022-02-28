@@ -8,7 +8,6 @@
 import UIKit
 import PGFoundation
 import UIComponents
-import Toast_Swift
 
 class SignUpViewController: ViewController<SignUpViewModel>, UITextFieldDelegate {
     
@@ -167,24 +166,24 @@ class SignUpViewController: ViewController<SignUpViewModel>, UITextFieldDelegate
         output.signUpResult
             .subscribe(onNext: { [weak self] response in
                 guard let response = response else {
-                    self?.view.makeToast("请求失败", position: .center)
+                    Toast.show(text: "请求失败")
                     return
                 }
                 
                 if response.status == SignUpStatusCode.userExisted.rawValue {
-                    self?.view.makeToast("该用户名已经注册过了～", position: .center)
+                    Toast.show(text: "该用户名已经注册过了～")
                     return
                 }
                 
                 guard let token = response.data?.tokenString else {
-                    self?.view.makeToast("请求失败", position: .center)
+                    Toast.show(text: "请求失败")
                     return
                 }
                 
                 UserManager.shared.login(withToken: token) { user, message in
                     guard user != nil else {
                         // token无法解析
-                        self?.view.makeToast(message, position: .center)
+                        Toast.show(text: message ?? "")
                         return
                     }
                     
