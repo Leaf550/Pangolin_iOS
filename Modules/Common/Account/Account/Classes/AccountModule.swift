@@ -26,11 +26,13 @@ extension AccountModule: AccountProvider {
     
     func presentLoginViewController(from controller: UIViewController,
                                     animated: Bool,
-                                    completion: (() -> Void)?) {
+                                    presentCompletion: (() -> Void)?,
+                                    loginCompletion: ((Bool) -> Void)?) {
         let loginViewController = LoginViewController(viewModel: LoginViewModel())
+        loginViewController.loginCompletion = loginCompletion ?? { _ in }
         controller.present(loginViewController,
                            animated: animated,
-                           completion: completion)
+                           completion: presentCompletion)
     }
     
 }
