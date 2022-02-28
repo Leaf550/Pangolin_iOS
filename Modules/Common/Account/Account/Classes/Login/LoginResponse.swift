@@ -12,11 +12,16 @@ import Foundation
 // MARK: - LoginResponse
 struct LoginResponse: Codable {
     var status: Int?
-    var data: DataClass?
+    var data: LoginData?
     var message: String?
 }
 
 // MARK: - DataClass
-struct DataClass: Codable {
+struct LoginData: Codable {
     var tokenString: String?
+}
+
+enum LoginStatusCode: Int {
+    case ok     = 200
+    case pwdErr = 602
 }
