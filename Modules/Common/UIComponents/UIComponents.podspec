@@ -28,5 +28,6 @@ TODO: Add long description of the pod here.
   #   'UIComponents' => ['UIComponents/Assets/*.png']
   # }
   
-  # s.dependency 'AFNetworking', '~> 2.3'
+  s.dependency 'SnapKit'
+  
 end

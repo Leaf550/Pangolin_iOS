@@ -13,6 +13,8 @@ public class UserManager {
     
     private var token: String?
     
+    public var user: User?
+    
     public func getToken() -> String? { token }
     
     public var isLogined: Bool {
@@ -26,24 +28,49 @@ public class UserManager {
         return timestamp > Double(exp)
     }
     
-    public var user: User? {
-        guard let token = token else { return nil }
-        return parseToken(token)
+    func login(withToken token: String, completion: (User?, String?) -> Void) {
+        guard !isLogined else {
+            completion(nil, "已经登录过了")
+            return
+        }
+        parseToken(token) { [weak self] user, message in
+            if let user = user {
+                self?.token = token
+                self?.user = user
+                completion(user, nil)
+            }
+            if let message = message {
+                completion(nil, message)
+            }
+        }
     }
     
-    func login(withToken token: String) -> User? {
-        guard isLogined else { return nil }
-        guard let user = parseToken(token) else { return nil }
-        self.token = token
-        return user
+    func logout() {
+        self.token = nil
+        self.user = nil
     }
     
-    private func parseToken(_ token: String) -> User? {
-        guard let decoded = Cycriptor.base64Decode(encoded: token) else { return nil }
-        guard let data = try? JSONSerialization.data(withJSONObject: decoded) else { return nil }
-        guard let user = try? JSONDecoder().decode(User.self, from: data) else { return nil }
+    private func parseToken(_ token: String, completion: (User?, String?) -> Void) {
+        let seq = token.split(separator: Character("."))
+        if seq.count < 3 {
+            completion(nil, "bad token")
+            return
+        }
+        let payload = String(seq[1])
+        guard let decoded = Cycriptor.base64Decode(encoded: payload) else {
+            completion(nil, "bad token")
+            return
+        }
+        guard let data = try? JSONSerialization.data(withJSONObject: decoded) else {
+            completion(nil, "bad token")
+            return
+        }
+        guard let user = try? JSONDecoder().decode(User.self, from: data) else {
+            completion(nil, "bad token")
+            return
+        }
         
-        return user
+        completion(user, nil)
     }
     
 }

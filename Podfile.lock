@@ -6,6 +6,7 @@ PODS:
     - RxCocoa
     - RxSwift
     - SnapKit
+    - Toast-Swift
     - UIComponents
     - Util
   - Alamofire (5.4.4)
@@ -31,10 +32,12 @@ PODS:
     - PGFoundation
     - Provider
     - UIComponents
+  - Toast-Swift (5.0.1)
   - ToDo (0.0.1):
     - PGFoundation
     - Provider
-  - UIComponents (0.0.1)
+  - UIComponents (0.0.1):
+    - SnapKit
   - Util (0.0.1)
 
 DEPENDENCIES:
@@ -49,6 +52,7 @@ DEPENDENCIES:
   - RxSwift (= 6.2.0)
   - SnapKit (= 5.0.1)
   - Starter (from `Modules/Business/Starter`)
+  - Toast-Swift (= 5.0.1)
   - ToDo (from `Modules/Business/ToDo`)
   - UIComponents (from `Modules/Common/UIComponents`)
   - Util (from `Modules/Common/Util`)
@@ -60,6 +64,7 @@ SPEC REPOS:
     - RxRelay
     - RxSwift
     - SnapKit
+    - Toast-Swift
 
 EXTERNAL SOURCES:
   Account:
@@ -84,7 +89,7 @@ EXTERNAL SOURCES:
     :path: Modules/Common/Util
 
 SPEC CHECKSUMS:
-  Account: 5d43290fac2bcbc676781dd8161af9489543e555
+  Account: 51464fb2d53f73c3949f35af684c32f7c73bef83
   Alamofire: f3b09a368f1582ab751b3fff5460276e0d2cf5c9
   Hybrid: f939efddf0a5e3cd6b48961abebdb98cba6add40
   Net: 080cdb0b67ba7c80c8ae8e5a18552b752290fbc8
@@ -96,10 +101,11 @@ SPEC CHECKSUMS:
   RxSwift: d356ab7bee873611322f134c5f9ef379fa183d8f
   SnapKit: 97b92857e3df3a0c71833cce143274bf6ef8e5eb
   Starter: dd0337154aa84ff0d149946af8510d6a4a66c5a9
+  Toast-Swift: 9b6a70f28b3bf0b96c40d46c0c4b9d6639846711
   ToDo: e5c5e6fc2281e9a5d29c971fb30025dcc1a7ff5e
-  UIComponents: 415cf798292b258df5c56e26f09f48ae62dc374f
+  UIComponents: 5448741eb270fd07acc77207b25ba098be1d92ed
   Util: 9269aba84bf203b4ea0604aeb60088d757e3e87e
 
-PODFILE CHECKSUM: 393e178909e9aa6612ce3b67c23322a83b4ea81c
+PODFILE CHECKSUM: c88560d8698404e45d1862e0ac3758cf5fb0d58f
 
 COCOAPODS: 1.10.1
