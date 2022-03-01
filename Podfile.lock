@@ -36,6 +36,8 @@ PODS:
   - ToDo (0.0.1):
     - PGFoundation
     - Provider
+    - RxCocoa
+    - RxSwift
   - UIComponents (0.0.1):
     - SnapKit
     - Toast-Swift
@@ -104,7 +106,7 @@ SPEC CHECKSUMS:
   SnapKit: 97b92857e3df3a0c71833cce143274bf6ef8e5eb
   Starter: dd0337154aa84ff0d149946af8510d6a4a66c5a9
   Toast-Swift: 9b6a70f28b3bf0b96c40d46c0c4b9d6639846711
-  ToDo: e5c5e6fc2281e9a5d29c971fb30025dcc1a7ff5e
+  ToDo: f4a1d8bb48f102a064fc6c481db58d0c8a9cc223
   UIComponents: aca5b0fafbdcc4bdfa33dec0a11326a7d5ed2d87
   Util: 9269aba84bf203b4ea0604aeb60088d757e3e87e
 
