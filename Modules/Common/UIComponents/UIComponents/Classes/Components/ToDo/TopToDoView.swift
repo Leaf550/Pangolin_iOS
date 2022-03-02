@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-public class ToDoBlock: UIView {
+public class TopTodoView: UIView {
 
     private var icon: ToDoTinyIcon
     private var name: String
@@ -38,8 +38,8 @@ public class ToDoBlock: UIView {
         self.number = number
         super.init(frame: .zero)
         
-        backgroundColor = .tertiarySystemBackground
-        self.layer.cornerRadius = 20
+        backgroundColor = .secondarySystemGroupedBackground
+        self.layer.cornerRadius = 12
         
         addSubview(icon)
         addSubview(nameLabel)
