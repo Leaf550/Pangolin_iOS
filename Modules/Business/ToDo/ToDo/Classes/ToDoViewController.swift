@@ -80,7 +80,7 @@ class ToDoViewController: UIViewController {
     }
     
     private func setUpSubView() {
-        view.backgroundColor = .secondarySystemBackground
+        view.backgroundColor = .systemGroupedBackground
         
         view.addSubview(listsTableView)
         listsTableView.snp.makeConstraints { make in

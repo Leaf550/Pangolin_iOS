@@ -47,19 +47,23 @@ public class ToDoListCellTableViewCell: TableViewCell {
     
     private lazy var rightArrow: UIImageView = {
         let imageView = UIImageView()
+        imageView.image = UIImage(named: "arrow_right")
         
         return imageView
     }()
     
     private lazy var separateLine: UIView = {
         let line = UIView()
-        line.backgroundColor = .lightGray
+        line.backgroundColor = .gray
+        line.alpha = 0.5
         
         return line
     }()
 
     public override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        
+        contentView.backgroundColor = .secondarySystemGroupedBackground
         
         contentView.addSubview(icon)
         contentView.addSubview(titleLabel)
@@ -80,8 +84,8 @@ public class ToDoListCellTableViewCell: TableViewCell {
         rightArrow.snp.makeConstraints { make in
             make.trailing.equalToSuperview().offset(-16)
             make.centerY.equalToSuperview()
-            make.width.equalTo(6)
-            make.height.equalTo(9)
+            make.width.equalTo(15)
+            make.height.equalTo(15)
         }
         
         numberLabel.snp.makeConstraints { make in

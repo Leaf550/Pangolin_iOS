@@ -10,30 +10,30 @@ import UIComponents
 
 class TopToDoListView: UIView {
     
-    private lazy var todayList: ToDoBlock = {
+    private lazy var todayList: TopTodoView = {
         let icon = ToDoTinyIcon(image: UIImage(), color: .blue)
-        let block = ToDoBlock(icon: icon, name: "今天", number: 0)
+        let block = TopTodoView(icon: icon, name: "今天", number: 0)
         
         return block
     }()
     
-    private lazy var flagList: ToDoBlock = {
+    private lazy var flagList: TopTodoView = {
         let icon = ToDoTinyIcon(image: UIImage(), color: .orange)
-        let block = ToDoBlock(icon: icon, name: "重要", number: 0)
+        let block = TopTodoView(icon: icon, name: "重要", number: 0)
         
         return block
     }()
     
-    private lazy var allList: ToDoBlock = {
+    private lazy var allList: TopTodoView = {
         let icon = ToDoTinyIcon(image: UIImage(), color: .gray)
-        let block = ToDoBlock(icon: icon, name: "全部", number: 0)
+        let block = TopTodoView(icon: icon, name: "全部", number: 0)
         
         return block
     }()
     
-    private lazy var finishedList: ToDoBlock = {
+    private lazy var finishedList: TopTodoView = {
         let icon = ToDoTinyIcon(image: UIImage(), color: .green)
-        let block = ToDoBlock(icon: icon, name: "已完成", number: 0)
+        let block = TopTodoView(icon: icon, name: "已完成", number: 0)
         
         return block
     }()
