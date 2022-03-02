@@ -10,7 +10,7 @@ import UIKit
 public class Screen {
     
     public static var isIPhoneX: Bool {
-        UIApplication.shared.windows[0].safeAreaInsets != UIEdgeInsets.zero
+        UIApplication.shared.keyWindow?.safeAreaInsets != UIEdgeInsets.zero
     }
     
     public static var screenWidth: CGFloat {

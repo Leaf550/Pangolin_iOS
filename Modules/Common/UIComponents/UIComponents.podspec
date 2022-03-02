@@ -28,8 +28,11 @@ TODO: Add long description of the pod here.
   #   'UIComponents' => ['UIComponents/Assets/*.png']
   # }
   
+  s.dependency 'Util'
+
   s.dependency 'SnapKit'
   s.dependency 'Toast-Swift'
-  s.dependency 'Util'
+  s.dependency 'RxSwift'
+  s.dependency 'RxCocoa'
   
 end

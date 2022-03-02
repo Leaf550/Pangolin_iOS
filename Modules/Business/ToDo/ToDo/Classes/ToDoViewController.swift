@@ -6,31 +6,87 @@
 //
 
 import UIKit
-import Provider
+import UIComponents
+import SnapKit
+import Util
 import RxSwift
 import RxCocoa
 
 class ToDoViewController: UIViewController {
     
-    private var disposeBag = DisposeBag()
+    private var numberOfRows = 20
+    
+    private var listData = BehaviorSubject<[Int]>(value: [Int](repeating: 0, count: 20))
+    
+    private let disposeBag = DisposeBag()
+    
+    private lazy var listsTableView: TableView = {
+        let table = TableView(frame: .zero, style: .grouped)
+        table.backgroundColor = .clear
+        table.separatorStyle = .none
+        table.rowHeight = 54
+        
+        listData
+            .bind(to: table.rx.items(cellIdentifier: ToDoListCellTableViewCell.reuseID, cellType: ToDoListCellTableViewCell.self)) { [weak self] row, data, cell in
+                guard let self = self else { return }
+                cell.titleLabel.text = String(row)
+                cell.numberLabel.text = "0"
+                cell.iconColor = .blue
+                cell.hasSeparateLine = (row != self.numberOfRows - 1)
+            }
+            .disposed(by: disposeBag)
+        
+        tableHeaderView.snp.makeConstraints { make in
+            make.width.equalTo(self.view.frame.size.width)
+        }
+        table.tableHeaderView = tableHeaderView
+        table.tableHeaderView?.layoutIfNeeded()
+        
+        return table
+    }()
+    
+    private lazy var myListTitleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "我的列表"
+        label.font = .textFont(for: .title2, weight: .medium)
+        
+        return label
+    }()
+    
+    private lazy var tableHeaderView: UIView = {
+        let header = UIView()
+        let topToDoLists = TopToDoListView()
+        header.addSubview(topToDoLists)
+        topToDoLists.snp.makeConstraints { make in
+            make.top.leading.trailing.equalToSuperview()
+        }
+        
+        header.addSubview(myListTitleLabel)
+        myListTitleLabel.snp.makeConstraints { make in
+            make.top.equalTo(topToDoLists.snp.bottom)
+            make.leading.equalTo(topToDoLists).offset(16)
+            make.bottom.equalToSuperview().offset(-10)
+        }
+        
+        return header
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let button = UIButton(type: .system)
-        button.setTitle("登录", for: .normal)
-        button.frame = CGRect(x: 100, y: 100, width: 100, height: 40)
-        view.addSubview(button)
+        listsTableView.register(ToDoListCellTableViewCell.self, forCellReuseIdentifier: ToDoListCellTableViewCell.reuseID)
         
-        button.rx.tap.subscribe(onNext: { _ in
-            let accountService = PGProviderManager.shared.provider(forProtocol: { AccountProvider.self })
-            accountService?.presentLoginViewController(from: self.tabBarController!, animated: true)
-        }).disposed(by: disposeBag)
-
+        setUpSubView()
     }
     
-    override func viewDidAppear(_ animated: Bool) {
+    private func setUpSubView() {
+        view.backgroundColor = .secondarySystemBackground
         
+        view.addSubview(listsTableView)
+        listsTableView.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(Screen.statusBarHeight)
+            make.leading.trailing.bottom.equalToSuperview()
+        }
     }
 
 }
