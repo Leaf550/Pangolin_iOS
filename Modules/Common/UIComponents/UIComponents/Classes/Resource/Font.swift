@@ -26,7 +26,7 @@ public enum FontWeight: CGFloat {
 }
 
 public extension UIFont {
-    static func textFont(for size: FontSize, weight: FontWeight) -> UIFont {
-        .systemFont(ofSize: size.rawValue, weight: Weight(weight.rawValue))
+    static func textFont(for size: FontSize, weight: UIFont.Weight) -> UIFont {
+        .systemFont(ofSize: size.rawValue, weight: weight)
     }
 }
