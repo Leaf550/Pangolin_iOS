@@ -112,7 +112,6 @@ class SignUpViewController: ViewController<SignUpViewModel>, UITextFieldDelegate
         super.viewDidLoad()
         
         setUpSubviews()
-        bindViewModel()
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {

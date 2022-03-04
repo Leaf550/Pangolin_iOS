@@ -18,9 +18,9 @@ public enum ToDoIconColor {
     case gray
 }
 
-class ToDoIconColorImpl {
+public class ToDoIconColorImpl {
     
-    static func plainColor(with enumerate: ToDoIconColor) -> UIColor {
+    public static func plainColor(with enumerate: ToDoIconColor) -> UIColor {
         switch enumerate {
             case .red:
                 return UIColor(hexString: "#fb3e2d")
@@ -41,7 +41,7 @@ class ToDoIconColorImpl {
         }
     }
     
-    static func gradient(with enumerate: ToDoIconColor) -> [CGColor] {
+    public static func gradient(with enumerate: ToDoIconColor) -> [CGColor] {
         switch enumerate {
             case .red:
                 return [UIColor(hexString: "#ff7060").cgColor, UIColor(hexString: "#eb4e3d").cgColor]

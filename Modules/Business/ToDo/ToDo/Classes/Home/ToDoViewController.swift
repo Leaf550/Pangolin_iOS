@@ -27,7 +27,7 @@ class ToDoViewController: UIViewController {
         table.rowHeight = 54
         
         listData
-            .bind(to: table.rx.items(cellIdentifier: ToDoListCellTableViewCell.reuseID, cellType: ToDoListCellTableViewCell.self)) { [weak self] row, data, cell in
+            .bind(to: table.rx.items(cellIdentifier: ToDoListTableViewCell.reuseID, cellType: ToDoListTableViewCell.self)) { [weak self] row, data, cell in
                 guard let self = self else { return }
                 cell.titleLabel.text = String(row)
                 cell.numberLabel.text = "0"
@@ -35,6 +35,13 @@ class ToDoViewController: UIViewController {
                 cell.hasSeparateLine = (row != self.numberOfRows - 1)
             }
             .disposed(by: disposeBag)
+        
+        table.rx.itemSelected.bind { [weak self] indexPath in
+            let todoListController = ToDoListViewController(titleColor: .blue)
+            todoListController.title = String(indexPath.row)
+            todoListController.hidesBottomBarWhenPushed = true
+            self?.navigationController?.pushViewController(todoListController, animated: true)
+        }.disposed(by: disposeBag)
         
         tableHeaderView.snp.makeConstraints { make in
             make.width.equalTo(self.view.frame.size.width)
@@ -74,7 +81,10 @@ class ToDoViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        listsTableView.register(ToDoListCellTableViewCell.self, forCellReuseIdentifier: ToDoListCellTableViewCell.reuseID)
+        self.navigationItem.title = "列表"
+        self.navigationItem.titleView = UIView()
+        
+        listsTableView.register(ToDoListTableViewCell.self, forCellReuseIdentifier: ToDoListTableViewCell.reuseID)
         
         setUpSubView()
     }

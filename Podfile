@@ -22,10 +22,11 @@ end
 
 # 公网第三方库
 def thirdPartPods
-  pod 'Alamofire', '5.4.4', :inhibit_warnings => true
-  pod 'SnapKit', '5.0.1', :inhibit_warnings => true
-  pod 'RxSwift', '6.2.0', :inhibit_warnings => true
-  pod 'RxCocoa', '6.2.0', :inhibit_warnings => true
+  pod 'Alamofire', '5.4.4',   :inhibit_warnings => true
+  pod 'SnapKit', '5.0.1',     :inhibit_warnings => true
+  pod 'RxSwift', '6.2.0',     :inhibit_warnings => true
+  pod 'RxCocoa', '6.2.0',     :inhibit_warnings => true
+  pod 'RxDataSources', '5.0', :inhibit_warnings => true
   pod 'Toast-Swift', '5.0.1', :inhibit_warnings => true
   # pod 'MMKV', '1.2.11', :inhibit_warnings => true
 end

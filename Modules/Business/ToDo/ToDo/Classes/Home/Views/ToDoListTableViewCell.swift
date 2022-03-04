@@ -1,5 +1,5 @@
 //
-//  ToDoListCellTableViewCell.swift
+//  ToDoListTableViewCell.swift
 //  ToDo
 //
 //  Created by 方昱恒 on 2022/3/2.
@@ -8,36 +8,38 @@
 import UIKit
 import UIComponents
 
-public class ToDoListCellTableViewCell: TableViewCell {
+class ToDoListTableViewCell: TableViewCell {
     
-    public var iconImage: UIImage = UIImage() {
+    static let reuseID = NSStringFromClass(ToDoListTableViewCell.self)
+    
+    var iconImage: UIImage = UIImage() {
         didSet {
             icon.image = iconImage
         }
     }
     
-    public var iconColor: ToDoIconColor = .blue {
+    var iconColor: ToDoIconColor = .blue {
         didSet {
             icon.color = iconColor
         }
     }
     
-    public var hasSeparateLine: Bool = true {
+    var hasSeparateLine: Bool = true {
         didSet {
             self.separateLine.isHidden = !hasSeparateLine
         }
     }
     
-    public lazy var icon = ToDoTinyIcon(image: iconImage, color: iconColor)
+    lazy var icon = ToDoTinyIcon(image: iconImage, color: iconColor)
     
-    public lazy var titleLabel: UILabel = {
+    lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.font = .textFont(for: .body, weight: .regular)
         label.textColor = .label
         return label
     }()
     
-    public lazy var numberLabel: UILabel = {
+    lazy var numberLabel: UILabel = {
         let label = UILabel()
         label.font = .textFont(for: .body, weight: .regular)
         label.textColor = .secondaryLabel
@@ -48,7 +50,6 @@ public class ToDoListCellTableViewCell: TableViewCell {
     private lazy var rightArrow: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(named: "arrow_right")
-        
         return imageView
     }()
     
@@ -56,11 +57,10 @@ public class ToDoListCellTableViewCell: TableViewCell {
         let line = UIView()
         line.backgroundColor = .gray
         line.alpha = 0.5
-        
         return line
     }()
 
-    public override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
         contentView.backgroundColor = .secondarySystemGroupedBackground
@@ -100,8 +100,6 @@ public class ToDoListCellTableViewCell: TableViewCell {
         }
         
     }
-    
-    public static let reuseID = NSStringFromClass(ToDoListCellTableViewCell.self)
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
