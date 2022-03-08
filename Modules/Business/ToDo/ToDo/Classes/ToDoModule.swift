@@ -25,7 +25,7 @@ class ToDoModule: PGModule {
 extension ToDoModule: ToDoProvider {
     
     func getToDoViewController() -> UIViewController {
-        ToDoViewController()
+        HomeViewController()
     }
     
 }

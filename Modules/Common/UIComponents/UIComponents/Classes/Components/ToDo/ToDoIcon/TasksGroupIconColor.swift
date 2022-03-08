@@ -1,5 +1,5 @@
 //
-//  ToDoIconColor.swift
+//  TasksGroupIconColor.swift
 //  UIComponents
 //
 //  Created by 方昱恒 on 2022/3/2.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-public enum ToDoIconColor {
+public enum TasksGroupIconColor {
     case red
     case orange
     case yellow
@@ -18,9 +18,9 @@ public enum ToDoIconColor {
     case gray
 }
 
-class ToDoIconColorImpl {
+public class TasksGroupIconColorImpl {
     
-    static func plainColor(with enumerate: ToDoIconColor) -> UIColor {
+    public static func plainColor(with enumerate: TasksGroupIconColor) -> UIColor {
         switch enumerate {
             case .red:
                 return UIColor(hexString: "#fb3e2d")
@@ -41,7 +41,7 @@ class ToDoIconColorImpl {
         }
     }
     
-    static func gradient(with enumerate: ToDoIconColor) -> [CGColor] {
+    public static func gradient(with enumerate: TasksGroupIconColor) -> [CGColor] {
         switch enumerate {
             case .red:
                 return [UIColor(hexString: "#ff7060").cgColor, UIColor(hexString: "#eb4e3d").cgColor]

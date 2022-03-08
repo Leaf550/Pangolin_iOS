@@ -1,5 +1,5 @@
 //
-//  ToDoLargeIcon.swift
+//  TasksGroupLargeIcon.swift
 //  UIComponents
 //
 //  Created by 方昱恒 on 2022/3/1.
@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-public class ToDoLargeIcon: UIView {
+public class TasksGroupLargeIcon: UIView {
 
     private var image: UIImage
     
@@ -20,14 +20,14 @@ public class ToDoLargeIcon: UIView {
         return imageView
     }()
     
-    public init(image: UIImage, backgroundColor: ToDoIconColor) {
+    public init(image: UIImage, backgroundColor: TasksGroupIconColor) {
         self.image = image
         super.init(frame: .zero)
         
         self.layer.cornerRadius = 48
         
         let gradient = CAGradientLayer()
-        gradient.colors = ToDoIconColorImpl.gradient(with: backgroundColor)
+        gradient.colors = TasksGroupIconColorImpl.gradient(with: backgroundColor)
         gradient.startPoint = CGPoint(x: 0, y: 0)
         gradient.endPoint = CGPoint(x: 0, y: 1)
         gradient.frame = CGRect(x: 0, y: 0, width: 96, height: 96)

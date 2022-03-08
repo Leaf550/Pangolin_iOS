@@ -1,5 +1,5 @@
 //
-//  TopToDoListView.swift
+//  TopTasksListView.swift
 //  ToDo
 //
 //  Created by 方昱恒 on 2022/3/2.
@@ -8,32 +8,32 @@
 import UIKit
 import UIComponents
 
-class TopToDoListView: UIView {
+class TopTasksListView: UIView {
     
-    private lazy var todayList: TopTodoView = {
-        let icon = ToDoTinyIcon(image: UIImage(), color: .blue)
-        let block = TopTodoView(icon: icon, name: "今天", number: 0)
+    private lazy var todayList: TopTasksView = {
+        let icon = TasksGroupTinyIcon(image: UIImage(), color: .blue)
+        let block = TopTasksView(icon: icon, name: "今天", number: 0)
         
         return block
     }()
     
-    private lazy var flagList: TopTodoView = {
-        let icon = ToDoTinyIcon(image: UIImage(), color: .orange)
-        let block = TopTodoView(icon: icon, name: "重要", number: 0)
+    private lazy var flagList: TopTasksView = {
+        let icon = TasksGroupTinyIcon(image: UIImage(), color: .orange)
+        let block = TopTasksView(icon: icon, name: "重要", number: 0)
         
         return block
     }()
     
-    private lazy var allList: TopTodoView = {
-        let icon = ToDoTinyIcon(image: UIImage(), color: .gray)
-        let block = TopTodoView(icon: icon, name: "全部", number: 0)
+    private lazy var allList: TopTasksView = {
+        let icon = TasksGroupTinyIcon(image: UIImage(), color: .gray)
+        let block = TopTasksView(icon: icon, name: "全部", number: 0)
         
         return block
     }()
     
-    private lazy var finishedList: TopTodoView = {
-        let icon = ToDoTinyIcon(image: UIImage(), color: .green)
-        let block = TopTodoView(icon: icon, name: "已完成", number: 0)
+    private lazy var finishedList: TopTasksView = {
+        let icon = TasksGroupTinyIcon(image: UIImage(), color: .green)
+        let block = TopTasksView(icon: icon, name: "已完成", number: 0)
         
         return block
     }()

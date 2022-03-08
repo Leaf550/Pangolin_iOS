@@ -9,23 +9,15 @@ import UIKit
 import RxSwift
 
 // 页面基类，支持利用RxSwift实现的MVVM。可在此扩展其他功能。
-open class ViewController<VM: ViewModel>: UIViewController {
+public protocol ViewController {
+    
+    associatedtype VM: ViewModel
  
-    public var viewModel: VM?
-    public let disposeBag = DisposeBag()
+    var viewModel: VM { get set }
+    var disposeBag: DisposeBag { get set }
     
-    public init(viewModel: VM) {
-        self.viewModel = viewModel
-        super.init(nibName: nil, bundle: nil)
-        view.backgroundColor = .systemBackground
-    }
+    init(viewModel: VM)
     
-    required public init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    open func bindViewModel() {
-        fatalError("This method must be overrided.")
-    }
+    func bindViewModel()
     
 }

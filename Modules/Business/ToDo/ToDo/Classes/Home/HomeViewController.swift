@@ -1,5 +1,5 @@
 //
-//  ToDoViewController.swift
+//  HomeViewController.swift
 //  ToDo
 //
 //  Created by 方昱恒 on 2022/2/27.
@@ -12,7 +12,7 @@ import Util
 import RxSwift
 import RxCocoa
 
-class ToDoViewController: UIViewController {
+class HomeViewController: UIViewController {
     
     private var numberOfRows = 20
     
@@ -27,7 +27,7 @@ class ToDoViewController: UIViewController {
         table.rowHeight = 54
         
         listData
-            .bind(to: table.rx.items(cellIdentifier: ToDoListCellTableViewCell.reuseID, cellType: ToDoListCellTableViewCell.self)) { [weak self] row, data, cell in
+            .bind(to: table.rx.items(cellIdentifier: TasksGroupTableViewCell.reuseID, cellType: TasksGroupTableViewCell.self)) { [weak self] row, data, cell in
                 guard let self = self else { return }
                 cell.titleLabel.text = String(row)
                 cell.numberLabel.text = "0"
@@ -35,6 +35,13 @@ class ToDoViewController: UIViewController {
                 cell.hasSeparateLine = (row != self.numberOfRows - 1)
             }
             .disposed(by: disposeBag)
+        
+        table.rx.itemSelected.bind { [weak self] indexPath in
+            let todoListController = TasksListViewController(titleColor: .blue)
+            todoListController.title = String(indexPath.row)
+            todoListController.hidesBottomBarWhenPushed = true
+            self?.navigationController?.pushViewController(todoListController, animated: true)
+        }.disposed(by: disposeBag)
         
         tableHeaderView.snp.makeConstraints { make in
             make.width.equalTo(self.view.frame.size.width)
@@ -55,7 +62,7 @@ class ToDoViewController: UIViewController {
     
     private lazy var tableHeaderView: UIView = {
         let header = UIView()
-        let topToDoLists = TopToDoListView()
+        let topToDoLists = TopTasksListView()
         header.addSubview(topToDoLists)
         topToDoLists.snp.makeConstraints { make in
             make.top.leading.trailing.equalToSuperview()
@@ -74,7 +81,10 @@ class ToDoViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        listsTableView.register(ToDoListCellTableViewCell.self, forCellReuseIdentifier: ToDoListCellTableViewCell.reuseID)
+        self.navigationItem.title = "列表"
+        self.navigationItem.titleView = UIView()
+        
+        listsTableView.register(TasksGroupTableViewCell.self, forCellReuseIdentifier: TasksGroupTableViewCell.reuseID)
         
         setUpSubView()
     }
