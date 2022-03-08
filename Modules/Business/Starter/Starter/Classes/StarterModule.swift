@@ -55,8 +55,7 @@ extension StarterModule {
         let home = UINavigationController(rootViewController: homeVC)
         home.tabBarItem = UITabBarItem(title: "home", image: nil, selectedImage: nil)
         
-        let testVC = UIViewController()
-        testVC.view.backgroundColor = .systemPink
+        let testVC = TestViewController()
         testVC.tabBarItem = UITabBarItem(title: "test", image: nil, selectedImage: nil)
         
         controllers.append(home)
@@ -65,4 +64,26 @@ extension StarterModule {
         tabBarController.viewControllers = controllers
     }
 
+}
+
+fileprivate class TestViewController: UIViewController {
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        view.backgroundColor = .systemBackground
+        
+        let button = UIButton(type: .system)
+        button.setTitle("登录", for: .normal)
+        button.frame = CGRect(x: 100, y: 100, width: 100, height: 40)
+        button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
+        view.addSubview(button)
+    }
+    
+    @objc
+    func buttonTapped() {
+        let accountService = PGProviderManager.shared.provider { AccountProvider.self }
+        accountService?.presentLoginViewController(from: self, animated: true)
+    }
+    
 }
