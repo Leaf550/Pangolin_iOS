@@ -10,7 +10,7 @@ import Provider
 
 class ToDoModule: PGModule {
     
-    public static var shared: PGModule = ToDoModule()           
+    public static var shared: PGModule = ToDoModule()
     
     func runModule() {
         PGProviderManager.shared.registerProvider({ ToDoProvider.self }, self)
@@ -25,7 +25,7 @@ class ToDoModule: PGModule {
 extension ToDoModule: ToDoProvider {
     
     func getToDoViewController() -> UIViewController {
-        ToDoViewController()
+        HomeViewController()
     }
     
 }

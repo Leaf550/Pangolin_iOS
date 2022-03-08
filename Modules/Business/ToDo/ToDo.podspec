@@ -14,7 +14,7 @@ TODO: Add long description of the pod here.
 
   s.ios.deployment_target = '13.0'
 
-  s.source_files = 'ToDo/Classes/**/*'
+  s.source_files = 'ToDo/Classes/**/*.swift'
   
   # s.resource_bundles = {
   #   'ToDo' => ['ToDo/Assets/*.png']
@@ -22,5 +22,10 @@ TODO: Add long description of the pod here.
   
   s.dependency 'PGFoundation'
   s.dependency 'Provider'
+  s.dependency 'UIComponents'
+  
+  s.dependency 'RxSwift'
+  s.dependency 'RxCocoa'
+  s.dependency 'RxDataSources'
   
 end

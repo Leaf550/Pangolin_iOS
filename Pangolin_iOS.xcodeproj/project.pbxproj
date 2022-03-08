@@ -17,8 +17,8 @@
 		1A7B4DF927CA30B400D3CCC9 /* Pangolin_iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Pangolin_iOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1A7B4E0527CA30B600D3CCC9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1A7B4E0827CA30B600D3CCC9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		1A7B4E0A27CA30B600D3CCC9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1A8EFBE927CA38EE007A7B28 /* Empty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Empty.swift; sourceTree = "<group>"; };
+		1A8EFC0C27CBD3BB007A7B28 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3FD22505A30DB4807D900B1A /* Pods-Pangolin_iOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Pangolin_iOS.debug.xcconfig"; path = "Target Support Files/Pods-Pangolin_iOS/Pods-Pangolin_iOS.debug.xcconfig"; sourceTree = "<group>"; };
 		546A49DDDC96C38A2935468C /* Pods-Pangolin_iOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Pangolin_iOS.release.xcconfig"; path = "Target Support Files/Pods-Pangolin_iOS/Pods-Pangolin_iOS.release.xcconfig"; sourceTree = "<group>"; };
 		A01CDCC6CECFBAD68F1FCB5D /* Pods_Pangolin_iOS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Pangolin_iOS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -59,7 +59,7 @@
 			children = (
 				1A7B4E0527CA30B600D3CCC9 /* Assets.xcassets */,
 				1A7B4E0727CA30B600D3CCC9 /* LaunchScreen.storyboard */,
-				1A7B4E0A27CA30B600D3CCC9 /* Info.plist */,
+				1A8EFC0C27CBD3BB007A7B28 /* Info.plist */,
 				1A8EFBE927CA38EE007A7B28 /* Empty.swift */,
 			);
 			path = Pangolin_iOS;

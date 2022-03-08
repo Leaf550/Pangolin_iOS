@@ -52,13 +52,14 @@ extension StarterModule {
         var controllers = [UIViewController]()
         
         let homeVC = toDoService.getToDoViewController()
-        homeVC.view.backgroundColor = .systemOrange
-        homeVC.tabBarItem = UITabBarItem(title: "home", image: nil, selectedImage: nil)
-        controllers.append(homeVC)
+        let home = UINavigationController(rootViewController: homeVC)
+        home.tabBarItem = UITabBarItem(title: "home", image: nil, selectedImage: nil)
         
         let testVC = UIViewController()
         testVC.view.backgroundColor = .systemPink
         testVC.tabBarItem = UITabBarItem(title: "test", image: nil, selectedImage: nil)
+        
+        controllers.append(home)
         controllers.append(testVC)
         
         tabBarController.viewControllers = controllers

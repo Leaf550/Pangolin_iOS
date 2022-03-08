@@ -8,8 +8,8 @@
 import UIKit
 
 public enum ColorName: String {
-    case backgroundColor        = "dddddd"
-    case textColor              = "333333"
+    case backgroundColor        = "#dddddd"
+    case textColor              = "#333333"
 }
 
 public extension UIColor {
