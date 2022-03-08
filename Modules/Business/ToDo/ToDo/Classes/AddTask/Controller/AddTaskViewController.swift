@@ -12,6 +12,8 @@ import RxCocoa
 
 class AddTaskViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
+    private var cellConfigureData = TaskConfigCellModel.defaultValue()
+    
     private let disposeBag = DisposeBag()
     
     private lazy var tableView: UITableView = {
@@ -76,8 +78,8 @@ extension AddTaskViewController {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         var cell: TaskConfigBaseTableViewCell?
-        let configData = TaskConfigCellModel.defaultValue()
-        switch configData[indexPath.section][indexPath.row].type {
+        
+        switch cellConfigureData[indexPath.section][indexPath.row].type {
             case .input:
                 cell = tableView.dequeueReusableCell(withIdentifier: TaskInputTableViewCell.reuseID, for: indexPath) as? TaskInputTableViewCell
             case .switch:
@@ -86,8 +88,8 @@ extension AddTaskViewController {
                 cell = tableView.dequeueReusableCell(withIdentifier: TaskArrowTableViewCell.reuseID, for: indexPath) as? TaskArrowTableViewCell
         }
         cell?.tableView = tableView
-        cell?.setIsSeparateLineHidden(indexPath.row == configData[indexPath.section].count - 1)
-        cell?.configCell(with: configData[indexPath.section][indexPath.row])
+        cell?.setIsSeparateLineHidden(indexPath.row == cellConfigureData[indexPath.section].count - 1)
+        cell?.configCell(with: cellConfigureData[indexPath.section][indexPath.row])
         
         return cell ?? UITableViewCell()
     }
@@ -95,6 +97,21 @@ extension AddTaskViewController {
 }
 
 extension AddTaskViewController {
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        switch cellConfigureData[indexPath.section][indexPath.row].type {
+            case .navigation:
+                let controller = ChooseGroupViewController()
+                controller.chooseCompleted = { [weak self] title, color in
+                    self?.cellConfigureData[indexPath.section][indexPath.row].currentValueLabelText = title
+                    self?.cellConfigureData[indexPath.section][indexPath.row].indicatorViewColor = TasksGroupIconColorImpl.plainColor(with: color)
+                    tableView.reloadData()
+                }
+                self.navigationController?.pushViewController(controller, animated: true)
+            default:
+                break
+        }
+    }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         UIView()
