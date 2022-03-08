@@ -1,5 +1,5 @@
 //
-//  ToDoListTableViewCell.swift
+//  TasksGroupTableViewCell.swift
 //  ToDo
 //
 //  Created by 方昱恒 on 2022/3/2.
@@ -8,9 +8,9 @@
 import UIKit
 import UIComponents
 
-class ToDoListTableViewCell: TableViewCell {
+class TasksGroupTableViewCell: TableViewCell {
     
-    static let reuseID = NSStringFromClass(ToDoListTableViewCell.self)
+    static let reuseID = NSStringFromClass(TasksGroupTableViewCell.self)
     
     var iconImage: UIImage = UIImage() {
         didSet {
@@ -18,7 +18,7 @@ class ToDoListTableViewCell: TableViewCell {
         }
     }
     
-    var iconColor: ToDoIconColor = .blue {
+    var iconColor: TasksGroupIconColor = .blue {
         didSet {
             icon.color = iconColor
         }
@@ -30,7 +30,7 @@ class ToDoListTableViewCell: TableViewCell {
         }
     }
     
-    lazy var icon = ToDoTinyIcon(image: iconImage, color: iconColor)
+    lazy var icon = TasksGroupTinyIcon(image: iconImage, color: iconColor)
     
     lazy var titleLabel: UILabel = {
         let label = UILabel()

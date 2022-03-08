@@ -11,9 +11,24 @@ import UIComponents
 import SnapKit
 import Util
 import Net
+import RxSwift
 import RxCocoa
 
-class LoginViewController: ViewController<LoginViewModel>, UITextFieldDelegate {
+class LoginViewController: UIViewController, ViewController, UITextFieldDelegate {
+    
+    typealias VM = LoginViewModel
+    
+    var viewModel: LoginViewModel
+    var disposeBag = DisposeBag()
+    
+    required init(viewModel: LoginViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     var loginCompletion: (Bool) -> Void = { _ in }
     
@@ -21,7 +36,7 @@ class LoginViewController: ViewController<LoginViewModel>, UITextFieldDelegate {
         let label = UILabel()
         label.text = "登录"
         label.textColor = .label
-        label.font = .textFont(for: .largeTitle, weight: .regular)
+        label.font = .textFont(for: .largeTitle, weight: .medium)
         
         return label
     }()
@@ -104,7 +119,7 @@ class LoginViewController: ViewController<LoginViewModel>, UITextFieldDelegate {
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        self.view.endEditing(true)
+        view.endEditing(true)
     }
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
@@ -119,9 +134,7 @@ class LoginViewController: ViewController<LoginViewModel>, UITextFieldDelegate {
         return true
     }
     
-    override func bindViewModel() {
-        guard let viewModel = viewModel else { return }
-        
+    func bindViewModel() {
         usernameTextField.rx.text.orEmpty
             .bind(to: viewModel.input.username)
             .disposed(by: disposeBag)
@@ -173,6 +186,8 @@ class LoginViewController: ViewController<LoginViewModel>, UITextFieldDelegate {
     }
     
     private func setUpSubviews() {
+        view.backgroundColor = .systemBackground
+        
         view.addSubview(loginTitleLabel)
         view.addSubview(usernameTextField)
         view.addSubview(passwordTextField)

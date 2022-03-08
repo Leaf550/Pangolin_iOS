@@ -1,5 +1,5 @@
 //
-//  ToDoModel.swift
+//  TaskModel.swift
 //  ToDo
 //
 //  Created by 方昱恒 on 2022/3/4.
@@ -8,12 +8,12 @@
 import PGFoundation
 import RxDataSources
 
-struct ToDoModel: Model {
+struct TaskModel: Model {
     var isSelected: Bool
     var text: String
 }
 
-extension ToDoModel: IdentifiableType, Equatable {
+extension TaskModel: IdentifiableType, Equatable {
     
     typealias Identity = String
     
@@ -27,16 +27,16 @@ extension ToDoModel: IdentifiableType, Equatable {
     
 }
 
-struct ToDoListSection {
+struct TasksListSection {
     var header: String
-    var items: [ToDoModel]
+    var items: [TaskModel]
 }
 
-extension ToDoListSection: AnimatableSectionModelType {
+extension TasksListSection: AnimatableSectionModelType {
     
     typealias Identity = String
     
-    init(original: ToDoListSection, items: [ToDoModel]) {
+    init(original: TasksListSection, items: [TaskModel]) {
         self = original
         self.items = items
     }

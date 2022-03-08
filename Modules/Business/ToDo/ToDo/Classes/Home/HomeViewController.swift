@@ -1,5 +1,5 @@
 //
-//  ToDoViewController.swift
+//  HomeViewController.swift
 //  ToDo
 //
 //  Created by 方昱恒 on 2022/2/27.
@@ -12,7 +12,7 @@ import Util
 import RxSwift
 import RxCocoa
 
-class ToDoViewController: UIViewController {
+class HomeViewController: UIViewController {
     
     private var numberOfRows = 20
     
@@ -27,7 +27,7 @@ class ToDoViewController: UIViewController {
         table.rowHeight = 54
         
         listData
-            .bind(to: table.rx.items(cellIdentifier: ToDoListTableViewCell.reuseID, cellType: ToDoListTableViewCell.self)) { [weak self] row, data, cell in
+            .bind(to: table.rx.items(cellIdentifier: TasksGroupTableViewCell.reuseID, cellType: TasksGroupTableViewCell.self)) { [weak self] row, data, cell in
                 guard let self = self else { return }
                 cell.titleLabel.text = String(row)
                 cell.numberLabel.text = "0"
@@ -37,7 +37,7 @@ class ToDoViewController: UIViewController {
             .disposed(by: disposeBag)
         
         table.rx.itemSelected.bind { [weak self] indexPath in
-            let todoListController = ToDoListViewController(titleColor: .blue)
+            let todoListController = TasksListViewController(titleColor: .blue)
             todoListController.title = String(indexPath.row)
             todoListController.hidesBottomBarWhenPushed = true
             self?.navigationController?.pushViewController(todoListController, animated: true)
@@ -62,7 +62,7 @@ class ToDoViewController: UIViewController {
     
     private lazy var tableHeaderView: UIView = {
         let header = UIView()
-        let topToDoLists = TopToDoListView()
+        let topToDoLists = TopTasksListView()
         header.addSubview(topToDoLists)
         topToDoLists.snp.makeConstraints { make in
             make.top.leading.trailing.equalToSuperview()
@@ -84,7 +84,7 @@ class ToDoViewController: UIViewController {
         self.navigationItem.title = "列表"
         self.navigationItem.titleView = UIView()
         
-        listsTableView.register(ToDoListTableViewCell.self, forCellReuseIdentifier: ToDoListTableViewCell.reuseID)
+        listsTableView.register(TasksGroupTableViewCell.self, forCellReuseIdentifier: TasksGroupTableViewCell.reuseID)
         
         setUpSubView()
     }

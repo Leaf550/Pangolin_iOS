@@ -8,8 +8,24 @@
 import UIKit
 import PGFoundation
 import UIComponents
+import RxSwift
 
-class SignUpViewController: ViewController<SignUpViewModel>, UITextFieldDelegate {
+class SignUpViewController: UIViewController, ViewController, UITextFieldDelegate {
+    
+    typealias VM = SignUpViewModel
+    
+    var viewModel: SignUpViewModel
+    
+    var disposeBag = DisposeBag()
+    
+    required init(viewModel: SignUpViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     /**
      闭包参数：是否注册完成
@@ -20,7 +36,7 @@ class SignUpViewController: ViewController<SignUpViewModel>, UITextFieldDelegate
         let label = UILabel()
         label.text = "注册"
         label.textColor = .label
-        label.font = .textFont(for: .largeTitle, weight: .regular)
+        label.font = .textFont(for: .largeTitle, weight: .medium)
         
         return label
     }()
@@ -111,6 +127,8 @@ class SignUpViewController: ViewController<SignUpViewModel>, UITextFieldDelegate
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        bindViewModel()
+        
         setUpSubviews()
     }
     
@@ -118,9 +136,7 @@ class SignUpViewController: ViewController<SignUpViewModel>, UITextFieldDelegate
         view.endEditing(true)
     }
     
-    override func bindViewModel() {
-        guard let viewModel = viewModel else { return }
-        
+    func bindViewModel() {
         usernameTextField.rx.text.orEmpty
             .bind(to: viewModel.input.username)
             .disposed(by: disposeBag)
@@ -211,6 +227,8 @@ class SignUpViewController: ViewController<SignUpViewModel>, UITextFieldDelegate
 // MARK: - UI Layout
 extension SignUpViewController {
     private func setUpSubviews() {
+        view.backgroundColor = .systemBackground
+        
         view.addSubview(signUpTitleLabel)
         view.addSubview(usernameTextField)
         view.addSubview(usernameWariningLabel)

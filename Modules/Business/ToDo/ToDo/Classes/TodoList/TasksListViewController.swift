@@ -1,5 +1,5 @@
 //
-//  ToDoListViewController.swift
+//  TasksListViewController.swift
 //  ToDo
 //
 //  Created by 方昱恒 on 2022/3/3.
@@ -12,24 +12,24 @@ import RxCocoa
 import SnapKit
 import RxDataSources
 
-class ToDoListViewController: UIViewController {
+class TasksListViewController: UIViewController, UITableViewDelegate {
     
-    var titleColor: ToDoIconColor
+    var titleColor: TasksGroupIconColor
     
     private var datasList = [
-        ToDoListSection(header: "", items: [
-            ToDoModel(isSelected: false, text: "1"),
-            ToDoModel(isSelected: false, text: "2"),
-            ToDoModel(isSelected: false, text: "3"),
-            ToDoModel(isSelected: false, text: "4"),
-            ToDoModel(isSelected: false, text: "5"),
-            ToDoModel(isSelected: false, text: "6"),
-            ToDoModel(isSelected: false, text: "7"),
-            ToDoModel(isSelected: false, text: "8")
+        TasksListSection(header: "", items: [
+            TaskModel(isSelected: false, text: "1"),
+            TaskModel(isSelected: false, text: "2"),
+            TaskModel(isSelected: false, text: "3"),
+            TaskModel(isSelected: false, text: "4"),
+            TaskModel(isSelected: false, text: "5"),
+            TaskModel(isSelected: false, text: "6"),
+            TaskModel(isSelected: false, text: "7"),
+            TaskModel(isSelected: false, text: "8")
         ])
     ]
     
-    lazy var sections = BehaviorSubject<[ToDoListSection]>(value: datasList)
+    lazy var sections = BehaviorSubject<[TasksListSection]>(value: datasList)
     
     private let disposeBag = DisposeBag()
     
@@ -38,11 +38,12 @@ class ToDoListViewController: UIViewController {
         table.backgroundColor = .clear
         table.separatorStyle = .none
         table.sectionStyle = .squareCorner
+        table.delegate = self
         
-        let datasource = RxTableViewSectionedAnimatedDataSource<ToDoListSection>(
+        let datasource = RxTableViewSectionedAnimatedDataSource<TasksListSection>(
             configureCell: { [weak self] _, tableView, indexPath, item in
                 guard let self = self else { return UITableViewCell() }
-                let cell = tableView.dequeueReusableCell(withIdentifier: ToDoTableViewCell.reuseID, for: indexPath) as? ToDoTableViewCell
+                let cell = tableView.dequeueReusableCell(withIdentifier: TaskTableViewCell.reuseID, for: indexPath) as? TaskTableViewCell
                 cell?.tableView = tableView
                 cell?.todoTextView.text = item.text
                 cell?.checkBox.setSelect(item.isSelected)
@@ -57,7 +58,7 @@ class ToDoListViewController: UIViewController {
                         var removed = self.datasList[indexPath.section].items.remove(at: index)
                         removed.isSelected = selected
                         self.datasList[indexPath.section].items.append(removed)
-                        self.datasList[indexPath.section] = ToDoListSection(
+                        self.datasList[indexPath.section] = TasksListSection(
                             original: self.datasList[indexPath.section],
                             items: self.datasList[indexPath.section].items
                         )
@@ -79,7 +80,7 @@ class ToDoListViewController: UIViewController {
         return table
     }()
     
-    init(titleColor: ToDoIconColor) {
+    init(titleColor: TasksGroupIconColor) {
         self.titleColor = titleColor
         super.init(nibName: nil, bundle: nil)
     }
@@ -91,7 +92,7 @@ class ToDoListViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        todoTable.register(ToDoTableViewCell.self, forCellReuseIdentifier: ToDoTableViewCell.reuseID)
+        todoTable.register(TaskTableViewCell.self, forCellReuseIdentifier: TaskTableViewCell.reuseID)
         
         setUpSubviews()
     }
@@ -99,7 +100,7 @@ class ToDoListViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.navigationBar.prefersLargeTitles = true
-        navigationController?.navigationBar.largeTitleTextAttributes = [.foregroundColor : ToDoIconColorImpl.plainColor(with: titleColor)]
+        navigationController?.navigationBar.largeTitleTextAttributes = [.foregroundColor : TasksGroupIconColorImpl.plainColor(with: titleColor)]
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -114,6 +115,25 @@ class ToDoListViewController: UIViewController {
         todoTable.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+        
+        let buttonItem = UIBarButtonItem(title: "新建", style: .plain, target: self, action: #selector(addToDo))
+        navigationItem.rightBarButtonItem = buttonItem
     }
     
+    @objc
+    func addToDo() {
+        let newTaskController = AddTaskViewController()
+        let navController = UINavigationController(rootViewController: newTaskController)
+        present(navController, animated: true, completion: nil)
+    }
+    
+}
+
+extension TasksListViewController {
+//    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+//        let label = UILabel()
+//        label.text = "test"
+//        label.backgroundColor = .red
+//        return label
+//    }
 }

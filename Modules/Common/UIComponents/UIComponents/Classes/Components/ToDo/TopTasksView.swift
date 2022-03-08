@@ -1,5 +1,5 @@
 //
-//  ToDoBlock.swift
+//  TopTasksView.swift
 //  UIComponents
 //
 //  Created by 方昱恒 on 2022/3/2.
@@ -8,9 +8,9 @@
 import UIKit
 import SnapKit
 
-public class TopTodoView: UIView {
+public class TopTasksView: UIView {
 
-    private var icon: ToDoTinyIcon
+    private var icon: TasksGroupTinyIcon
     private var name: String
     private var number: Int
     
@@ -32,7 +32,7 @@ public class TopTodoView: UIView {
         return label
     }()
     
-    public init(icon: ToDoTinyIcon, name: String, number: Int) {
+    public init(icon: TasksGroupTinyIcon, name: String, number: Int) {
         self.icon = icon
         self.name = name
         self.number = number

@@ -1,5 +1,5 @@
 //
-//  ToDoTinyIcon.swift
+//  TasksGroupTinyIcon.swift
 //  UIComponents
 //
 //  Created by 方昱恒 on 2022/3/1.
@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-public class ToDoTinyIcon: UIView {
+public class TasksGroupTinyIcon: UIView {
     
     public var image: UIImage {
         didSet {
@@ -16,9 +16,9 @@ public class ToDoTinyIcon: UIView {
         }
     }
     
-    public var color: ToDoIconColor {
+    public var color: TasksGroupIconColor {
         didSet {
-            self.backgroundColor = ToDoIconColorImpl.plainColor(with: color)
+            self.backgroundColor = TasksGroupIconColorImpl.plainColor(with: color)
         }
     }
 
@@ -30,11 +30,11 @@ public class ToDoTinyIcon: UIView {
         return imageView
     }()
     
-    public init(image: UIImage, color: ToDoIconColor) {
+    public init(image: UIImage, color: TasksGroupIconColor) {
         self.image = image
         self.color = color
         super.init(frame: .zero)
-        self.backgroundColor = ToDoIconColorImpl.plainColor(with: color)
+        self.backgroundColor = TasksGroupIconColorImpl.plainColor(with: color)
         self.layer.cornerRadius = 16
         
         addSubview(imageView)

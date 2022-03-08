@@ -1,5 +1,5 @@
 //
-//  ToDoTableViewCell.swift
+//  TaskTableViewCell.swift
 //  ToDo
 //
 //  Created by 方昱恒 on 2022/3/3.
@@ -11,9 +11,9 @@ import SnapKit
 import RxSwift
 import RxCocoa
 
-class ToDoTableViewCell: TableViewCell {
+class TaskTableViewCell: TableViewCell {
     
-    static var reuseID: String = NSStringFromClass(ToDoTableViewCell.self)
+    static var reuseID: String = NSStringFromClass(TaskTableViewCell.self)
     
     var tableView: UITableView?
     
