@@ -34,7 +34,7 @@ class AddTaskViewController: UIViewController, UITableViewDataSource, UITableVie
         
         tableView.register(TaskInputTableViewCell.self, forCellReuseIdentifier: TaskInputTableViewCell.reuseID)
         tableView.register(TaskSwitchTableViewCell.self, forCellReuseIdentifier: TaskSwitchTableViewCell.reuseID)
-        tableView.register(TaskArrowTableViewCell.self, forCellReuseIdentifier: TaskArrowTableViewCell.reuseID)
+        tableView.register(TaskNavigationTableViewCell.self, forCellReuseIdentifier: TaskNavigationTableViewCell.reuseID)
         
         configNavigationItem()
         setUpSubViews()
@@ -85,7 +85,7 @@ extension AddTaskViewController {
             case .switch:
                 cell = tableView.dequeueReusableCell(withIdentifier: TaskSwitchTableViewCell.reuseID, for: indexPath) as? TaskSwitchTableViewCell
             case .navigation:
-                cell = tableView.dequeueReusableCell(withIdentifier: TaskArrowTableViewCell.reuseID, for: indexPath) as? TaskArrowTableViewCell
+                cell = tableView.dequeueReusableCell(withIdentifier: TaskNavigationTableViewCell.reuseID, for: indexPath) as? TaskNavigationTableViewCell
         }
         cell?.tableView = tableView
         cell?.setIsSeparateLineHidden(indexPath.row == cellConfigureData[indexPath.section].count - 1)

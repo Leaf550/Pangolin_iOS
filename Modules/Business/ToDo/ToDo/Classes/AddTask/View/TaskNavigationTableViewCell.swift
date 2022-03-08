@@ -1,5 +1,5 @@
 //
-//  TaskArrowTableViewCell.swift
+//  TaskNavigationTableViewCell.swift
 //  ToDo
 //
 //  Created by 方昱恒 on 2022/3/8.
@@ -8,9 +8,9 @@
 import UIKit
 import UIComponents
 
-class TaskArrowTableViewCell: TaskConfigBaseTableViewCell {
+class TaskNavigationTableViewCell: TaskConfigBaseTableViewCell {
     
-    static var reuseID: String = NSStringFromClass(TaskArrowTableViewCell.self)
+    static var reuseID: String = NSStringFromClass(TaskNavigationTableViewCell.self)
     
     override func setUpSubViews() {
         titleLabel = UILabel()
