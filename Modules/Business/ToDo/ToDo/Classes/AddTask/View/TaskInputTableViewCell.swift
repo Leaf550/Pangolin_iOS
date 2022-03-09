@@ -34,6 +34,29 @@ class TaskInputTableViewCell: TaskConfigBaseTableViewCell {
             self?.tableView?.beginUpdates()
             self?.tableView?.endUpdates()
         }.disposed(by: disposeBag)
+        
+        if let input = textView {
+            contentView.addSubview(input)
+        }
+        
+        textView?.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(16)
+            make.trailing.equalToSuperview().offset(-16)
+            make.top.equalToSuperview().offset(10)
+            make.bottom.equalToSuperview().offset(-10)
+            make.height.equalTo(38)
+        }
+        
+        contentView.addSubview(separateLine)
+        separateLine.snp.makeConstraints { make in
+            if let textView = textView {
+                make.leading.equalTo(textView)
+            } else {
+                make.leading.equalToSuperview().offset(16)
+            }
+            make.bottom.trailing.equalToSuperview()
+            make.height.equalTo(0.5)
+        }
     }
     
 }
