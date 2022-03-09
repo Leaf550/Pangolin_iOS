@@ -25,8 +25,6 @@ class TaskNavigationTableViewCell: TaskConfigBaseTableViewCell {
         
         arrowImageView = UIImageView()
         arrowImageView?.image = UIImage(named: "arrow_right")
-        
-        super.setUpSubViews()
     }
     
 }

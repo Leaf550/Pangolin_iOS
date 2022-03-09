@@ -44,7 +44,7 @@ class AddTaskViewController: UIViewController, UITableViewDataSource, UITableVie
         let leftButton = UIBarButtonItem(title: "取消", style: .plain, target: self, action: #selector(cancelAddition))
         self.navigationItem.leftBarButtonItem = leftButton
         
-        let rightButton = UIBarButtonItem(title: "完成", style: .done              , target: self, action: #selector(completeAddition))
+        let rightButton = UIBarButtonItem(title: "完成", style: .done, target: self, action: #selector(completeAddition))
         self.navigationItem.rightBarButtonItem = rightButton
     }
     

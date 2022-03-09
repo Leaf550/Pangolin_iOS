@@ -21,8 +21,6 @@ class TaskSwitchTableViewCell: TaskConfigBaseTableViewCell {
         titleLabel?.font = .textFont(for: .body, weight: .regular)
         
         `switch` = UISwitch()
-        
-        super.setUpSubViews()
     }
     
 }

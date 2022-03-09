@@ -84,6 +84,9 @@ class HomeViewController: UIViewController {
         self.navigationItem.title = "列表"
         self.navigationItem.titleView = UIView()
         
+        let rightItem = UIBarButtonItem(image: UIImage(named: "plus"), style: .plain, target: self, action: #selector(addButtonTapped))
+        navigationItem.rightBarButtonItem = rightItem
+        
         listsTableView.register(TasksGroupTableViewCell.self, forCellReuseIdentifier: TasksGroupTableViewCell.reuseID)
         
         setUpSubView()
@@ -97,6 +100,14 @@ class HomeViewController: UIViewController {
             make.top.equalToSuperview().offset(Screen.statusBarHeight)
             make.leading.trailing.bottom.equalToSuperview()
         }
+    }
+    
+    
+    @objc
+    private func addButtonTapped() {
+        let addGroupController = AddGroupViewController()
+        let navController = UINavigationController(rootViewController: addGroupController)
+        present(navController, animated: true, completion: nil)
     }
 
 }

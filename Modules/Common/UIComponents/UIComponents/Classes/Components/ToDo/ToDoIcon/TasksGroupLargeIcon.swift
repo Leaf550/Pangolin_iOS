@@ -9,30 +9,44 @@ import UIKit
 import SnapKit
 
 public class TasksGroupLargeIcon: UIView {
+    
+    public var color: TasksGroupIconColor {
+        didSet {
+            gradientLayer.colors = TasksGroupIconColorImpl.gradient(with: color)
+        }
+    }
 
-    private var image: UIImage
+    public var image: UIImage {
+        didSet {
+            imageView.image = image
+        }
+    }
     
     private lazy var imageView: UIImageView = {
         let imageView = UIImageView()
-        self.image.withTintColor(.white, renderingMode: .alwaysTemplate)
-        imageView.image = self.image
+        imageView.tintColor = .white
+        imageView.image = image
         
         return imageView
     }()
     
-    public init(image: UIImage, backgroundColor: TasksGroupIconColor) {
-        self.image = image
-        super.init(frame: .zero)
-        
-        self.layer.cornerRadius = 48
-        
+    private lazy var gradientLayer: CAGradientLayer = {
         let gradient = CAGradientLayer()
-        gradient.colors = TasksGroupIconColorImpl.gradient(with: backgroundColor)
+        gradient.colors = TasksGroupIconColorImpl.gradient(with: color)
         gradient.startPoint = CGPoint(x: 0, y: 0)
         gradient.endPoint = CGPoint(x: 0, y: 1)
         gradient.frame = CGRect(x: 0, y: 0, width: 96, height: 96)
         gradient.cornerRadius = 48
-        self.layer.addSublayer(gradient)
+        return gradient
+    }()
+    
+    public init(image: UIImage, backgroundColor: TasksGroupIconColor) {
+        self.image = image
+        self.color = backgroundColor
+        super.init(frame: .zero)
+        
+        layer.cornerRadius = 48
+        layer.addSublayer(gradientLayer)
         
         addSubview(imageView)
         imageView.snp.makeConstraints { make in

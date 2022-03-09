@@ -34,8 +34,6 @@ class TaskInputTableViewCell: TaskConfigBaseTableViewCell {
             self?.tableView?.beginUpdates()
             self?.tableView?.endUpdates()
         }.disposed(by: disposeBag)
-        
-        super.setUpSubViews()
     }
     
 }

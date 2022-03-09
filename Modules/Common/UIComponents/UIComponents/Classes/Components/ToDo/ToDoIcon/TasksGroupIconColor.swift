@@ -7,15 +7,15 @@
 
 import UIKit
 
-public enum TasksGroupIconColor {
-    case red
-    case orange
-    case yellow
-    case green
-    case cyan
-    case blue
-    case purple
-    case gray
+public enum TasksGroupIconColor: Int {
+    case red        = 0
+    case orange     = 1
+    case yellow     = 2
+    case green      = 3
+//    case cyan       = 4
+    case blue       = 4
+    case purple     = 5
+    case gray       = 6
 }
 
 public class TasksGroupIconColorImpl {
@@ -30,8 +30,8 @@ public class TasksGroupIconColorImpl {
                 return UIColor(hexString: "#f7cd15")
             case .green:
                 return UIColor(hexString: "#00c660")
-            case .cyan:
-                return UIColor(hexString: "#67a8eb")
+//            case .cyan:
+//                return UIColor(hexString: "#67a8eb")
             case .blue:
                 return UIColor(hexString: "#127aff")
             case .purple:
@@ -51,8 +51,8 @@ public class TasksGroupIconColorImpl {
                 return [UIColor(hexString: "#fff45d").cgColor, UIColor(hexString: "#f8cd4b").cgColor]
             case .green:
                 return [UIColor(hexString: "#7bea8c").cgColor, UIColor(hexString: "#61c46a").cgColor]
-            case .cyan:
-                return [UIColor(hexString: "#8ed0ff").cgColor, UIColor(hexString: "#68a9ed").cgColor]
+//            case .cyan:
+//                return [UIColor(hexString: "#8ed0ff").cgColor, UIColor(hexString: "#68a9ed").cgColor]
             case .blue:
                 return [UIColor(hexString: "#4fa0ff").cgColor, UIColor(hexString: "#317bf7").cgColor]
             case .purple:

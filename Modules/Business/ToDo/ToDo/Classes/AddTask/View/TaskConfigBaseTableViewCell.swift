@@ -33,7 +33,7 @@ class TaskConfigBaseTableViewCell: TableViewCell {
         self.style = .fillEnds
         contentView.backgroundColor = .secondarySystemGroupedBackground
         
-        setUpSubViews()
+        addSubViewsConstraints()
     }
     
     required init?(coder: NSCoder) {
@@ -45,10 +45,12 @@ class TaskConfigBaseTableViewCell: TableViewCell {
     }
     
     func setUpSubViews() {
-        addSubViewsConstraints()
+        fatalError("setUpSubViews() has not been implemented")
     }
     
     private func addSubViewsConstraints() {
+        setUpSubViews()
+        
         if let input = textView {
             contentView.addSubview(input)
         }
