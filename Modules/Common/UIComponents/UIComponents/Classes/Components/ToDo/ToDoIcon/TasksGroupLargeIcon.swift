@@ -13,6 +13,7 @@ public class TasksGroupLargeIcon: UIView {
     public var color: TasksGroupIconColor {
         didSet {
             gradientLayer.colors = TasksGroupIconColorImpl.gradient(with: color)
+            layer.shadowColor = TasksGroupIconColorImpl.gradient(with: color).first
         }
     }
 
@@ -54,6 +55,11 @@ public class TasksGroupLargeIcon: UIView {
             make.bottom.trailing.equalToSuperview().offset(-20)
             make.height.width.equalTo(56)
         }
+        
+        layer.shadowOffset = .zero
+        layer.shadowRadius = 30
+        layer.shadowOpacity = 0.3
+        layer.shadowColor = TasksGroupIconColorImpl.gradient(with: color).first
     }
     
     required init?(coder: NSCoder) {
