@@ -13,6 +13,7 @@ def developmentPods
   pod 'Net', :path => 'Modules/Common/Net'
   pod 'UIComponents', :path => 'Modules/Common/UIComponents'
   pod 'Account', :path => 'Modules/Common/Account'
+  pod 'KV', :path => 'Modules/Common/KV'
   
   # business
   pod 'Starter', :path => 'Modules/Business/Starter'
@@ -28,7 +29,7 @@ def thirdPartPods
   pod 'RxCocoa', '6.2.0',     :inhibit_warnings => true
   pod 'RxDataSources', '5.0', :inhibit_warnings => true
   pod 'Toast-Swift', '5.0.1', :inhibit_warnings => true
-  # pod 'MMKV', '1.2.11', :inhibit_warnings => true
+  pod 'MMKV', '1.2.11', :inhibit_warnings => true
 end
 
 target 'Pangolin_iOS' do

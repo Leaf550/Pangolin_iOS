@@ -23,6 +23,7 @@ TODO: Add long description of the pod here.
   s.dependency 'PGFoundation'
   s.dependency 'Provider'
   s.dependency 'UIComponents'
+  s.dependency 'Net'
   
   s.dependency 'RxSwift'
   s.dependency 'RxCocoa'

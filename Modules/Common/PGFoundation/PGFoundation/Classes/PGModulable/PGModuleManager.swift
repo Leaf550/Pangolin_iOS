@@ -10,9 +10,10 @@ public class PGModuleManager {
     public static let shared = PGModuleManager()
     
     private var moduleNames: [String] = [
-        "ToDo.ToDoModule",
         "Starter.StarterModule",
+        "KV.KVModule",
         "Account.AccountModule",
+        "ToDo.ToDoModule",
     ]
     
     private var modules = [PGModule]()

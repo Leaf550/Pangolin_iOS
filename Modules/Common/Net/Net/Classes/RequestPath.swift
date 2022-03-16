@@ -16,4 +16,6 @@ public enum RequestPath: String {
     case signOut   = "/signOut"
     // 注册
     case signUp    = "/signUp"
+    // home页
+    case home      = "/home"
 }

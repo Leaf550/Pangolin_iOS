@@ -16,8 +16,6 @@ public protocol ViewController {
     var viewModel: VM { get set }
     var disposeBag: DisposeBag { get set }
     
-    init(viewModel: VM)
-    
     func bindViewModel()
     
 }

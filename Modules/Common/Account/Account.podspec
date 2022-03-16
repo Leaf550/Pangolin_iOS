@@ -25,10 +25,10 @@ TODO: Add long description of the pod here.
   s.dependency 'UIComponents'
   s.dependency 'Util'
   s.dependency 'Net'
+  s.dependency 'KV'
   
   s.dependency 'SnapKit'
   s.dependency 'RxSwift'
   s.dependency 'RxCocoa'
-  s.dependency 'Toast-Swift'
   
 end

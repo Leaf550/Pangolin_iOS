@@ -7,13 +7,16 @@
 
 import Foundation
 import Alamofire
+import Provider
 
 public class Net {
     
     private var host: String = "http://127.0.0.1:8080"
     private var path: RequestPath = .root
     private var url: String { host + path.rawValue }
-    private var header: [String : String]? = nil
+    private var header: [String : String]? = [
+        "Authorization" : PGProviderManager.shared.provider { AccountProvider.self }?.getToken() ?? ""
+    ]
     private var body: [String : String]? = nil
     private var interceptor: RequestInterceptor? = nil
     private var request: DataRequest?
@@ -28,7 +31,9 @@ public class Net {
     }
     
     public func configHeader(_ header: [String : String]) -> Self {
-        self.header = header
+        for (key, value) in header {
+            self.header?[key] = value
+        }
         return self
     }
     

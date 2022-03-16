@@ -7,6 +7,7 @@
 
 import PGFoundation
 import Provider
+import KV
 
 class AccountModule: PGModule {
     
@@ -18,6 +19,15 @@ class AccountModule: PGModule {
 
     deinit {
         PGProviderManager.shared.deregisterProvider({ AccountProvider.self })
+    }
+    
+    func applicationWillFinishLaunching() {
+        if let token = KV().string(forKey: UserManager.shared.tokenMMKVKey) {
+            UserManager.shared.token = token
+        }
+        if let user = KV().object(UserImpl.self, forKey: UserManager.shared.userMMKVKey) {
+            UserManager.shared.user = user
+        }
     }
     
 }
@@ -34,5 +44,14 @@ extension AccountModule: AccountProvider {
                            animated: animated,
                            completion: presentCompletion)
     }
+    
+    func getToken() -> String? {
+        UserManager.shared.getToken()
+    }
+    
+    func getUser() -> User? {
+        UserManager.shared.getUser()
+    }
+    
     
 }

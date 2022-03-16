@@ -172,7 +172,7 @@ class LoginViewController: UIViewController, ViewController, UITextFieldDelegate
                 
                 UserManager.shared.login(withToken: token) { user, message in
                     guard user != nil else {
-                        // token无法解析
+                        // token无法解析、mmkv存储失败
                         Toast.show(text: message ?? "")
                         return
                     }

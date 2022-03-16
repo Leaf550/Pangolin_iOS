@@ -12,7 +12,11 @@ public class TopTasksView: UIView {
 
     private var icon: TasksGroupTinyIcon
     private var name: String
-    private var number: Int
+    private var number: Int {
+        didSet {
+            numberLabel.text = String(number)
+        }
+    }
     
     private lazy var nameLabel: UILabel = {
         let label = UILabel()
@@ -31,6 +35,10 @@ public class TopTasksView: UIView {
         
         return label
     }()
+    
+    public func setNumber(number: Int) {
+        self.number = number
+    }
     
     public init(icon: TasksGroupTinyIcon, name: String, number: Int) {
         self.icon = icon

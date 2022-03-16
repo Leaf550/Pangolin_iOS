@@ -6,29 +6,35 @@
 //
 
 import Util
+import KV
 
-public class UserManager {
+class UserManager {
     
-    public static let shared = UserManager()
+    static let shared = UserManager()
+        
+    func getToken() -> String? { token }
     
-    private var token: String?
+    func getUser() -> UserImpl? { user }
     
-    public var user: User?
-    
-    public func getToken() -> String? { token }
-    
-    public var isLogined: Bool {
+    var isLogined: Bool {
         user != nil && !isLoginExpiration
     }
     
-    public var isLoginExpiration: Bool {
+    var isLoginExpiration: Bool {
         guard let user = user else { return true }
         let exp = user.exp ?? 0
         let timestamp = Date().timeIntervalSince1970
         return timestamp > Double(exp)
     }
     
-    func login(withToken token: String, completion: (User?, String?) -> Void) {
+    var token: String?
+    var user: UserImpl?
+    
+    private var kv = KV(field: .account)
+    let userMMKVKey = "userMMKVKey"
+    let tokenMMKVKey = "tokenMMKVKey"
+    
+    func login(withToken token: String, completion: (UserImpl?, String?) -> Void) {
         guard !isLogined else {
             completion(nil, "已经登录过了")
             return
@@ -37,7 +43,12 @@ public class UserManager {
             if let user = user {
                 self?.token = token
                 self?.user = user
-                completion(user, nil)
+                if kv.set(user, forKey: userMMKVKey)
+                    && kv.set(token, forKey: tokenMMKVKey) {
+                    completion(user, nil)
+                } else {
+                    completion(nil, "用户数据存储失败")
+                }
             }
             if let message = message {
                 completion(nil, message)
@@ -50,7 +61,7 @@ public class UserManager {
         self.user = nil
     }
     
-    private func parseToken(_ token: String, completion: (User?, String?) -> Void) {
+    private func parseToken(_ token: String, completion: (UserImpl?, String?) -> Void) {
         let seq = token.split(separator: Character("."))
         if seq.count < 3 {
             completion(nil, "bad token")
@@ -65,7 +76,7 @@ public class UserManager {
             completion(nil, "bad token")
             return
         }
-        guard let user = try? JSONDecoder().decode(User.self, from: data) else {
+        guard let user = try? JSONDecoder().decode(UserImpl.self, from: data) else {
             completion(nil, "bad token")
             return
         }

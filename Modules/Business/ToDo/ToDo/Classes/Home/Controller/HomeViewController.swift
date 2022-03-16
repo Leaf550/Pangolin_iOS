@@ -6,19 +6,22 @@
 //
 
 import UIKit
+import PGFoundation
 import UIComponents
 import SnapKit
 import Util
 import RxSwift
 import RxCocoa
 
-class HomeViewController: UIViewController {
+class HomeViewController: UIViewController, ViewController {
     
-    private var numberOfRows = 20
+    typealias VM = HomeViewModel
     
-    private var listData = BehaviorSubject<[Int]>(value: [Int](repeating: 0, count: 20))
+    var viewModel: HomeViewModel = HomeViewModel()
     
-    private let disposeBag = DisposeBag()
+    private var homeModel = BehaviorRelay<HomeModel?>(value: nil)
+    
+    var disposeBag = DisposeBag()
     
     private lazy var listsTableView: TableView = {
         let table = TableView(frame: .zero, style: .grouped)
@@ -26,13 +29,15 @@ class HomeViewController: UIViewController {
         table.separatorStyle = .none
         table.rowHeight = 54
         
-        listData
+        homeModel
+            .map { $0?.data?.taskLists ?? [] }
             .bind(to: table.rx.items(cellIdentifier: TasksGroupTableViewCell.reuseID, cellType: TasksGroupTableViewCell.self)) { [weak self] row, data, cell in
                 guard let self = self else { return }
-                cell.titleLabel.text = String(row)
-                cell.numberLabel.text = "0"
-                cell.iconColor = .blue
-                cell.hasSeparateLine = (row != self.numberOfRows - 1)
+                cell.titleLabel.text = data.listName
+                cell.numberLabel.text = String(data.taskCount ?? 0)
+                cell.iconColor = TasksGroupIconColor(rawValue: data.listColor ?? 0) ?? .blue
+                let numberOfRows = table.numberOfRows(inSection: 0)
+                cell.hasSeparateLine = (row != numberOfRows - 1)
             }
             .disposed(by: disposeBag)
         
@@ -60,9 +65,11 @@ class HomeViewController: UIViewController {
         return label
     }()
     
+    private var topToDoLists = TopTasksListView()
+    
     private lazy var tableHeaderView: UIView = {
         let header = UIView()
-        let topToDoLists = TopTasksListView()
+        
         header.addSubview(topToDoLists)
         topToDoLists.snp.makeConstraints { make in
             make.top.leading.trailing.equalToSuperview()
@@ -90,6 +97,29 @@ class HomeViewController: UIViewController {
         listsTableView.register(TasksGroupTableViewCell.self, forCellReuseIdentifier: TasksGroupTableViewCell.reuseID)
         
         setUpSubView()
+        bindViewModel()
+    }
+    
+    func bindViewModel() {
+        rx.methodInvoked(#selector(viewDidAppear(_:)))
+            .map { _ in Void() }
+            .bind(to: viewModel.input.onHomeRefresh)
+            .disposed(by: disposeBag)
+        
+        let output = viewModel.transformToOutput()
+        
+        output.homeModel
+            .bind(to: homeModel)
+            .disposed(by: disposeBag)
+        
+        output.homeModel
+            .subscribe(onNext: { [weak self] model in
+                self?.topToDoLists.todayList.setNumber(number: model?.data?.today ?? 0)
+                self?.topToDoLists.flagList.setNumber(number: model?.data?.important ?? 0)
+                self?.topToDoLists.allList.setNumber(number: model?.data?.all ?? 0)
+                self?.topToDoLists.finishedList.setNumber(number: model?.data?.completed ?? 0)
+            })
+            .disposed(by: disposeBag)
     }
     
     private func setUpSubView() {
