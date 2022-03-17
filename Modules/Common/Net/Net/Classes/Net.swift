@@ -11,9 +11,9 @@ import Provider
 
 public class Net {
     
-    private var host: String = "http://127.0.0.1:8080"
+    private var host: RequestHost = .develop
     private var path: RequestPath = .root
-    private var url: String { host + path.rawValue }
+    private var url: String { host.rawValue + path.rawValue }
     private var header: [String : String]? = [
         "Authorization" : PGProviderManager.shared.provider { AccountProvider.self }?.getToken() ?? ""
     ]
@@ -23,6 +23,11 @@ public class Net {
     
     public static func build() -> Net {
         return Net()
+    }
+    
+    public func configHost(_ host: RequestHost) -> Self {
+        self.host = host
+        return self
     }
     
     public func configPath(_ path: RequestPath) -> Self {

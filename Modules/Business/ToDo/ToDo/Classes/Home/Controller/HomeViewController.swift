@@ -41,12 +41,19 @@ class HomeViewController: UIViewController, ViewController {
             }
             .disposed(by: disposeBag)
         
-        table.rx.itemSelected.bind { [weak self] indexPath in
-            let todoListController = TasksListViewController(titleColor: .blue)
-            todoListController.title = String(indexPath.row)
-            todoListController.hidesBottomBarWhenPushed = true
-            self?.navigationController?.pushViewController(todoListController, animated: true)
-        }.disposed(by: disposeBag)
+        table.rx.itemSelected
+            .withLatestFrom(homeModel) {
+                ($0, $1)
+            }
+            .bind { [weak self] indexPath, homeModel in
+                let todoListController = TasksListViewController(
+                    titleColor: .blue,
+                    listId: homeModel?.data?.taskLists?[indexPath.row].listID ?? "",
+                    title: homeModel?.data?.taskLists?[indexPath.row].listName ?? ""
+                )
+                todoListController.hidesBottomBarWhenPushed = true
+                self?.navigationController?.pushViewController(todoListController, animated: true)
+            }.disposed(by: disposeBag)
         
         tableHeaderView.snp.makeConstraints { make in
             make.width.equalTo(self.view.frame.size.width)
@@ -87,6 +94,8 @@ class HomeViewController: UIViewController, ViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        view.backgroundColor = .systemBackground
         
         self.navigationItem.title = "列表"
         self.navigationItem.titleView = UIView()

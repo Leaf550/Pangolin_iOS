@@ -19,6 +19,8 @@ class TaskTableViewCell: TableViewCell {
     
     private let disposeBag = DisposeBag()
     
+    var taskID: String?
+    
     lazy var checkBox = CheckBox()
     
     lazy var todoTextView: UITextView = {
@@ -40,6 +42,22 @@ class TaskTableViewCell: TableViewCell {
         return textView
     }()
     
+    private lazy var commentLabel: UILabel = {
+        let label = UILabel()
+        label.font = .textFont(for: .caption0, weight: .regular)
+        label.textColor = .secondaryLabel
+        
+        return label
+    }()
+    
+    private lazy var dateLabel: UILabel = {
+        let label = UILabel()
+        label.font = .textFont(for: .caption0, weight: .regular)
+        label.textColor = .secondaryLabel
+        
+        return label
+    }()
+    
     private lazy var separateLine: UIView = {
         let line = UIView()
         line.backgroundColor = .gray
@@ -55,6 +73,47 @@ class TaskTableViewCell: TableViewCell {
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        
+        setUpSubViews()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    func configData(with model: TaskModel) {
+        taskID = model.taskID
+        
+        todoTextView.text = model.title
+        commentLabel.text = model.comment
+        checkBox.setSelect(model.isCompleted ?? false)
+        flag.isHidden = !(model.isImportant ?? false)
+        
+        var dateString = ""
+        if let dateTimestamp = model.date {
+            let date = Date(timeIntervalSince1970: dateTimestamp * 0.001)
+            if Calendar.current.isDateInToday(date) {
+                dateString += "今天"
+            } else if Calendar.current.isDateInTomorrow(date) {
+                dateString += "明天"
+            } else {
+                let formater = DateFormatter()
+                formater.dateFormat = "MMM-dd"
+                dateString += formater.string(from: date)
+            }
+            dateString += " "
+        }
+        
+        if let time = model.time {
+            let date = Date(timeIntervalSince1970: time * 0.001)
+            let formater = DateFormatter()
+            formater.dateFormat = "HH:mm"
+            dateString += formater.string(from: date)
+        }
+        dateLabel.text = dateString
+    }
+    
+    private func setUpSubViews() {
         self.style = .fillEnds
         self.selectionStyle = .none
         
@@ -62,6 +121,8 @@ class TaskTableViewCell: TableViewCell {
         
         contentView.addSubview(checkBox)
         contentView.addSubview(todoTextView)
+        contentView.addSubview(commentLabel)
+        contentView.addSubview(dateLabel)
         contentView.addSubview(separateLine)
         contentView.addSubview(flag)
         
@@ -74,8 +135,18 @@ class TaskTableViewCell: TableViewCell {
             make.leading.equalTo(checkBox.snp.trailing).offset(16)
             make.trailing.equalTo(flag.snp.leading)
             make.top.equalToSuperview().offset(5)
-            make.bottom.equalToSuperview().offset(-5)
             make.height.greaterThanOrEqualTo(36)
+        }
+        
+        commentLabel.snp.makeConstraints { make in
+            make.leading.equalTo(todoTextView).offset(5)
+            make.top.equalTo(todoTextView.snp.bottom).offset(-5)
+        }
+        
+        dateLabel.snp.makeConstraints { make in
+            make.leading.equalTo(todoTextView).offset(5)
+            make.top.equalTo(commentLabel.snp.bottom)
+            make.bottom.equalToSuperview().offset(-5)
         }
         
         separateLine.snp.makeConstraints { make in
@@ -89,11 +160,6 @@ class TaskTableViewCell: TableViewCell {
             make.trailing.equalToSuperview().offset(-16)
             make.top.equalTo(checkBox)
         }
-        
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
     
 }

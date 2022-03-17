@@ -13,6 +13,7 @@ public enum FontSize: CGFloat {
     case title2         = 22
     case title3         = 20
     case body           = 17
+    case caption0       = 15
     case caption1       = 12
     case caption2       = 11
 }

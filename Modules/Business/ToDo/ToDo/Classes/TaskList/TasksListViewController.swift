@@ -6,32 +6,24 @@
 //
 
 import UIKit
+import PGFoundation
 import UIComponents
 import RxSwift
 import RxCocoa
 import SnapKit
 import RxDataSources
 
-class TasksListViewController: UIViewController, UITableViewDelegate {
+class TasksListViewController: UIViewController, ViewController, UITableViewDelegate {
+    
+    typealias VM = TasksListViewModel
+    var viewModel = TasksListViewModel()
+    var disposeBag = DisposeBag()
     
     var titleColor: TasksGroupIconColor
+    var listId: String
     
-    private var datasList = [
-        TasksListSection(header: "", items: [
-            TaskModel(isSelected: false, text: "1"),
-            TaskModel(isSelected: false, text: "2"),
-            TaskModel(isSelected: false, text: "3"),
-            TaskModel(isSelected: false, text: "4"),
-            TaskModel(isSelected: false, text: "5"),
-            TaskModel(isSelected: false, text: "6"),
-            TaskModel(isSelected: false, text: "7"),
-            TaskModel(isSelected: false, text: "8")
-        ])
-    ]
-    
+    private var datasList = [TasksListSection]()
     lazy var sections = BehaviorSubject<[TasksListSection]>(value: datasList)
-    
-    private let disposeBag = DisposeBag()
     
     private lazy var todoTable: TableView = {
         let table = TableView()
@@ -45,30 +37,53 @@ class TasksListViewController: UIViewController, UITableViewDelegate {
                 guard let self = self else { return UITableViewCell() }
                 let cell = tableView.dequeueReusableCell(withIdentifier: TaskTableViewCell.reuseID, for: indexPath) as? TaskTableViewCell
                 cell?.tableView = tableView
-                cell?.todoTextView.text = item.text
-                cell?.checkBox.setSelect(item.isSelected)
+                
+                cell?.configData(with: item)
+                
                 cell?.checkBox.checkBoxSelectCallBack = { selected in
-                    if selected {
-                        var index = 0
-                        for i in 0 ..< self.datasList[indexPath.section].items.count {
-                            if self.datasList[indexPath.section].items[i].text == cell?.todoTextView.text ?? "" {
-                                index = i
-                            }
+                    var index = 0
+                    for i in 0 ..< self.datasList[indexPath.section].items.count {
+                        if self.datasList[indexPath.section].items[i].taskID == cell?.taskID ?? "" {
+                            index = i
                         }
-                        var removed = self.datasList[indexPath.section].items.remove(at: index)
-                        removed.isSelected = selected
-                        self.datasList[indexPath.section].items.append(removed)
+                    }
+                    if selected {
+                        var removed = self.datasList[indexPath.section].tasks.remove(at: index)
+                        removed.isCompleted = selected
+                        self.datasList[indexPath.section].tasks.append(removed)
                         self.datasList[indexPath.section] = TasksListSection(
                             original: self.datasList[indexPath.section],
                             items: self.datasList[indexPath.section].items
                         )
                         self.sections.onNext(self.datasList)
                     } else {
-
+                        var removed = self.datasList[indexPath.section].tasks.remove(at: index)
+                        removed.isCompleted = selected
+                        var has = false
+                        for i in 0 ..< self.datasList[indexPath.section].items.count {
+                            let task = self.datasList[indexPath.section].items[i]
+                            if task.createTime ?? 0 > removed.createTime ?? 0 {
+                                self.datasList[indexPath.section].tasks.insert(removed, at: i)
+                                has = true
+                                break
+                            }
+                        }
+                        if !has {
+                            self.datasList[indexPath.section].tasks.append(removed)
+                        }
+                        self.datasList[indexPath.section] = TasksListSection(
+                            original: self.datasList[indexPath.section],
+                            items: self.datasList[indexPath.section].items
+                        )
+                        self.sections.onNext(self.datasList)
                     }
                 }
                 return cell ?? UITableViewCell()
             })
+        
+        datasource.titleForHeaderInSection = { ds, index in
+            return ds.sectionModels[index].header
+        }
         
         sections.bind(to: table.rx.items(dataSource: datasource))
             .disposed(by: disposeBag)
@@ -80,9 +95,11 @@ class TasksListViewController: UIViewController, UITableViewDelegate {
         return table
     }()
     
-    init(titleColor: TasksGroupIconColor) {
+    init(titleColor: TasksGroupIconColor, listId: String, title: String) {
         self.titleColor = titleColor
+        self.listId = listId
         super.init(nibName: nil, bundle: nil)
+        self.title = title
     }
     
     required init?(coder: NSCoder) {
@@ -95,6 +112,9 @@ class TasksListViewController: UIViewController, UITableViewDelegate {
         todoTable.register(TaskTableViewCell.self, forCellReuseIdentifier: TaskTableViewCell.reuseID)
         
         setUpSubviews()
+        bindViewModel()
+        
+        viewModel.input.viewDidLoadWithListId.onNext(listId)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -106,6 +126,19 @@ class TasksListViewController: UIViewController, UITableViewDelegate {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         navigationController?.navigationBar.prefersLargeTitles = false
+    }
+    
+    func bindViewModel() {
+        let output = viewModel.transformToOutput()
+        
+        output.tasksListModel
+            .map { $0?.data?.sections ?? [] }
+            .bind(to: sections)
+            .disposed(by: disposeBag)
+        
+        sections.subscribe(onNext: { [weak self] section in
+            self?.datasList = section
+        }).disposed(by: disposeBag)
     }
     
     private func setUpSubviews() {

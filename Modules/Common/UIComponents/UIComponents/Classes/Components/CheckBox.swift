@@ -17,7 +17,6 @@ public class CheckBox: UIView {
     private var isSelected: Bool = false {
         didSet {
             selectView.isHidden = !isSelected
-            checkBoxSelectCallBack(isSelected)
             selectView.backgroundColor = isSelected ? selectedColor : unSelectedColor
             layer.borderColor = (isSelected ? selectedColor : unSelectedColor).cgColor
         }
@@ -67,6 +66,7 @@ public class CheckBox: UIView {
         tap.rx.event.bind { [weak self] _ in
             guard let self = self else { return }
             self.setSelect(!self.isSelected)
+            self.checkBoxSelectCallBack(self.isSelected)
         }.disposed(by: disposeBag)
         
         self.addGestureRecognizer(tap)
