@@ -47,9 +47,9 @@ class HomeViewController: UIViewController, ViewController {
             }
             .bind { [weak self] indexPath, homeModel in
                 let todoListController = TasksListViewController(
-                    titleColor: .blue,
-                    listId: homeModel?.data?.taskLists?[indexPath.row].listID ?? "",
-                    title: homeModel?.data?.taskLists?[indexPath.row].listName ?? ""
+                    titleColor: TasksGroupIconColor(rawValue: homeModel?.data?.taskLists?[indexPath.row].listColor ?? 0) ?? .blue,
+                    title: homeModel?.data?.taskLists?[indexPath.row].listName ?? "",
+                    listType: .other(homeModel?.data?.taskLists?[indexPath.row].listID ?? "")
                 )
                 todoListController.hidesBottomBarWhenPushed = true
                 self?.navigationController?.pushViewController(todoListController, animated: true)
@@ -72,7 +72,51 @@ class HomeViewController: UIViewController, ViewController {
         return label
     }()
     
-    private var topToDoLists = TopTasksListView()
+    private lazy var topToDoLists: TopTasksListView = {
+        let view = TopTasksListView()
+        
+        view.todayTapped = { [weak self] in
+            let todoListController = TasksListViewController(
+                titleColor: .blue,
+                title: "今天",
+                listType: .today
+            )
+            todoListController.hidesBottomBarWhenPushed = true
+            self?.navigationController?.pushViewController(todoListController, animated: true)
+        }
+        
+        view.importantTapped = { [weak self] in
+            let todoListController = TasksListViewController(
+                titleColor: .orange,
+                title: "重要",
+                listType: .important
+            )
+            todoListController.hidesBottomBarWhenPushed = true
+            self?.navigationController?.pushViewController(todoListController, animated: true)
+        }
+        
+        view.allTapped = { [weak self] in
+            let todoListController = TasksListViewController(
+                titleColor: .gray,
+                title: "全部",
+                listType: .all
+            )
+            todoListController.hidesBottomBarWhenPushed = true
+            self?.navigationController?.pushViewController(todoListController, animated: true)
+        }
+        
+        view.completedTapped = { [weak self] in
+            let todoListController = TasksListViewController(
+                titleColor: .green,
+                title: "已完成",
+                listType: .completed
+            )
+            todoListController.hidesBottomBarWhenPushed = true
+            self?.navigationController?.pushViewController(todoListController, animated: true)
+        }
+        
+        return view
+    }()
     
     private lazy var tableHeaderView: UIView = {
         let header = UIView()
@@ -140,7 +184,6 @@ class HomeViewController: UIViewController, ViewController {
             make.leading.trailing.bottom.equalToSuperview()
         }
     }
-    
     
     @objc
     private func addButtonTapped() {

@@ -10,7 +10,7 @@ import RxSwift
 import Net
 
 struct TasksListViewModelInput: ViewModelInput {
-    let viewDidLoadWithListId = PublishSubject<String>()
+    let viewDidLoadWithListId = PublishSubject<ListType>()
 }
 
 struct TasksListViewModelOutput: ViewModelOutput {
@@ -29,8 +29,8 @@ class TasksListViewModel: ViewModel {
         let output = TasksListViewModelOutput()
         
         input.viewDidLoadWithListId
-            .flatMapLatest { [weak self] listId in
-                self?.requestTasksList(withListId: listId) ?? Observable.never()
+            .flatMapLatest { [weak self] listType in
+                self?.requestTasksList(with: listType) ?? Observable.never()
             }
             .bind(to: output.tasksListModel)
             .disposed(by: disposeBag)
@@ -38,15 +38,27 @@ class TasksListViewModel: ViewModel {
         return output
     }
     
-    private func requestTasksList(withListId listId: String) -> Observable<TasksListModel?> {
+    private func requestTasksList(with listType: ListType) -> Observable<TasksListModel?> {
         Observable<TasksListModel?>.create { observer in
             let net = Net.build()
-                .configHost(.mock)
-                .configPath(.tasksList)
-                .configBody([
-                    "listId" : listId
-                ])
-                .get { json in
+            
+            switch listType {
+                case .today:
+                    net.configPath(.tasksInToday)
+                case .important:
+                    net.configPath(.tasksIsImportant)
+                case .all:
+                    net.configPath(.allTasks)
+                case .completed:
+                    net.configPath(.tasksIsCompleted)
+                case .other(let listId):
+                    net.configPath(.tasksList)
+                    .configBody([
+                        "listId" : listId
+                    ])
+            }
+            
+            net.get { json in
                     guard let data = try? JSONSerialization.data(withJSONObject: json) else {
                         observer.onNext(nil)
                         return

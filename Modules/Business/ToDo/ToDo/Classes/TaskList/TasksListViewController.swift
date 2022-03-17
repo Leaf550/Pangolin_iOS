@@ -13,6 +13,14 @@ import RxCocoa
 import SnapKit
 import RxDataSources
 
+enum ListType {
+    case today
+    case important
+    case all
+    case completed
+    case other(String)
+}
+
 class TasksListViewController: UIViewController, ViewController, UITableViewDelegate {
     
     typealias VM = TasksListViewModel
@@ -20,7 +28,9 @@ class TasksListViewController: UIViewController, ViewController, UITableViewDele
     var disposeBag = DisposeBag()
     
     var titleColor: TasksGroupIconColor
-    var listId: String
+    var listId: String?
+    
+    var listType: ListType
     
     private var datasList = [TasksListSection]()
     lazy var sections = BehaviorSubject<[TasksListSection]>(value: datasList)
@@ -95,9 +105,9 @@ class TasksListViewController: UIViewController, ViewController, UITableViewDele
         return table
     }()
     
-    init(titleColor: TasksGroupIconColor, listId: String, title: String) {
+    init(titleColor: TasksGroupIconColor, title: String, listType: ListType) {
         self.titleColor = titleColor
-        self.listId = listId
+        self.listType = listType
         super.init(nibName: nil, bundle: nil)
         self.title = title
     }
@@ -114,7 +124,7 @@ class TasksListViewController: UIViewController, ViewController, UITableViewDele
         setUpSubviews()
         bindViewModel()
         
-        viewModel.input.viewDidLoadWithListId.onNext(listId)
+        viewModel.input.viewDidLoadWithListId.onNext(self.listType)
     }
     
     override func viewWillAppear(_ animated: Bool) {

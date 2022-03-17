@@ -25,16 +25,19 @@ public class Net {
         return Net()
     }
     
+    @discardableResult
     public func configHost(_ host: RequestHost) -> Self {
         self.host = host
         return self
     }
     
+    @discardableResult
     public func configPath(_ path: RequestPath) -> Self {
         self.path = path
         return self
     }
     
+    @discardableResult
     public func configHeader(_ header: [String : String]) -> Self {
         for (key, value) in header {
             self.header?[key] = value
@@ -42,22 +45,26 @@ public class Net {
         return self
     }
     
+    @discardableResult
     public func configBody(_ body: [String : String]) -> Self {
         self.body = body
         return self
     }
     
+    @discardableResult
     public func configInterceptor(_ interceptor: RequestInterceptor) -> Self {
         self.interceptor = interceptor
         return self
     }
     
+    @discardableResult
     public func `get`(completion: @escaping (Any) -> Void,
                       error: @escaping (Error) -> Void) -> Self {
         request(method: .get, interceptor: interceptor, completion: completion, error: error)
         return self
     }
     
+    @discardableResult
     public func post(completion: @escaping (Any) -> Void,
                      error: @escaping (Error) -> Void) -> Self {
         request(method: .post, interceptor: interceptor, completion: completion, error: error)

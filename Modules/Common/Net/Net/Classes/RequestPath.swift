@@ -18,15 +18,23 @@ public enum RequestHost: String {
 
 public enum RequestPath: String {
     // 占位
-    case root      = "/"
+    case root               = "/"
     // 登录
-    case signIn    = "/signIn"
+    case signIn             = "/signIn"
     // 登出
-    case signOut   = "/signOut"
+    case signOut            = "/signOut"
     // 注册
-    case signUp    = "/signUp"
+    case signUp             = "/signUp"
     // home页
-    case home      = "/home"
+    case home               = "/home"
     // 任务列表页
-    case tasksList = "/getTasksInList"
+    case tasksList          = "/getTasksInList"
+    // 今日任务
+    case tasksInToday       = "/getTasksInToday"
+    // 重要任务
+    case tasksIsImportant   = "/getTasksIsImportant"
+    // 全部任务
+    case allTasks           = "/getAllTasks"
+    // 已完成任务
+    case tasksIsCompleted   = "getTasksIsCompleted"
 }
