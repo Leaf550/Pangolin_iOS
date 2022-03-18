@@ -30,10 +30,9 @@ class TasksListViewController: UIViewController, ViewController, UITableViewDele
     var titleColor: TasksGroupIconColor
     var listId: String?
     
-    var listType: ListType
+    var pageData: ListPageData
     
-    private var datasList = [TasksListSection]()
-    lazy var sections = BehaviorSubject<[TasksListSection]>(value: datasList)
+    lazy var rxSections = ReplaySubject<[TasksListSection]>.create(bufferSize: 1)
     
     private lazy var todoTable: TableView = {
         let table = TableView()
@@ -52,50 +51,58 @@ class TasksListViewController: UIViewController, ViewController, UITableViewDele
                 
                 cell?.checkBox.checkBoxSelectCallBack = { selected in
                     var index = 0
-                    for i in 0 ..< self.datasList[indexPath.section].items.count {
-                        if self.datasList[indexPath.section].items[i].taskID == cell?.taskID ?? "" {
+                    guard var section = self.pageData.sections?[indexPath.section] else { return }
+                    for i in 0 ..< section.items.count {
+                        if section.items[i].taskID == cell?.taskID ?? "" {
                             index = i
                         }
                     }
+                    guard var tasks = section.tasks else { return }
                     if selected {
-                        var removed = self.datasList[indexPath.section].tasks.remove(at: index)
+                        var removed = tasks.remove(at: index)
                         removed.isCompleted = selected
-                        self.datasList[indexPath.section].tasks.append(removed)
-                        self.datasList[indexPath.section] = TasksListSection(
-                            original: self.datasList[indexPath.section],
-                            items: self.datasList[indexPath.section].items
+                        tasks.append(removed)
+                        section.tasks = tasks
+                        self.pageData.sections?[indexPath.section] = TasksListSection(
+                            original: section,
+                            items: tasks
                         )
-                        self.sections.onNext(self.datasList)
+                        self.rxSections.onNext(self.pageData.sections ?? [])
                     } else {
-                        var removed = self.datasList[indexPath.section].tasks.remove(at: index)
+                        var removed = tasks.remove(at: index)
                         removed.isCompleted = selected
-                        var has = false
-                        for i in 0 ..< self.datasList[indexPath.section].items.count {
-                            let task = self.datasList[indexPath.section].items[i]
+                        var insertIndex: Int? = nil
+                        for i in 0 ..< tasks.count {
+                            let task = tasks[i]
                             if task.createTime ?? 0 > removed.createTime ?? 0 {
-                                self.datasList[indexPath.section].tasks.insert(removed, at: i)
-                                has = true
+                                insertIndex = i
                                 break
                             }
                         }
-                        if !has {
-                            self.datasList[indexPath.section].tasks.append(removed)
+                        if insertIndex == nil {
+                            tasks.append(removed)
+                        } else {
+                            tasks.insert(removed, at: insertIndex ?? 0)
                         }
-                        self.datasList[indexPath.section] = TasksListSection(
-                            original: self.datasList[indexPath.section],
-                            items: self.datasList[indexPath.section].items
+                        self.pageData.sections?[indexPath.section] = TasksListSection(
+                            original: section,
+                            items: tasks
                         )
-                        self.sections.onNext(self.datasList)
+                        self.rxSections.onNext(self.pageData.sections ?? [])
                     }
                 }
                 return cell ?? UITableViewCell()
             })
         
         datasource.titleForHeaderInSection = { ds, index in
-            return ds.sectionModels[index].header
+            if ds.sectionModels.count == 1 {
+                return nil
+            }
+            return ds.sectionModels[index].taskList?.listName ?? ""
         }
         
-        sections.bind(to: table.rx.items(dataSource: datasource))
+        rxSections
+            .bind(to: table.rx.items(dataSource: datasource))
             .disposed(by: disposeBag)
         
         table.rx.didScroll.bind { [weak self] _ in
@@ -105,11 +112,15 @@ class TasksListViewController: UIViewController, ViewController, UITableViewDele
         return table
     }()
     
-    init(titleColor: TasksGroupIconColor, title: String, listType: ListType) {
+    init(titleColor: TasksGroupIconColor,
+         title: String,
+         pageData: ListPageData) {
         self.titleColor = titleColor
-        self.listType = listType
+        self.pageData = pageData
         super.init(nibName: nil, bundle: nil)
         self.title = title
+        
+        rxSections.onNext(pageData.sections ?? [])
     }
     
     required init?(coder: NSCoder) {
@@ -123,8 +134,6 @@ class TasksListViewController: UIViewController, ViewController, UITableViewDele
         
         setUpSubviews()
         bindViewModel()
-        
-        viewModel.input.viewDidLoadWithListId.onNext(self.listType)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -139,15 +148,15 @@ class TasksListViewController: UIViewController, ViewController, UITableViewDele
     }
     
     func bindViewModel() {
-        let output = viewModel.transformToOutput()
-        
-        output.tasksListModel
-            .map { $0?.data?.sections ?? [] }
-            .bind(to: sections)
-            .disposed(by: disposeBag)
-        
-        sections.subscribe(onNext: { [weak self] section in
-            self?.datasList = section
+//        let output = viewModel.transformToOutput()
+//
+//        output.tasksListModel
+//            .map { $0?.data?.rxSections ?? [] }
+//            .bind(to: rxSections)
+//            .disposed(by: disposeBag)
+//
+        rxSections.subscribe(onNext: { [weak self] section in
+            self?.pageData.sections = section
         }).disposed(by: disposeBag)
     }
     

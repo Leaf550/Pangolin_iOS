@@ -36,5 +36,5 @@ public enum RequestPath: String {
     // 全部任务
     case allTasks           = "/getAllTasks"
     // 已完成任务
-    case tasksIsCompleted   = "getTasksIsCompleted"
+    case tasksIsCompleted   = "/getTasksIsCompleted"
 }

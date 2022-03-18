@@ -8,37 +8,6 @@
 import PGFoundation
 import RxDataSources
 
-//   let tasksListModel = try? newJSONDecoder().decode(TasksListModel.self, from: jsonData)
-
-// MARK: - TasksListModel
-struct TasksListModel: Model, Codable {
-    var status: Int?
-    var data: TasksListData?
-    var message: String?
-}
-
-// MARK: - TasksListData
-struct TasksListData: Codable {
-    var sections: [TasksListSection]?
-}
-
-struct TaskModel: Codable {
-    var uid, taskID, title, comment: String?
-    var date, time: Double?
-    var isImportant, isCompleted: Bool?
-    var createTime, priority: Int?
-    var listID, listName: String?
-    var listColor: Int?
-
-    enum CodingKeys: String, CodingKey {
-        case uid
-        case taskID = "taskId"
-        case title, comment, date, time, isImportant, isCompleted, createTime, priority
-        case listID = "listId"
-        case listName, listColor
-    }
-}
-
 extension TaskModel: IdentifiableType, Equatable {
     typealias Identity = String
     
@@ -51,14 +20,9 @@ extension TaskModel: IdentifiableType, Equatable {
     }
 }
 
-struct TasksListSection: Codable {
-    var header: String
-    var tasks: [TaskModel]
-}
-
 extension TasksListSection: AnimatableSectionModelType {
     var items: [TaskModel] {
-        tasks
+        tasks ?? []
     }
     
     typealias Identity = String
@@ -69,6 +33,6 @@ extension TasksListSection: AnimatableSectionModelType {
     }
     
     var identity: String {
-        header
+        taskList?.listID ?? UUID().uuidString
     }
 }

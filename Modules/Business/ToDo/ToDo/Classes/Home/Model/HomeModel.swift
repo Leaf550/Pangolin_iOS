@@ -7,7 +7,7 @@
 
 //   let homeModel = try? newJSONDecoder().decode(HomeModel.self, from: jsonData)
 
-import PGFoundation
+import Foundation
 
 // MARK: - HomeModel
 struct HomeModel: Codable {
@@ -16,15 +16,28 @@ struct HomeModel: Codable {
     var message: String?
 }
 
-// MARK: - DataClass
+// MARK: - HomeData
 struct HomeData: Codable {
-    var today, important, all, completed: Int?
-    var taskLists: [TaskList]?
+    var todayCount, importantCount, allCount, completedCount: Int?
+    var today, important, all, completed: ListPageData?
+    var otherList: [ListPageData]?
+}
+
+// MARK: - ListPageData
+struct ListPageData: Codable {
+    var sections: [TasksListSection]?
+}
+
+// MARK: - TasksListSection
+struct TasksListSection: Codable {
+    var taskList: TaskList?
+    var tasks: [TaskModel]?
 }
 
 // MARK: - TaskList
 struct TaskList: Codable {
-    var listID, uid: String?
+    var listID: String?
+    var uid: String?
     var listType: Int?
     var listName: String?
     var listColor: Int?
@@ -34,5 +47,24 @@ struct TaskList: Codable {
     enum CodingKeys: String, CodingKey {
         case listID = "listId"
         case uid, listType, listName, listColor, imageName, taskCount, completedCount, createTime, sortedBy
+    }
+}
+
+// MARK: - TaskModel
+struct TaskModel: Codable {
+    var uid: String?
+    var taskID, title: String?
+    var comment: String?
+    var date, time: Double?
+    var createTime, priority: Int?
+    var listID: String?
+    var isCompleted, isImportant: Bool?
+
+    enum CodingKeys: String, CodingKey {
+        case uid
+        case taskID = "taskId"
+        case title, comment, date, time, createTime, priority
+        case listID = "listId"
+        case isCompleted, isImportant
     }
 }

@@ -12,10 +12,10 @@ import RxCocoa
 
 class TopTasksListView: UIView {
     
-    var todayTapped: (() -> Void)?
-    var importantTapped: (() -> Void)?
-    var allTapped: (() -> Void)?
-    var completedTapped: (() -> Void)?
+    var todayTapped = PublishSubject<UITapGestureRecognizer>()
+    var importantTapped = PublishSubject<UITapGestureRecognizer>()
+    var allTapped = PublishSubject<UITapGestureRecognizer>()
+    var completedTapped = PublishSubject<UITapGestureRecognizer>()
     
     private let disposeBag = DisposeBag()
     
@@ -23,23 +23,18 @@ class TopTasksListView: UIView {
         let icon = TasksGroupTinyIcon(image: UIImage(), color: .blue)
         let block = TopTasksView(icon: icon, name: "今天", number: 0)
         let tap = UITapGestureRecognizer()
-        tap.rx.event.bind { [weak self] _ in
-            self?.todayTapped?()
-        }.disposed(by: disposeBag)
+        tap.rx.event.bind(to: todayTapped).disposed(by: disposeBag)
         block.addGestureRecognizer(tap)
         
         return block
     }()
     
-    lazy var flagList: TopTasksView = {
+    lazy var importantList: TopTasksView = {
         let icon = TasksGroupTinyIcon(image: UIImage(), color: .orange)
         let block = TopTasksView(icon: icon, name: "重要", number: 0)
         let tap = UITapGestureRecognizer()
-        tap.rx.event.bind { [weak self] _ in
-            self?.importantTapped?()
-        }.disposed(by: disposeBag)
+        tap.rx.event.bind(to: importantTapped).disposed(by: disposeBag)
         block.addGestureRecognizer(tap)
-        
         
         return block
     }()
@@ -48,24 +43,18 @@ class TopTasksListView: UIView {
         let icon = TasksGroupTinyIcon(image: UIImage(), color: .gray)
         let block = TopTasksView(icon: icon, name: "全部", number: 0)
         let tap = UITapGestureRecognizer()
-        tap.rx.event.bind { [weak self] _ in
-            self?.allTapped?()
-        }.disposed(by: disposeBag)
+        tap.rx.event.bind(to: allTapped).disposed(by: disposeBag)
         block.addGestureRecognizer(tap)
-        
         
         return block
     }()
     
-    lazy var finishedList: TopTasksView = {
+    lazy var completedList: TopTasksView = {
         let icon = TasksGroupTinyIcon(image: UIImage(), color: .green)
         let block = TopTasksView(icon: icon, name: "已完成", number: 0)
         let tap = UITapGestureRecognizer()
-        tap.rx.event.bind { [weak self] _ in
-            self?.completedTapped?()
-        }.disposed(by: disposeBag)
+        tap.rx.event.bind(to: completedTapped).disposed(by: disposeBag)
         block.addGestureRecognizer(tap)
-        
         
         return block
     }()
@@ -74,9 +63,9 @@ class TopTasksListView: UIView {
         super.init(frame: frame)
         
         addSubview(todayList)
-        addSubview(flagList)
+        addSubview(importantList)
         addSubview(allList)
-        addSubview(finishedList)
+        addSubview(completedList)
         
         let distance = 16
         
@@ -84,7 +73,7 @@ class TopTasksListView: UIView {
             make.leading.top.equalToSuperview().offset(distance)
         }
         
-        flagList.snp.makeConstraints { make in
+        importantList.snp.makeConstraints { make in
             make.top.equalTo(todayList)
             make.leading.equalTo(todayList.snp.trailing).offset(distance)
             make.trailing.equalToSuperview().offset(-distance)
@@ -97,7 +86,7 @@ class TopTasksListView: UIView {
             make.bottom.equalToSuperview().offset(-distance)
         }
         
-        finishedList.snp.makeConstraints { make in
+        completedList.snp.makeConstraints { make in
             make.top.equalTo(allList)
             make.leading.equalTo(allList.snp.trailing).offset(distance)
             make.trailing.equalToSuperview().offset(-distance)
