@@ -6,13 +6,22 @@
 //
 
 import UIKit
+import PGFoundation
 import UIComponents
 import SnapKit
 import RxSwift
 
-class AddGroupViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class AddGroupViewController: UIViewController, ViewController, UITableViewDataSource, UITableViewDelegate {
     
-    private let disposeBag = DisposeBag()
+    typealias VM = AddGroupViewModel
+ 
+    var viewModel: VM = AddGroupViewModel()
+    
+    var disposeBag = DisposeBag()
+    
+    private var listName: String?
+    private var color: TasksGroupIconColor = .red
+    private var imageName: String = "default"
     
     private lazy var tableView: TableView = {
         let table = TableView()
@@ -34,15 +43,57 @@ class AddGroupViewController: UIViewController, UITableViewDataSource, UITableVi
 
         configNavigationBar()
         setUpSubViews()
+        bindViewModel()
+    }
+    
+    func bindViewModel() {
+        navigationItem.rightBarButtonItem?.rx.tap
+            .asObservable()
+            .map { [weak self] in
+                (self?.listName , self?.color, self?.imageName)
+            }
+            .filter { (listName, color, imageName) in
+                let a = listName != nil && listName != ""
+                let b = color != nil
+                let c = imageName != nil && imageName != ""
+                if !(a && b && c) {
+                    Toast.show(text: "请将内容填写完整哦～", image: nil)
+                    return false
+                }
+                return true
+            }
+            .map {
+                ($0 ?? "", $1 ?? .blue, $2 ?? "")
+            }
+            .bind(to: viewModel.input.completeTapped)
+            .disposed(by: disposeBag)
+        
+        let output = viewModel.transformToOutput()
+        
+        output.uploadCompleted
+            .subscribe(onNext: { [weak self] result in
+                switch result {
+                    case .success:
+                        self?.dismiss(animated: true, completion: nil)
+                    case .failed:
+                        Toast.show(text: "上传失败", image: nil)
+                    case .error:
+                        break
+                }
+            })
+            .disposed(by: disposeBag)
     }
     
     private func configNavigationBar() {
         title = "新建列表"
         
-        let leftButton = UIBarButtonItem(title: "取消", style: .plain, target: self, action: #selector(cancelAddition))
+        let leftButton = UIBarButtonItem(title: "取消", style: .plain, target: nil, action: nil)
+        leftButton.rx.tap.bind { [weak self] in
+            self?.dismiss(animated: true, completion: nil)
+        }.disposed(by: disposeBag)
         self.navigationItem.leftBarButtonItem = leftButton
         
-        let rightButton = UIBarButtonItem(title: "完成", style: .done, target: self, action: #selector(completeAddition))
+        let rightButton = UIBarButtonItem(title: "完成", style: .done, target: nil, action: nil)
         self.navigationItem.rightBarButtonItem = rightButton
     }
     
@@ -55,14 +106,6 @@ class AddGroupViewController: UIViewController, UITableViewDataSource, UITableVi
         }
     }
     
-    @objc
-    private func cancelAddition() {
-        dismiss(animated: true, completion: nil)
-    }
-    
-    @objc func completeAddition() {
-        dismiss(animated: true, completion: nil)
-    }
 }
 
 // MARK: - UITableViewDataSource
@@ -87,16 +130,26 @@ extension AddGroupViewController {
             cell = tableView.dequeueReusableCell(withIdentifier: GroupIconTableViewCell.reuseID, for: indexPath) as? GroupIconTableViewCell
         }
         
-        cell?.didSelectColor = { color in
+        cell?.didSelectColor = { [weak self] color in
             let titleCell = tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? GroupTitleTableViewCell
             titleCell?.groupIcon?.color = color
             titleCell?.textFieldTextColor = color
+            self?.color = color
         }
         
-        cell?.didSelectImage = { image in
+        cell?.didSelectImage = { [weak self] imageName in
             let titleCell = tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? GroupTitleTableViewCell
-            titleCell?.groupIcon?.image = image
+            titleCell?.groupIcon?.image = UIImage(named: imageName) ?? UIImage()
+            self?.imageName = imageName
         }
+        
+        cell?.groupTitleTextTield?.rx.text
+            .orEmpty
+            .subscribe(onNext: { [weak self] title in
+                self?.listName = title
+            })
+            .disposed(by: disposeBag)
+            
         
         return cell ?? UITableViewCell()
     }

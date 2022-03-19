@@ -56,7 +56,7 @@ extension GroupIconTableViewCell {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         selectedIndex = indexPath.item
-        didSelectImage(UIImage(named: "tick") ?? UIImage())
+        didSelectImage("tick")
     }
     
 }

@@ -9,30 +9,30 @@ import PGFoundation
 import RxDataSources
 
 extension TaskModel: IdentifiableType, Equatable {
-    typealias Identity = String
+    public typealias Identity = String
     
-    var identity: String {
+    public var identity: String {
         taskID ?? UUID().uuidString
     }
     
-    static func == (lhs: Self, rhs: Self) -> Bool {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.taskID ?? UUID().uuidString == rhs.taskID ?? UUID().uuidString
     }
 }
 
 extension TasksListSection: AnimatableSectionModelType {
-    var items: [TaskModel] {
+    public var items: [TaskModel] {
         tasks ?? []
     }
     
-    typealias Identity = String
+    public typealias Identity = String
     
-    init(original: TasksListSection, items: [TaskModel]) {
+    public init(original: TasksListSection, items: [TaskModel]) {
         self = original
         self.tasks = items
     }
     
-    var identity: String {
+    public var identity: String {
         taskList?.listID ?? UUID().uuidString
     }
 }

@@ -13,7 +13,7 @@ def developmentPods
   pod 'Net', :path => 'Modules/Common/Net'
   pod 'UIComponents', :path => 'Modules/Common/UIComponents'
   pod 'Account', :path => 'Modules/Common/Account'
-  pod 'KV', :path => 'Modules/Common/KV'
+  pod 'Persistence', :path => 'Modules/Common/Persistence'
   
   # business
   pod 'Starter', :path => 'Modules/Business/Starter'

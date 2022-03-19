@@ -10,6 +10,7 @@ import Net
 import RxRelay
 import RxSwift
 import Foundation
+import Provider
 
 struct HomeViewModelInput: ViewModelInput {
     let onHomeRefresh = PublishRelay<Void>()
@@ -25,6 +26,8 @@ class HomeViewModel: ViewModel {
     typealias Output = HomeViewModelOutput
     
     var input: Input = HomeViewModelInput()
+    
+    private let persistenceService = PGProviderManager.shared.provider { PersistenceProvider.self }
     
     private var disposeBag = DisposeBag()
     
@@ -45,7 +48,7 @@ class HomeViewModel: ViewModel {
         Observable<HomeModel?>.create { observer in
             let net = Net.build()
                 .configPath(.home)
-                .get { json in
+                .get { [weak self] json in
                     guard let data = try? JSONSerialization.data(withJSONObject: json) else {
                         observer.onNext(nil)
                         return
@@ -57,7 +60,10 @@ class HomeViewModel: ViewModel {
                     if model.status != 200 {
                         observer.onNext(nil)
                     } else {
-                        observer.onNext(model)                        
+                        observer.onNext(model)
+                        if let self = self {
+                            _ = self.persistenceService?.saveHomeModel(model)
+                        }
                     }
                 } error: { err in
                     observer.onNext(nil)

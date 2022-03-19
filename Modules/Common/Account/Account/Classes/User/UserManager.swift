@@ -6,7 +6,7 @@
 //
 
 import Util
-import KV
+import Provider
 
 class UserManager {
     
@@ -30,9 +30,7 @@ class UserManager {
     var token: String?
     var user: UserImpl?
     
-    private var kv = KV(field: .account)
-    let userMMKVKey = "userMMKVKey"
-    let tokenMMKVKey = "tokenMMKVKey"
+    private let persistenceProvider = PGProviderManager.shared.provider { PersistenceProvider.self }
     
     func login(withToken token: String, completion: (UserImpl?, String?) -> Void) {
         guard !isLogined else {
@@ -43,8 +41,8 @@ class UserManager {
             if let user = user {
                 self?.token = token
                 self?.user = user
-                if kv.set(user, forKey: userMMKVKey)
-                    && kv.set(token, forKey: tokenMMKVKey) {
+                if self?.persistenceProvider?.saveUser(user) ?? false
+                    && self?.persistenceProvider?.saveToken(token) ?? false {
                     completion(user, nil)
                 } else {
                     completion(nil, "用户数据存储失败")

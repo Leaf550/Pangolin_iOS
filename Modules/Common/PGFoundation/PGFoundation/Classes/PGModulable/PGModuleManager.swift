@@ -11,7 +11,7 @@ public class PGModuleManager {
     
     private var moduleNames: [String] = [
         "Starter.StarterModule",
-        "KV.KVModule",
+        "Persistence.PersistenceModule",
         "Account.AccountModule",
         "ToDo.ToDoModule",
     ]

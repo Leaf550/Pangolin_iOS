@@ -12,6 +12,7 @@ import SnapKit
 import Util
 import RxSwift
 import RxCocoa
+import Provider
 
 class HomeViewController: UIViewController, ViewController {
     
@@ -19,7 +20,8 @@ class HomeViewController: UIViewController, ViewController {
     
     var viewModel: HomeViewModel = HomeViewModel()
     
-    private var homeModel = BehaviorRelay<HomeModel?>(value: nil)
+    private let persistenceService = PGProviderManager.shared.provider { PersistenceProvider.self }
+    private lazy var homeModel = BehaviorRelay<HomeModel?>(value: persistenceService?.getHomeModel())
     
     var disposeBag = DisposeBag()
     
@@ -47,11 +49,12 @@ class HomeViewController: UIViewController, ViewController {
                 ($0, $1)
             }
             .bind { [weak self] indexPath, homeModel in
-                let taskList = homeModel?.data?.otherList?[indexPath.row].sections?.first?.taskList
+                guard let pageData = homeModel?.data?.otherList?[indexPath.row] else { return }
+                let taskList = pageData.sections?.first?.taskList
                 let todoListController = TasksListViewController(
                     titleColor: TasksGroupIconColor(rawValue: taskList?.listColor ?? 0) ?? .blue,
                     title: taskList?.listName ?? "",
-                    pageData: homeModel?.data?.otherList?[indexPath.row] ?? ListPageData()
+                    pageData: pageData
                 )
                 todoListController.hidesBottomBarWhenPushed = true
                 self?.navigationController?.pushViewController(todoListController, animated: true)

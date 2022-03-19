@@ -7,11 +7,12 @@
 
 import PGFoundation
 import Provider
-import KV
 
 class AccountModule: PGModule {
     
     public static var shared: PGModule = AccountModule()
+    
+    private let persistenceService = PGProviderManager.shared.provider { PersistenceProvider.self }
     
     func runModule() {
         PGProviderManager.shared.registerProvider({ AccountProvider.self }, self)
@@ -22,10 +23,10 @@ class AccountModule: PGModule {
     }
     
     func applicationWillFinishLaunching() {
-        if let token = KV().string(forKey: UserManager.shared.tokenMMKVKey) {
+        if let token = persistenceService?.getToken() {
             UserManager.shared.token = token
         }
-        if let user = KV().object(UserImpl.self, forKey: UserManager.shared.userMMKVKey) {
+        if let user: UserImpl = persistenceService?.getUser() {
             UserManager.shared.user = user
         }
     }

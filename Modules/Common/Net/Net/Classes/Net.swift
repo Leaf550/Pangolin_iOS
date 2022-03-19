@@ -15,7 +15,7 @@ public class Net {
     private var path: RequestPath = .root
     private var url: String { host.rawValue + path.rawValue }
     private var header: [String : String]? = [
-        "Authorization" : PGProviderManager.shared.provider { AccountProvider.self }?.getToken() ?? ""
+        "Authorization" : PGProviderManager.shared.provider { PersistenceProvider.self }?.getToken() ?? ""
     ]
     private var body: [String : String]? = nil
     private var interceptor: RequestInterceptor? = nil

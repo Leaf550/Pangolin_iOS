@@ -1,6 +1,5 @@
 PODS:
   - Account (0.0.1):
-    - KV
     - Net
     - PGFoundation
     - Provider
@@ -13,14 +12,15 @@ PODS:
   - Differentiator (5.0.0)
   - Hybrid (0.0.1):
     - Util
-  - KV (0.0.1):
-    - MMKV
-    - PGFoundation
   - MMKV (1.2.11):
     - MMKVCore (~> 1.2.11)
   - MMKVCore (1.2.12)
   - Net (0.0.1):
     - Alamofire
+    - Provider
+  - Persistence (0.0.1):
+    - MMKV
+    - PGFoundation
     - Provider
   - PGFoundation (0.0.1):
     - RxSwift
@@ -65,9 +65,9 @@ DEPENDENCIES:
   - Account (from `Modules/Common/Account`)
   - Alamofire (= 5.4.4)
   - Hybrid (from `Modules/Common/Hybrid`)
-  - KV (from `Modules/Common/KV`)
   - MMKV (= 1.2.11)
   - Net (from `Modules/Common/Net`)
+  - Persistence (from `Modules/Common/Persistence`)
   - PGFoundation (from `Modules/Common/PGFoundation`)
   - Provider (from `Modules/Common/Provider`)
   - Router (from `Modules/Common/Router`)
@@ -99,10 +99,10 @@ EXTERNAL SOURCES:
     :path: Modules/Common/Account
   Hybrid:
     :path: Modules/Common/Hybrid
-  KV:
-    :path: Modules/Common/KV
   Net:
     :path: Modules/Common/Net
+  Persistence:
+    :path: Modules/Common/Persistence
   PGFoundation:
     :path: Modules/Common/PGFoundation
   Provider:
@@ -119,14 +119,14 @@ EXTERNAL SOURCES:
     :path: Modules/Common/Util
 
 SPEC CHECKSUMS:
-  Account: 27a6a7586c05d05311098e305b5f8745dc07f642
+  Account: 5d43290fac2bcbc676781dd8161af9489543e555
   Alamofire: f3b09a368f1582ab751b3fff5460276e0d2cf5c9
   Differentiator: e8497ceab83c1b10ca233716d547b9af21b9344d
   Hybrid: f939efddf0a5e3cd6b48961abebdb98cba6add40
-  KV: bcd5fe165b8cc3e22aea8a3495ee8fa04ff15ac3
   MMKV: 217b643c181c3d2f71983206ca1972d0a6e99881
   MMKVCore: df0565f6b58463604731a68ba6cd89bc0b2d1d55
   Net: 4ec17e99f8a3f3fcb77067d64f95ca28838f13f8
+  Persistence: b073d6c8b6d12cf707e7adbdacff36e556b5545f
   PGFoundation: 3a2a2acad8436e8f8e48a2e8a57ea4ab894c39ef
   Provider: 5a3bedf02e8d1287d7b1da661ca97b440b540491
   Router: d9dfb27ee05c3f6beef3cf1d820d730c87c62a7b
@@ -141,6 +141,6 @@ SPEC CHECKSUMS:
   UIComponents: b1d741cba7e3a8a53b9ee7c9449e8c642d73fd05
   Util: 9269aba84bf203b4ea0604aeb60088d757e3e87e
 
-PODFILE CHECKSUM: 78ed6f55fda2e8ea05542cf300cab56187e9c522
+PODFILE CHECKSUM: a213cf683ac8efb6940e74085ff470fc777f8417
 
 COCOAPODS: 1.10.1

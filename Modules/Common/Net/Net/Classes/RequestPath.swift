@@ -25,6 +25,8 @@ public enum RequestPath: String {
     case signOut            = "/signOut"
     // 注册
     case signUp             = "/signUp"
+    // 添加任务分组
+    case addGroup           = "/addTaskList"
     // home页
     case home               = "/home"
     // 任务列表页

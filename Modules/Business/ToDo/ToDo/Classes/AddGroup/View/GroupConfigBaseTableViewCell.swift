@@ -13,7 +13,7 @@ import Util
 class GroupConfigBaseTableViewCell: TableViewCell {
     
     var didSelectColor: (_ color: TasksGroupIconColor) -> Void = { _ in }
-    var didSelectImage: (_ image: UIImage) -> Void = { _ in }
+    var didSelectImage: (_ imageName: String) -> Void = { _ in }
     
     var groupIcon: TasksGroupLargeIcon?
     var groupTitleTextTield: UITextField?
