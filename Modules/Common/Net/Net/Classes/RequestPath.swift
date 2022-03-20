@@ -27,16 +27,8 @@ public enum RequestPath: String {
     case signUp             = "/signUp"
     // 添加任务分组
     case addGroup           = "/addTaskList"
+    // 新增任务
+    case addTask            = "/addTask"
     // home页
     case home               = "/home"
-    // 任务列表页
-    case tasksList          = "/getTasksInList"
-    // 今日任务
-    case tasksInToday       = "/getTasksInToday"
-    // 重要任务
-    case tasksIsImportant   = "/getTasksIsImportant"
-    // 全部任务
-    case allTasks           = "/getAllTasks"
-    // 已完成任务
-    case tasksIsCompleted   = "/getTasksIsCompleted"
 }

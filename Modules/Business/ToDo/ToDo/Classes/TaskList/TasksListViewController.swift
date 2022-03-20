@@ -174,7 +174,8 @@ class TasksListViewController: UIViewController, ViewController, UITableViewDele
     
     @objc
     func addToDo() {
-        let newTaskController = AddTaskViewController()
+        let defaultSelectedList = pageData.sections?.first?.taskList
+        let newTaskController = AddTaskViewController(defaultList: defaultSelectedList)
         let navController = UINavigationController(rootViewController: newTaskController)
         present(navController, animated: true, completion: nil)
     }

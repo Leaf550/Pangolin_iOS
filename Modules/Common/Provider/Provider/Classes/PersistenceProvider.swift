@@ -19,4 +19,7 @@ public protocol PersistenceProvider: PGProvider {
     func saveHomeModel(_ homeModel: HomeModel) -> Bool
     func getHomeModel() -> HomeModel?
     
+    // TaskLists
+    func getAllTaskLists() -> [TaskList]?
+    
 }

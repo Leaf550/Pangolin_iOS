@@ -143,7 +143,8 @@ extension AddGroupViewController {
             self?.imageName = imageName
         }
         
-        cell?.groupTitleTextTield?.rx.text
+        cell?.groupTitleTextTield?.rx
+            .text
             .orEmpty
             .subscribe(onNext: { [weak self] title in
                 self?.listName = title

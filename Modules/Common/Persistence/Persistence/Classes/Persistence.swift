@@ -53,4 +53,13 @@ extension PersistenceModule: PersistenceProvider {
         accountKV.object(HomeModel.self, forKey: PersistenceKVKey.homeModelKVKey)
     }
     
+    // MARK: - TaskLists
+    func getAllTaskLists() -> [TaskList]? {
+        guard let homeModel = getHomeModel() else { return nil }
+        let lists = homeModel.data?.otherList?
+            .map { $0.sections?.first?.taskList }
+            .filter { $0 != nil }
+        return lists as? [TaskList]
+    }
+    
 }

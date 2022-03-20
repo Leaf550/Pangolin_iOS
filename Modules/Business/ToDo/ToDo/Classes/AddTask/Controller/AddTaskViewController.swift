@@ -9,12 +9,19 @@ import UIKit
 import UIComponents
 import RxSwift
 import RxCocoa
+import PGFoundation
+import Persistence
+import Provider
 
-class AddTaskViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class AddTaskViewController: UIViewController, ViewController, UITableViewDataSource, UITableViewDelegate {
     
-    private var cellConfigureData = TaskConfigCellModel.defaultValue()
+    typealias VM = AddTaskViewModel
+ 
+    var viewModel: VM = AddTaskViewModel()
     
-    private let disposeBag = DisposeBag()
+    private lazy var cellConfigureData = TaskConfigCellModel()
+    
+    var disposeBag = DisposeBag()
     
     private lazy var tableView: UITableView = {
         let table = UITableView(frame: .zero, style: .grouped)
@@ -25,6 +32,25 @@ class AddTaskViewController: UIViewController, UITableViewDataSource, UITableVie
         
         return table
     }()
+    
+    private lazy var titleValue = BehaviorSubject<String?>(value: nil)
+    private lazy var commentValue = BehaviorSubject<String?>(value: nil)
+    private lazy var dateValue = BehaviorSubject<Double?>(value: nil)
+    private lazy var timeValue = BehaviorSubject<Double?>(value: nil)
+    private lazy var isImportantValue = BehaviorSubject<Bool>(value: false)
+    private lazy var listValue = BehaviorSubject<TaskList?>(value: cellConfigureData.selectedList)
+    
+    init(defaultList: TaskList?) {
+        super.init(nibName: nil, bundle: nil)
+        
+        if defaultList != nil {
+            cellConfigureData.selectedList = defaultList
+        }
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         self.title = "新建事项"
@@ -38,14 +64,56 @@ class AddTaskViewController: UIViewController, UITableViewDataSource, UITableVie
         
         configNavigationItem()
         setUpSubViews()
+        bindViewModel()
+    }
+    
+    func bindViewModel() {
+        let data = Observable.combineLatest(
+            titleValue.map { $0 ?? "" },
+            commentValue,
+            dateValue.map { Int64(($0 ?? 0) * 1000) },
+            timeValue.map { Int64(($0 ?? 0) * 1000) },
+            isImportantValue,
+            listValue.map { $0?.listID ?? "" }
+        )
+        
+        navigationItem.rightBarButtonItem?.rx
+            .tap
+            .withLatestFrom(data) { $1 }
+            .filter { $0 != "" && $5 != "" }
+            .bind(to: viewModel.input.completeButtonTap)
+            .disposed(by: disposeBag)
+        
+        let output = viewModel.transformToOutput()
+        
+        output.uploadResult
+            .subscribe(onNext: { isSuccess in
+                print(isSuccess)
+            })
+            .disposed(by: disposeBag)
     }
     
     private func configNavigationItem() {
-        let leftButton = UIBarButtonItem(title: "取消", style: .plain, target: self, action: #selector(cancelAddition))
+        let leftButton = UIBarButtonItem(title: "取消", style: .plain, target: nil, action: nil)
         self.navigationItem.leftBarButtonItem = leftButton
         
-        let rightButton = UIBarButtonItem(title: "完成", style: .done, target: self, action: #selector(completeAddition))
+        let rightButton = UIBarButtonItem(title: "完成", style: .done, target: nil, action: nil)
         self.navigationItem.rightBarButtonItem = rightButton
+        
+        leftButton.rx.tap.bind {
+            self.dismiss(animated: true, completion: nil)
+        }.disposed(by: disposeBag)
+        
+        rightButton.rx.tap.bind {
+            self.dismiss(animated: true, completion: nil)
+        }.disposed(by: disposeBag)
+        
+        Observable.combineLatest(
+            titleValue,
+            listValue
+        ) { $0 != nil && $0 != "" && $1 != nil }
+        .bind(to: rightButton.rx.isEnabled)
+        .disposed(by: disposeBag)
     }
     
     private func setUpSubViews() {
@@ -55,31 +123,24 @@ class AddTaskViewController: UIViewController, UITableViewDataSource, UITableVie
         }
     }
     
-    @objc
-    private func cancelAddition() {
-        dismiss(animated: true, completion: nil)
-    }
-    
-    @objc func completeAddition() {
-        dismiss(animated: true, completion: nil)
-    }
-    
 }
 
 extension AddTaskViewController {
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return TaskConfigCellModel.defaultValue().count
+        return cellConfigureData.defaultValue.count
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return TaskConfigCellModel.defaultValue()[section].count
+        return cellConfigureData.defaultValue[section].count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         var cell: TaskConfigBaseTableViewCell?
+        let allCellModels = cellConfigureData.defaultValue[indexPath.section]
+        let cellModel = cellConfigureData.defaultValue[indexPath.section][indexPath.row]
         
-        switch cellConfigureData[indexPath.section][indexPath.row].type {
+        switch cellModel.type {
             case .input:
                 cell = tableView.dequeueReusableCell(withIdentifier: TaskInputTableViewCell.reuseID, for: indexPath) as? TaskInputTableViewCell
             case .switch:
@@ -88,8 +149,29 @@ extension AddTaskViewController {
                 cell = tableView.dequeueReusableCell(withIdentifier: TaskNavigationTableViewCell.reuseID, for: indexPath) as? TaskNavigationTableViewCell
         }
         cell?.tableView = tableView
-        cell?.setIsSeparateLineHidden(indexPath.row == cellConfigureData[indexPath.section].count - 1)
-        cell?.configCell(with: cellConfigureData[indexPath.section][indexPath.row])
+        cell?.setIsSeparateLineHidden(indexPath.row == allCellModels.count - 1)
+        cell?.configCell(with: cellModel)
+        
+        switch cellModel.content {
+            case .title:
+                cell?.textView?.rx
+                    .text
+                    .bind(to: titleValue)
+                    .disposed(by: disposeBag)
+            case .comment:
+                cell?.textView?.rx
+                    .text
+                    .bind(to: commentValue)
+                    .disposed(by: disposeBag)
+            case .date: break
+            case .time: break
+            case .important:
+                cell?.switch?.rx
+                    .isOn
+                    .bind(to: isImportantValue)
+                    .disposed(by: disposeBag)
+            case .list: break
+        }
         
         return cell ?? UITableViewCell()
     }
@@ -99,13 +181,18 @@ extension AddTaskViewController {
 extension AddTaskViewController {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        switch cellConfigureData[indexPath.section][indexPath.row].type {
+        switch cellConfigureData.defaultValue[indexPath.section][indexPath.row].type {
             case .navigation:
-                let controller = ChooseGroupViewController()
-                controller.chooseCompleted = { [weak self] title, color in
-                    self?.cellConfigureData[indexPath.section][indexPath.row].currentValueLabelText = title
-                    self?.cellConfigureData[indexPath.section][indexPath.row].indicatorViewColor = TasksGroupIconColorImpl.plainColor(with: color)
+                guard let selectedList = self.cellConfigureData.selectedList else { return }
+                let controller = ChooseGroupViewController(selected: selectedList)
+                controller.groupListSubject.onNext(self.cellConfigureData.savedTaskLists ?? [])
+                controller.didSelectList = { [weak self] selectedList in
+                    self?.cellConfigureData.defaultValue[indexPath.section][indexPath.row].currentValueLabelText = selectedList.listName
+                    let color = TasksGroupIconColor(rawValue: selectedList.listColor ?? 0) ?? .blue
+                    self?.cellConfigureData.defaultValue[indexPath.section][indexPath.row].indicatorViewColor = TasksGroupIconColorImpl.plainColor(with: color)
                     tableView.reloadData()
+                    self?.cellConfigureData.selectedList = selectedList
+                    self?.listValue.onNext(selectedList)
                 }
                 self.navigationController?.pushViewController(controller, animated: true)
             default:
