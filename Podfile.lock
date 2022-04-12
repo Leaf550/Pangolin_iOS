@@ -9,6 +9,13 @@ PODS:
     - UIComponents
     - Util
   - Alamofire (5.4.4)
+  - BBS (0.0.1):
+    - Net
+    - PGFoundation
+    - Provider
+    - RxCocoa
+    - RxSwift
+    - UIComponents
   - Differentiator (5.0.0)
   - Hybrid (0.0.1):
     - Util
@@ -64,6 +71,7 @@ PODS:
 DEPENDENCIES:
   - Account (from `Modules/Common/Account`)
   - Alamofire (= 5.4.4)
+  - BBS (from `Modules/Business/BBS`)
   - Hybrid (from `Modules/Common/Hybrid`)
   - MMKV (= 1.2.11)
   - Net (from `Modules/Common/Net`)
@@ -97,6 +105,8 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   Account:
     :path: Modules/Common/Account
+  BBS:
+    :path: Modules/Business/BBS
   Hybrid:
     :path: Modules/Common/Hybrid
   Net:
@@ -121,6 +131,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Account: 5d43290fac2bcbc676781dd8161af9489543e555
   Alamofire: f3b09a368f1582ab751b3fff5460276e0d2cf5c9
+  BBS: 819e80c3a67beaadd46be5a88f8ef151f176a80f
   Differentiator: e8497ceab83c1b10ca233716d547b9af21b9344d
   Hybrid: f939efddf0a5e3cd6b48961abebdb98cba6add40
   MMKV: 217b643c181c3d2f71983206ca1972d0a6e99881
@@ -141,6 +152,6 @@ SPEC CHECKSUMS:
   UIComponents: b1d741cba7e3a8a53b9ee7c9449e8c642d73fd05
   Util: 9269aba84bf203b4ea0604aeb60088d757e3e87e
 
-PODFILE CHECKSUM: a213cf683ac8efb6940e74085ff470fc777f8417
+PODFILE CHECKSUM: 24148f0945bde56eb37048eeaca7380056e81fe8
 
 COCOAPODS: 1.10.1

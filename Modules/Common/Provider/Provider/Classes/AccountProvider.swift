@@ -13,7 +13,6 @@ public protocol AccountProvider: PGProvider {
                                     animated: Bool,
                                     presentCompletion: (() -> Void)?,
                                     loginCompletion: ((Bool) -> Void)?)
-    
     func getToken() -> String?
     func getUser() -> User?
     

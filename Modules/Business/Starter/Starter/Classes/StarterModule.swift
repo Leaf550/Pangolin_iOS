@@ -48,17 +48,24 @@ extension StarterModule {
         }
         
         guard let toDoService = PGProviderManager.shared.provider(forProtocol: { ToDoProvider.self }) else { return }
+        guard let bbsService = PGProviderManager.shared.provider(forProtocol: { BBSProvider.self }) else { return }
         
         var controllers = [UIViewController]()
         
-        let homeVC = toDoService.getToDoViewController()
-        let home = UINavigationController(rootViewController: homeVC)
-        home.tabBarItem = UITabBarItem(title: "home", image: nil, selectedImage: nil)
+        if let homeVC = toDoService.getToDoViewController() {
+            let home = UINavigationController(rootViewController: homeVC)
+            home.tabBarItem = UITabBarItem(title: "home", image: nil, selectedImage: nil)
+            controllers.append(home)
+        }
+        
+        if let bbsVC = bbsService.getBBSViewController() {
+            let bbs = UINavigationController(rootViewController: bbsVC)
+            bbs.tabBarItem = UITabBarItem(title: "xxx社区", image: nil, selectedImage: nil)
+            controllers.append(bbs)
+        }
         
         let testVC = TestViewController()
         testVC.tabBarItem = UITabBarItem(title: "test", image: nil, selectedImage: nil)
-        
-        controllers.append(home)
         controllers.append(testVC)
         
         tabBarController.viewControllers = controllers

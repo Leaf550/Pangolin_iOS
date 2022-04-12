@@ -14,6 +14,7 @@ public class PGModuleManager {
         "Persistence.PersistenceModule",
         "Account.AccountModule",
         "ToDo.ToDoModule",
+        "BBS.BBSModule",
     ]
     
     private var modules = [PGModule]()

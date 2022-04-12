@@ -8,5 +8,5 @@
 import UIKit
 
 public protocol ToDoProvider: PGProvider {
-    func getToDoViewController() -> UIViewController
+    func getToDoViewController() -> UIViewController?
 }

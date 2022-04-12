@@ -11,6 +11,7 @@ public protocol PGModule {
     
     // 做一些各业务模块的初始化工作
     func runModule()
+    // 启动回调
     func applicationWillFinishLaunching()
     func applicationDidFinishLaunching()
     func applicationDidSetUpViews()
