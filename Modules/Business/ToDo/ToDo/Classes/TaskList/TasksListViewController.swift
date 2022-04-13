@@ -12,13 +12,14 @@ import RxSwift
 import RxCocoa
 import SnapKit
 import RxDataSources
+import Net
 
 enum ListType {
     case today
     case important
     case all
     case completed
-    case other(String)
+    case other(Int)
 }
 
 class TasksListViewController: UIViewController, ViewController, UITableViewDelegate {
@@ -29,10 +30,14 @@ class TasksListViewController: UIViewController, ViewController, UITableViewDele
     
     var titleColor: TasksGroupIconColor
     var listId: String?
-    
-    var pageData: ListPageData
+    var listType: ListType
+    var listIndex: Int?
     
     lazy var rxSections = ReplaySubject<[TasksListSection]>.create(bufferSize: 1)
+    var sections: [TasksListSection] = []
+    
+    var requestSetTaskIsCompleted = PublishSubject<(TaskModel, Bool)>()
+    var requestSetTaskIsCompletedCompleted = PublishSubject<(String, Bool)>()
     
     private lazy var todoTable: TableView = {
         let table = TableView()
@@ -50,46 +55,11 @@ class TasksListViewController: UIViewController, ViewController, UITableViewDele
                 cell?.configData(with: item)
                 
                 cell?.checkBox.checkBoxSelectCallBack = { selected in
-                    var index = 0
-                    guard var section = self.pageData.sections?[indexPath.section] else { return }
-                    for i in 0 ..< section.items.count {
-                        if section.items[i].taskID == cell?.taskID ?? "" {
-                            index = i
-                        }
+                    if !Net.isReachableToServer() {
+                        Toast.show(text: "暂无网络连接", image: nil)
+                        return
                     }
-                    guard var tasks = section.tasks else { return }
-                    if selected {
-                        var removed = tasks.remove(at: index)
-                        removed.isCompleted = selected
-                        tasks.append(removed)
-                        section.tasks = tasks
-                        self.pageData.sections?[indexPath.section] = TasksListSection(
-                            original: section,
-                            items: tasks
-                        )
-                        self.rxSections.onNext(self.pageData.sections ?? [])
-                    } else {
-                        var removed = tasks.remove(at: index)
-                        removed.isCompleted = selected
-                        var insertIndex: Int? = nil
-                        for i in 0 ..< tasks.count {
-                            let task = tasks[i]
-                            if task.createTime ?? 0 > removed.createTime ?? 0 {
-                                insertIndex = i
-                                break
-                            }
-                        }
-                        if insertIndex == nil {
-                            tasks.append(removed)
-                        } else {
-                            tasks.insert(removed, at: insertIndex ?? 0)
-                        }
-                        self.pageData.sections?[indexPath.section] = TasksListSection(
-                            original: section,
-                            items: tasks
-                        )
-                        self.rxSections.onNext(self.pageData.sections ?? [])
-                    }
+                    self.didSelectCheckBox(with: item, selected: selected, cell: cell)
                 }
                 return cell ?? UITableViewCell()
             })
@@ -114,13 +84,44 @@ class TasksListViewController: UIViewController, ViewController, UITableViewDele
     
     init(titleColor: TasksGroupIconColor,
          title: String,
-         pageData: ListPageData) {
+         listType: ListType) {
         self.titleColor = titleColor
-        self.pageData = pageData
+        self.listType = listType
         super.init(nibName: nil, bundle: nil)
         self.title = title
         
-        rxSections.onNext(pageData.sections ?? [])
+        TaskManager.shared.homeModel
+            .map { [weak self] homeModel -> [TasksListSection] in
+                var sections: [TasksListSection]?
+                switch listType {
+                    case .today:
+                        sections = homeModel?.data?.today?.sections
+                    case .important:
+                        sections = homeModel?.data?.important?.sections
+                    case .all:
+                        sections = homeModel?.data?.all?.sections
+                    case .completed:
+                        sections = homeModel?.data?.completed?.sections
+                    case .other(let listIndex):
+                        self?.listIndex = listIndex
+                        sections = homeModel?.data?.otherList?[listIndex].sections
+                }
+                
+                return self?.configTableDatas(with: sections) ?? []
+            }
+            .subscribe(onNext: { [weak self] sections in
+                self?.sections = sections
+                self?.rxSections.onNext(sections)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    func configTableDatas(with sections: [TasksListSection]?) -> [TasksListSection] {
+        []
+    }
+    
+    func didSelectCheckBox(with task: TaskModel, selected: Bool, cell: TaskTableViewCell?) {
+        
     }
     
     required init?(coder: NSCoder) {
@@ -148,16 +149,16 @@ class TasksListViewController: UIViewController, ViewController, UITableViewDele
     }
     
     func bindViewModel() {
-//        let output = viewModel.transformToOutput()
-//
-//        output.tasksListModel
-//            .map { $0?.data?.rxSections ?? [] }
-//            .bind(to: rxSections)
-//            .disposed(by: disposeBag)
-//
-        rxSections.subscribe(onNext: { [weak self] section in
-            self?.pageData.sections = section
-        }).disposed(by: disposeBag)
+        requestSetTaskIsCompleted
+            .bind(to: viewModel.input.updateTaskIsCompleted)
+            .disposed(by: disposeBag)
+        
+        let output = viewModel.transformToOutput()
+        
+        output.updateCompleted
+            .bind(to: requestSetTaskIsCompletedCompleted)
+            .disposed(by: disposeBag)
+        
     }
     
     private func setUpSubviews() {
@@ -174,19 +175,10 @@ class TasksListViewController: UIViewController, ViewController, UITableViewDele
     
     @objc
     func addToDo() {
-        let defaultSelectedList = pageData.sections?.first?.taskList
+        let defaultSelectedList = sections.first?.taskList
         let newTaskController = AddTaskViewController(defaultList: defaultSelectedList)
         let navController = UINavigationController(rootViewController: newTaskController)
         present(navController, animated: true, completion: nil)
     }
     
-}
-
-extension TasksListViewController {
-//    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-//        let label = UILabel()
-//        label.text = "test"
-//        label.backgroundColor = .red
-//        return label
-//    }
 }

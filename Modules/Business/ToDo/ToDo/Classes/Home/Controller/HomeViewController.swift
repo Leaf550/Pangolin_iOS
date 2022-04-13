@@ -20,9 +20,6 @@ class HomeViewController: UIViewController, ViewController {
     
     var viewModel: HomeViewModel = HomeViewModel()
     
-    private let persistenceService = PGProviderManager.shared.provider { PersistenceProvider.self }
-    private lazy var homeModel = BehaviorRelay<HomeModel?>(value: persistenceService?.getHomeModel())
-    
     var disposeBag = DisposeBag()
     
     private lazy var listsTableView: TableView = {
@@ -31,13 +28,16 @@ class HomeViewController: UIViewController, ViewController {
         table.separatorStyle = .none
         table.rowHeight = 54
         
-        homeModel
+        TaskManager.shared.homeModel
             .map { $0?.data?.otherList ?? [] }
             .bind(to: table.rx.items(cellIdentifier: TasksGroupTableViewCell.reuseID, cellType: TasksGroupTableViewCell.self)) { [weak self] row, data, cell in
                 guard let self = self else { return }
                 let section = data.sections?.first
                 cell.titleLabel.text = section?.taskList?.listName ?? ""
-                cell.numberLabel.text = String(section?.tasks?.count ?? 0)
+                let unCompletedCount = section?.tasks?.reduce(0, { partialResult, task in
+                    partialResult + ((task.isCompleted ?? false) ? 0 : 1 )
+                })
+                cell.numberLabel.text = String(unCompletedCount ?? 0)
                 cell.iconColor = TasksGroupIconColor(rawValue: section?.taskList?.listColor ?? 0) ?? .blue
                 let numberOfRows = table.numberOfRows(inSection: 0)
                 cell.hasSeparateLine = (row != numberOfRows - 1)
@@ -45,16 +45,16 @@ class HomeViewController: UIViewController, ViewController {
             .disposed(by: disposeBag)
         
         table.rx.itemSelected
-            .withLatestFrom(homeModel) {
+            .withLatestFrom(TaskManager.shared.homeModel) {
                 ($0, $1)
             }
             .bind { [weak self] indexPath, homeModel in
                 guard let pageData = homeModel?.data?.otherList?[indexPath.row] else { return }
                 let taskList = pageData.sections?.first?.taskList
-                let todoListController = TasksListViewController(
+                let todoListController = TasksListPlainViewController(
                     titleColor: TasksGroupIconColor(rawValue: taskList?.listColor ?? 0) ?? .blue,
                     title: taskList?.listName ?? "",
-                    pageData: pageData
+                    listType: .other(indexPath.row)
                 )
                 todoListController.hidesBottomBarWhenPushed = true
                 self?.navigationController?.pushViewController(todoListController, animated: true)
@@ -81,13 +81,13 @@ class HomeViewController: UIViewController, ViewController {
         let view = TopTasksListView()
         
         view.todayTapped
-            .withLatestFrom(homeModel) { ($0, $1) }
+            .withLatestFrom(TaskManager.shared.homeModel) { ($0, $1) }
             .bind { [weak self] _, homeModel in
                 guard let todayData = homeModel?.data?.today else { return }
-                let todoListController = TasksListViewController(
+                let todoListController = TasksListGroupedViewController(
                     titleColor: .blue,
                     title: "今天",
-                    pageData: todayData
+                    listType: .today
                 )
                 todoListController.hidesBottomBarWhenPushed = true
                 self?.navigationController?.pushViewController(todoListController, animated: true)
@@ -95,13 +95,13 @@ class HomeViewController: UIViewController, ViewController {
             .disposed(by: disposeBag)
         
         view.importantTapped
-            .withLatestFrom(homeModel) { ($0, $1) }
+            .withLatestFrom(TaskManager.shared.homeModel) { ($0, $1) }
             .bind { [weak self] _, homeModel in
                 guard let importantData = homeModel?.data?.important else { return }
-                let todoListController = TasksListViewController(
+                let todoListController = TasksListGroupedViewController(
                     titleColor: .orange,
                     title: "重要",
-                    pageData: importantData
+                    listType: .important
                 )
                 todoListController.hidesBottomBarWhenPushed = true
                 self?.navigationController?.pushViewController(todoListController, animated: true)
@@ -109,13 +109,13 @@ class HomeViewController: UIViewController, ViewController {
             .disposed(by: disposeBag)
         
         view.allTapped
-            .withLatestFrom(homeModel) { ($0, $1) }
+            .withLatestFrom(TaskManager.shared.homeModel) { ($0, $1) }
             .bind { [weak self] _, homeModel in
                 guard let allData = homeModel?.data?.all else { return }
-                let todoListController = TasksListViewController(
+                let todoListController = TasksListGroupedViewController(
                     titleColor: .gray,
                     title: "全部",
-                    pageData: allData
+                    listType: .all
                 )
                 todoListController.hidesBottomBarWhenPushed = true
                 self?.navigationController?.pushViewController(todoListController, animated: true)
@@ -123,13 +123,13 @@ class HomeViewController: UIViewController, ViewController {
             .disposed(by: disposeBag)
         
         view.completedTapped
-            .withLatestFrom(homeModel) { ($0, $1) }
+            .withLatestFrom(TaskManager.shared.homeModel) { ($0, $1) }
             .bind { [weak self] _, homeModel in
                 guard let completedData = homeModel?.data?.completed else { return }
-                let todoListController = TasksListViewController(
+                let todoListController = TasksListGroupedViewController(
                     titleColor: .green,
                     title: "已完成",
-                    pageData: completedData
+                    listType: .completed
                 )
                 todoListController.hidesBottomBarWhenPushed = true
                 self?.navigationController?.pushViewController(todoListController, animated: true)
@@ -172,21 +172,24 @@ class HomeViewController: UIViewController, ViewController {
         
         setUpSubView()
         bindViewModel()
+        
+        viewModel.input.onHomeRefresh.onNext(Void())
     }
     
     func bindViewModel() {
-        rx.methodInvoked(#selector(viewDidAppear(_:)))
-            .map { _ in Void() }
-            .bind(to: viewModel.input.onHomeRefresh)
-            .disposed(by: disposeBag)
-        
         let output = viewModel.transformToOutput()
         
         output.homeModel
-            .bind(to: homeModel)
+            .filter({ model in
+                if model == nil {
+                    Toast.show(text: "网络错误，仅可浏览", image: nil)
+                }
+                return model != nil
+            })
+            .bind(to: TaskManager.shared.homeModel)
             .disposed(by: disposeBag)
         
-        output.homeModel
+        TaskManager.shared.homeModel
             .subscribe(onNext: { [weak self] model in
                 self?.topToDoLists.todayList.setNumber(number: model?.data?.todayCount ?? 0)
                 self?.topToDoLists.importantList.setNumber(number: model?.data?.importantCount ?? 0)

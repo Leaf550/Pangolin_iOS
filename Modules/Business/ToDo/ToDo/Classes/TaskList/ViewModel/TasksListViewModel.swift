@@ -10,11 +10,11 @@ import RxSwift
 import Net
 
 struct TasksListViewModelInput: ViewModelInput {
-    let viewDidLoadWithListId = PublishSubject<ListType>()
+    let updateTaskIsCompleted = PublishSubject<(TaskModel, Bool)>()
 }
 
 struct TasksListViewModelOutput: ViewModelOutput {
-//    let tasksListModel = PublishSubject<TasksListModel?>()
+    let updateCompleted = PublishSubject<(String, Bool)>()
 }
 
 class TasksListViewModel: ViewModel {
@@ -28,58 +28,39 @@ class TasksListViewModel: ViewModel {
     func transformToOutput() -> TasksListViewModelOutput {
         let output = TasksListViewModelOutput()
         
-//        input.viewDidLoadWithListId
-//            .flatMapLatest { [weak self] listType in
-//                self?.requestTasksList(with: listType) ?? Observable.never()
-//            }
-//            .bind(to: output.tasksListModel)
-//            .disposed(by: disposeBag)
+        input.updateTaskIsCompleted
+            .flatMapLatest { [weak self] (task, completed) -> Observable<(String, Bool)> in
+                guard let taskId = task.taskID else { return Observable<(String, Bool)>.never() }
+                return self?.updateTaskIsCompleted(taskId: taskId, isCompleted: completed) ?? Observable<(String, Bool)>.never()
+            }
+            .bind(to: output.updateCompleted)
+            .disposed(by: disposeBag)
         
         return output
     }
     
-//    private func requestTasksList(with listType: ListType) -> Observable<TasksListModel?> {
-//        Observable<TasksListModel?>.create { observer in
-//            let net = Net.build()
-//
-//            switch listType {
-//                case .today:
-//                    net.configPath(.tasksInToday)
-//                case .important:
-//                    net.configPath(.tasksIsImportant)
-//                case .all:
-//                    net.configPath(.allTasks)
-//                case .completed:
-//                    net.configPath(.tasksIsCompleted)
-//                case .other(let listId):
-//                    net.configPath(.tasksList)
-//                    .configBody([
-//                        "listId" : listId
-//                    ])
-//            }
-//
-//            net.get { json in
-//                    guard let data = try? JSONSerialization.data(withJSONObject: json) else {
-//                        observer.onNext(nil)
-//                        return
-//                    }
-//                    guard let model = try? JSONDecoder().decode(TasksListModel.self, from: data) else {
-//                        observer.onNext(nil)
-//                        return
-//                    }
-//                    if model.status != 200 {
-//                        observer.onNext(nil)
-//                    } else {
-//                        observer.onNext(model)
-//                    }
-//                } error: { err in
-//                    observer.onNext(nil)
-//                }
-//
-//            return Disposables.create {
-//                net.cancel()
-//            }
-//        }
-//    }
-//
+    func updateTaskIsCompleted(taskId: String, isCompleted: Bool) -> Observable<(String, Bool)> {
+        Observable<(String, Bool)>.create { observer in
+            let net = Net.build()
+                .configPath(RequestPath.taskCompleted)
+                .configBody([
+                    "taskId" : taskId,
+                    "completed" : isCompleted ? "1" : "0"
+                ])
+                .get { json in
+                    if (json as? [String : Any])?["status"] as? Int == 200 {
+                        observer.onNext((taskId, true))
+                    } else {
+                        observer.onNext((taskId, false))
+                    }
+                } error: { _ in
+                    observer.onNext((taskId, false))
+                }
+            
+            return Disposables.create {
+                net.cancel()
+            }
+        }
+    }
+    
 }

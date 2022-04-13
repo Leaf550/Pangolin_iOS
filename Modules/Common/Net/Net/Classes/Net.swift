@@ -11,7 +11,9 @@ import Provider
 
 public class Net {
     
-    private var host: RequestHost = .develop
+    static var host: RequestHost = .develop
+    
+    private var host: RequestHost = Net.host
     private var path: RequestPath = .root
     private var url: String { host.rawValue + path.rawValue }
     private var header: [String : String]? = [
@@ -23,12 +25,6 @@ public class Net {
     
     public static func build() -> Net {
         return Net()
-    }
-    
-    @discardableResult
-    public func configHost(_ host: RequestHost) -> Self {
-        self.host = host
-        return self
     }
     
     @discardableResult
@@ -73,6 +69,21 @@ public class Net {
     
     public func cancel() {
         request?.cancel()
+    }
+    
+    public static func netWorkStatus() -> NetworkStatus {
+        switch NetworkReachabilityManager.default?.status ?? .unknown {
+            case .unknown:
+                return .unknown
+            case .notReachable:
+                return .notReachable
+            case .reachable(let connectionType):
+                return connectionType == .cellular ? .cellular : .ethernetOrWiFi
+        }
+    }
+    
+    public static func isReachableToServer() -> Bool {
+        NetworkReachabilityManager(host: Net.host.rawValue)?.isReachable ?? false
     }
     
     private func request(method: HTTPMethod,

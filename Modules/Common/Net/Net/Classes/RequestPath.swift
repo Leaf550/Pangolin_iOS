@@ -10,6 +10,10 @@ import UIKit
 public enum RequestHost: String {
     // 开发环境
     case develop    = "http://127.0.0.1:8080"
+    // 热点
+    case hotPoint   = "http://172.20.10.4:8080"
+    // 校园网
+    case cqupt5g    = "http://????"
     // 生产环境
     case product    = ""
     // Mock环境
@@ -31,4 +35,6 @@ public enum RequestPath: String {
     case addTask            = "/addTask"
     // home页
     case home               = "/home"
+    // 完成（取消完成）任务
+    case taskCompleted      = "/taskCompleted"
 }

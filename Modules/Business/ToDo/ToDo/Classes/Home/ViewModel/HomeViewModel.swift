@@ -13,7 +13,7 @@ import Foundation
 import Provider
 
 struct HomeViewModelInput: ViewModelInput {
-    let onHomeRefresh = PublishRelay<Void>()
+    let onHomeRefresh = PublishSubject<Void>()
 }
 
 struct HomeViewModelOutput: ViewModelOutput {

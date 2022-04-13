@@ -43,7 +43,8 @@ public struct TaskModel: Codable {
         case taskID = "taskId"
         case title, comment, date, time, createTime, priority
         case listID = "listId"
-        case isCompleted, isImportant
+        case isCompleted = "completed"
+        case isImportant = "important"
     }
 }
 
