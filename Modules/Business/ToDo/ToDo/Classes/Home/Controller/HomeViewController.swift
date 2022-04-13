@@ -81,9 +81,7 @@ class HomeViewController: UIViewController, ViewController {
         let view = TopTasksListView()
         
         view.todayTapped
-            .withLatestFrom(TaskManager.shared.homeModel) { ($0, $1) }
-            .bind { [weak self] _, homeModel in
-                guard let todayData = homeModel?.data?.today else { return }
+            .bind { [weak self] _ in
                 let todoListController = TasksListGroupedViewController(
                     titleColor: .blue,
                     title: "今天",
@@ -95,9 +93,7 @@ class HomeViewController: UIViewController, ViewController {
             .disposed(by: disposeBag)
         
         view.importantTapped
-            .withLatestFrom(TaskManager.shared.homeModel) { ($0, $1) }
-            .bind { [weak self] _, homeModel in
-                guard let importantData = homeModel?.data?.important else { return }
+            .bind { [weak self] _ in
                 let todoListController = TasksListGroupedViewController(
                     titleColor: .orange,
                     title: "重要",
@@ -109,9 +105,7 @@ class HomeViewController: UIViewController, ViewController {
             .disposed(by: disposeBag)
         
         view.allTapped
-            .withLatestFrom(TaskManager.shared.homeModel) { ($0, $1) }
-            .bind { [weak self] _, homeModel in
-                guard let allData = homeModel?.data?.all else { return }
+            .bind { [weak self] _ in
                 let todoListController = TasksListGroupedViewController(
                     titleColor: .gray,
                     title: "全部",
@@ -123,9 +117,7 @@ class HomeViewController: UIViewController, ViewController {
             .disposed(by: disposeBag)
         
         view.completedTapped
-            .withLatestFrom(TaskManager.shared.homeModel) { ($0, $1) }
-            .bind { [weak self] _, homeModel in
-                guard let completedData = homeModel?.data?.completed else { return }
+            .bind { [weak self] _ in
                 let todoListController = TasksListGroupedViewController(
                     titleColor: .green,
                     title: "已完成",
@@ -189,12 +181,12 @@ class HomeViewController: UIViewController, ViewController {
             .bind(to: TaskManager.shared.homeModel)
             .disposed(by: disposeBag)
         
-        TaskManager.shared.homeModel
-            .subscribe(onNext: { [weak self] model in
-                self?.topToDoLists.todayList.setNumber(number: model?.data?.todayCount ?? 0)
-                self?.topToDoLists.importantList.setNumber(number: model?.data?.importantCount ?? 0)
-                self?.topToDoLists.allList.setNumber(number: model?.data?.allCount ?? 0)
-                self?.topToDoLists.completedList.setNumber(number: model?.data?.completedCount ?? 0)
+        TaskManager.shared.allPageData
+            .subscribe(onNext: { [weak self] allPageData in
+                let count = allPageData?.sections?.reduce(0, { partialResult, section in
+                    return partialResult + (section.tasks?.count ?? 0)
+                }) ?? 0
+                self?.topToDoLists.allList.setNumber(number: count)
             })
             .disposed(by: disposeBag)
     }

@@ -56,7 +56,7 @@ class TasksListPlainViewController: TasksListViewController {
                             }
                         }
                         if let index = taskIndex {
-                            sections[0].tasks?.remove(at: index)
+                            sections[0].tasks?[index].isCompleted = selected
                             homeModel.data?.otherList?[listIndex].sections = sections
                             TaskManager.shared.homeModel.onNext(homeModel)
                         }

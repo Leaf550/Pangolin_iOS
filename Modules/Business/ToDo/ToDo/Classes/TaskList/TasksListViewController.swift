@@ -91,17 +91,22 @@ class TasksListViewController: UIViewController, ViewController, UITableViewDele
         self.title = title
         
         TaskManager.shared.homeModel
-            .map { [weak self] homeModel -> [TasksListSection] in
+            .withLatestFrom(TaskManager.shared.allPageData) { ($0, $1) }
+            .map { [weak self] (homeModel, allPageData) -> [TasksListSection] in
                 var sections: [TasksListSection]?
                 switch listType {
                     case .today:
-                        sections = homeModel?.data?.today?.sections
+//                        sections = homeModel?.data?.today?.sections
+                        break
                     case .important:
-                        sections = homeModel?.data?.important?.sections
+//                        sections = homeModel?.data?.important?.sections
+                        break
                     case .all:
-                        sections = homeModel?.data?.all?.sections
+                        sections = allPageData?.sections
+                        break
                     case .completed:
-                        sections = homeModel?.data?.completed?.sections
+//                        sections = homeModel?.data?.completed?.sections
+                        break
                     case .other(let listIndex):
                         self?.listIndex = listIndex
                         sections = homeModel?.data?.otherList?[listIndex].sections
