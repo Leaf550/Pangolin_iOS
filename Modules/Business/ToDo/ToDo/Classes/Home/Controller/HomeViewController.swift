@@ -22,11 +22,19 @@ class HomeViewController: UIViewController, ViewController {
     
     var disposeBag = DisposeBag()
     
+    private lazy var refreshControl: UIRefreshControl = {
+        let refresh = UIRefreshControl()
+        refresh.addTarget(self, action: #selector(beginRefresh), for: .valueChanged)
+        return refresh
+    }()
+    
     private lazy var listsTableView: TableView = {
         let table = TableView(frame: .zero, style: .grouped)
         table.backgroundColor = .clear
         table.separatorStyle = .none
         table.rowHeight = 54
+        
+        table.addSubview(refreshControl)
         
         TaskManager.shared.homeModel
             .map { $0?.data?.otherList ?? [] }
@@ -165,17 +173,23 @@ class HomeViewController: UIViewController, ViewController {
         setUpSubView()
         bindViewModel()
         
-        viewModel.input.onHomeRefresh.onNext(Void())
+        beginRefresh()
     }
     
     func bindViewModel() {
+        rx.methodInvoked(#selector(beginRefresh))
+            .map { _ in Void() }
+            .bind(to: viewModel.input.onHomeRefresh)
+            .disposed(by: disposeBag)
+        
         let output = viewModel.transformToOutput()
         
         output.homeModel
-            .filter({ model in
+            .filter({ [weak self] model in
                 if model == nil {
                     Toast.show(text: "网络错误，仅可浏览", image: nil)
                 }
+                self?.refreshControl.endRefreshing()
                 return model != nil
             })
             .bind(to: TaskManager.shared.homeModel)
@@ -216,6 +230,11 @@ class HomeViewController: UIViewController, ViewController {
                 self?.topToDoLists.completedList.setNumber(number: count)
             })
             .disposed(by: disposeBag)
+    }
+    
+    @objc
+    private func beginRefresh() {
+        
     }
     
     private func setUpSubView() {
