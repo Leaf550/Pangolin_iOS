@@ -13,7 +13,7 @@ public enum RequestHost: String {
     // 热点
     case hotPoint   = "http://172.20.10.4:8080"
     // 校园网
-    case cqupt5g    = "http://????"
+    case cqupt5g    = "http://10.17.66.134:8080"
     // 生产环境
     case product    = ""
     // Mock环境

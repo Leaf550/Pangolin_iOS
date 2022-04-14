@@ -65,10 +65,7 @@ class TasksListViewController: UIViewController, ViewController, UITableViewDele
             })
         
         datasource.titleForHeaderInSection = { ds, index in
-            if ds.sectionModels.count == 1 {
-                return nil
-            }
-            return ds.sectionModels[index].taskList?.listName ?? ""
+            ds.sectionModels[index].taskList?.listName ?? ""
         }
         
         rxSections
@@ -90,28 +87,35 @@ class TasksListViewController: UIViewController, ViewController, UITableViewDele
         super.init(nibName: nil, bundle: nil)
         self.title = title
         
+        let combined = Observable.combineLatest(
+            TaskManager.shared.todayPageData,
+            TaskManager.shared.importantPageData,
+            TaskManager.shared.allPageData,
+            TaskManager.shared.completedPageData
+        ) { ($0, $1, $2, $3) }
+        
         TaskManager.shared.homeModel
-            .withLatestFrom(TaskManager.shared.allPageData) { ($0, $1) }
-            .map { [weak self] (homeModel, allPageData) -> [TasksListSection] in
+            .withLatestFrom(combined) { ($0, $1.0, $1.1, $1.2, $1.3) }
+            .map { [weak self] (homeModel, todayPageData, importantPageData, allPageData, completedPageData) -> [TasksListSection] in
                 var sections: [TasksListSection]?
                 switch listType {
                     case .today:
-//                        sections = homeModel?.data?.today?.sections
+                        sections = todayPageData?.sections
                         break
                     case .important:
-//                        sections = homeModel?.data?.important?.sections
+                        sections = importantPageData?.sections
                         break
                     case .all:
                         sections = allPageData?.sections
                         break
                     case .completed:
-//                        sections = homeModel?.data?.completed?.sections
+                        sections = completedPageData?.sections
                         break
                     case .other(let listIndex):
                         self?.listIndex = listIndex
                         sections = homeModel?.data?.otherList?[listIndex].sections
                 }
-                
+
                 return self?.configTableDatas(with: sections) ?? []
             }
             .subscribe(onNext: { [weak self] sections in

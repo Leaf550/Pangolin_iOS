@@ -181,12 +181,39 @@ class HomeViewController: UIViewController, ViewController {
             .bind(to: TaskManager.shared.homeModel)
             .disposed(by: disposeBag)
         
+        TaskManager.shared.todayPageData
+            .subscribe(onNext: { [weak self] allPageData in
+                let count = allPageData?.sections?.reduce(0, { partialResult, section in
+                    return partialResult + (section.tasks?.count ?? 0)
+                }) ?? 0
+                self?.topToDoLists.todayList.setNumber(number: count)
+            })
+            .disposed(by: disposeBag)
+        
+        TaskManager.shared.importantPageData
+            .subscribe(onNext: { [weak self] allPageData in
+                let count = allPageData?.sections?.reduce(0, { partialResult, section in
+                    return partialResult + (section.tasks?.count ?? 0)
+                }) ?? 0
+                self?.topToDoLists.importantList.setNumber(number: count)
+            })
+            .disposed(by: disposeBag)
+        
         TaskManager.shared.allPageData
             .subscribe(onNext: { [weak self] allPageData in
                 let count = allPageData?.sections?.reduce(0, { partialResult, section in
                     return partialResult + (section.tasks?.count ?? 0)
                 }) ?? 0
                 self?.topToDoLists.allList.setNumber(number: count)
+            })
+            .disposed(by: disposeBag)
+        
+        TaskManager.shared.completedPageData
+            .subscribe(onNext: { [weak self] allPageData in
+                let count = allPageData?.sections?.reduce(0, { partialResult, section in
+                    return partialResult + (section.tasks?.count ?? 0)
+                }) ?? 0
+                self?.topToDoLists.completedList.setNumber(number: count)
             })
             .disposed(by: disposeBag)
     }
