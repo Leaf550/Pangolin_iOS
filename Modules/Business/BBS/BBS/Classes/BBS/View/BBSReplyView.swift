@@ -13,23 +13,29 @@ class BBSReplyView: UIView {
     private var replies = [UIView]()
     
     override init(frame: CGRect) {
-        super.init(frame: frame)
-        
-        let u1 = UserImpl(sub: "", username: "u1", level: nil, experience: nil, exp: nil)
-        let u2 = UserImpl(sub: "", username: "u2", level: nil, experience: nil, exp: nil)
-        let u3 = UserImpl(sub: "", username: "u3", level: nil, experience: nil, exp: nil)
-        
-        addReply(originUser: u1, targetUser: nil, content: "test11")
-        addReply(originUser: u2, targetUser: u1, content: "test2")
-        addReply(originUser: u3, targetUser: u2, content: "test2123123")
-        addReply(originUser: u3, targetUser: nil, content: "啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦")
+        super.init(frame: .zero)
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func addReply(originUser: User?, targetUser: User?, content: String) {
+    func configViews(with comments: [BBSComment]) {
+        for reply in replies {
+            reply.snp.removeConstraints()
+            reply.removeFromSuperview()
+        }
+        replies = []
+        layoutIfNeeded()
+        
+        for comment in comments {
+            self.addReply(originUser: comment.sourceUser,
+                          targetUser: comment.targetUser,
+                     content: comment.content ?? "")
+        }
+    }
+    
+    private func addReply(originUser: User?, targetUser: User?, content: String) {
         var replyString = "\(originUser?.username ?? "")"
         replyString += (targetUser != nil ? " 回复 \(targetUser?.username ?? "")：\(content)" : "：\(content)")
         let attributedreplyString = NSMutableAttributedString(string: replyString)

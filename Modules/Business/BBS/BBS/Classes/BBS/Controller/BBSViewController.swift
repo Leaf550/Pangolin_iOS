@@ -8,13 +8,28 @@
 import UIKit
 import PGFoundation
 import SnapKit
+import RxSwift
 
-class BBSViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class BBSViewController: UIViewController, ViewController, UITableViewDataSource, UITableViewDelegate {
+    
+    typealias VM = BBSViewModel
+    
+    var viewModel = BBSViewModel()
+    var disposeBag = DisposeBag()
+    
+    private var bbsHomeModel: BBSHomeModel?
+    
+    private lazy var refreshControl: UIRefreshControl = {
+        let refresh = UIRefreshControl()
+        refresh.addTarget(self, action: #selector(onRefresh), for: .valueChanged)
+        return refresh
+    }()
     
     private lazy var tableView: UITableView = {
         let table = UITableView()
         table.register(BBSTableViewCell.self, forCellReuseIdentifier: BBSTableViewCell.reuseID)
         table.backgroundColor = .systemBackground
+        table.addSubview(refreshControl)
         
         table.dataSource = self
         
@@ -25,12 +40,30 @@ class BBSViewController: UIViewController, UITableViewDataSource, UITableViewDel
         super.viewDidLoad()
 
         setUpSubViews()
+        bindViewModel()
+        onRefresh()
+    }
+    
+    func bindViewModel() {
+        let output = viewModel.transformToOutput()
+        
+        output.bbsHomeRefreshCompleted
+            .subscribe(onNext: { [weak self] model in
+                self?.refreshControl.endRefreshing()
+                self?.bbsHomeModel = model
+                self?.tableView.reloadData()
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    @objc
+    private func onRefresh() {
+        viewModel.input.bbsHomeRefresh.onNext(Void())
     }
     
     private func setUpSubViews() {
         self.title = "xxx社区"
         navigationController?.navigationBar.prefersLargeTitles = true
-        
         view.backgroundColor = .systemBackground
         
         view.addSubview(tableView)
@@ -49,12 +82,15 @@ extension BBSViewController {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        1
+        bbsHomeModel?.data?.posts?.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: BBSTableViewCell.reuseID, for: indexPath) as? BBSTableViewCell
         
+        if let post = bbsHomeModel?.data?.posts?[indexPath.row] {
+            cell?.configViews(with: post)
+        }
         
         return cell ?? UITableViewCell()
     }
@@ -62,7 +98,7 @@ extension BBSViewController {
 }
 
 
-struct UserImpl: User {
+struct UserImpl: Codable, User {
     var sub: String?
     var username: String?
     var level: Int?

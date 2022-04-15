@@ -41,7 +41,6 @@ class BBSTableViewCell: UITableViewCell {
     
     private lazy var contentLabel: UILabel = {
         let label = UILabel()
-        label.text = "内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容"
         label.numberOfLines = 0
         label.font = .textFont(for: .body, weight: .regular)
         label.textColor = .label
@@ -93,6 +92,43 @@ class BBSTableViewCell: UITableViewCell {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    func configViews(with post: BBSPost) {
+        contentLabel.text = post.content
+        nicknameLabel.text = post.author?.username
+        
+        let formatter = DateFormatter()
+        formatter.locale = Locale.init(identifier: "zh_CN")
+        let timestamp = Double((post.createTime ?? 0) / 1000)
+        formatter.dateFormat = postDateFormatString(timeIntervalSince1970: timestamp)
+        timeLabel.text = formatter.string(from: Date(timeIntervalSince1970: timestamp))
+        
+        if let commentList = post.commentList {
+            replyView.configViews(with: commentList)
+        }
+    }
+    
+    private func postDateFormatString(timeIntervalSince1970 timestamp: Double) -> String {
+        var formatString = ""
+        
+        let date = Date(timeIntervalSince1970: timestamp)
+        
+        let calendar = Calendar.current
+        let now = calendar.dateComponents([.year], from: Date())
+        let postTime = calendar.dateComponents([.year], from: date)
+        let isThisYear = now.year == postTime.year
+        if !isThisYear {
+            formatString += "yyyy年"
+        }
+        
+        if !calendar.isDateInToday(date) {
+            formatString += "MM月dd日"
+        }
+        
+        formatString += "HH:mm"
+        
+        return formatString
     }
     
     private func setUpSubViews() {
