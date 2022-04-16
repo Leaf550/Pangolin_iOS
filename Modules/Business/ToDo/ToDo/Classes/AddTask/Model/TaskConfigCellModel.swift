@@ -28,6 +28,7 @@ enum AddTaskCellContent {
 class TaskConfigCellModel {
     var type: AddTaskCellType
     var content: AddTaskCellContent
+    var textViewText: String?
     var inputPlaceholder: String?
     var titleLabelText: String?
     var iconColor: UIColor?
@@ -45,20 +46,8 @@ class TaskConfigCellModel {
     // 默认是已存储列表的第一个
     lazy var selectedList = savedTaskLists?.first
     
-    lazy var defaultValue: [[TaskConfigCellModel]] = {
-        var data = [
-            [
-                inputCellModel(inputPlaceholder: "标题", content: .title),
-                inputCellModel(inputPlaceholder: "备注", content: .comment)
-            ],
-            [
-                switchCellModel(iconColor: .systemRed, content: .date, iconImage: nil, title: "日期", switchStatus: false),
-                switchCellModel(iconColor: .systemBlue, content: .time, iconImage: nil, title: "时间", switchStatus: false)
-            ],
-            [
-                switchCellModel(iconColor: .systemOrange, content: .important, iconImage: nil, title: "重要", switchStatus: false)
-            ]
-        ]
+    func defaultValue(task: TaskModel?) -> [[TaskConfigCellModel]] {
+        var data = configData(task: task)
         let color: UIColor
         if selectedList != nil {
             color = TasksGroupIconColorImpl.plainColor(with: TasksGroupIconColor(rawValue: selectedList?.listColor ?? 0) ?? .blue)
@@ -73,10 +62,27 @@ class TaskConfigCellModel {
         ])
         
         return data
-    }()
+    }
+    
+    private func configData(task: TaskModel?) -> [[TaskConfigCellModel]] {
+        return [
+            [
+                inputCellModel(inputPlaceholder: "标题", textViewText: task?.title, content: .title),
+                inputCellModel(inputPlaceholder: "备注", textViewText: task?.comment, content: .comment)
+            ],
+            [
+                switchCellModel(iconColor: .systemRed, content: .date, iconImage: nil, title: "日期", switchStatus: task?.date == nil),
+                switchCellModel(iconColor: .systemBlue, content: .time, iconImage: nil, title: "时间", switchStatus: task?.time == nil)
+            ],
+            [
+                switchCellModel(iconColor: .systemOrange, content: .important, iconImage: nil, title: "重要", switchStatus: task?.isImportant ?? false)
+            ]
+        ]
+    }
     
     init(type: AddTaskCellType,
          content: AddTaskCellContent,
+         textViewText: String?,
          inputPlaceholder: String?,
          titleLabelText: String?,
          iconColor: UIColor?,
@@ -86,6 +92,7 @@ class TaskConfigCellModel {
          indicatorViewColor: UIColor?) {
         self.type = type
         self.content = content
+        self.textViewText = textViewText
         self.inputPlaceholder = inputPlaceholder
         self.titleLabelText = titleLabelText
         self.iconColor = iconColor
@@ -98,18 +105,12 @@ class TaskConfigCellModel {
     init() {
         self.type = .input
         self.content = .title
-        self.inputPlaceholder = nil
-        self.titleLabelText = nil
-        self.iconColor = nil
-        self.iconImage = nil
-        self.switchStatus = nil
-        self.currentValueLabelText = nil
-        self.indicatorViewColor = nil
     }
     
-    func inputCellModel(inputPlaceholder: String, content: AddTaskCellContent) -> TaskConfigCellModel {
+    func inputCellModel(inputPlaceholder: String, textViewText: String?, content: AddTaskCellContent) -> TaskConfigCellModel {
         TaskConfigCellModel(type: .input,
                             content: content,
+                            textViewText: textViewText,
                             inputPlaceholder: inputPlaceholder,
                             titleLabelText: nil,
                             iconColor: nil,
@@ -126,6 +127,7 @@ class TaskConfigCellModel {
                          switchStatus: Bool) -> TaskConfigCellModel {
         TaskConfigCellModel(type: .switch,
                             content: content,
+                            textViewText: nil,
                             inputPlaceholder: nil,
                             titleLabelText: title,
                             iconColor: iconColor,
@@ -141,6 +143,7 @@ class TaskConfigCellModel {
                              currentValue: String) -> TaskConfigCellModel {
         TaskConfigCellModel(type: .navigation,
                             content: content,
+                            textViewText: nil,
                             inputPlaceholder: nil,
                             titleLabelText: title,
                             iconColor: nil,

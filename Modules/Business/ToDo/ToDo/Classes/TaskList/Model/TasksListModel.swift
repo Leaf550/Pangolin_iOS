@@ -36,3 +36,14 @@ extension TasksListSection: AnimatableSectionModelType {
         taskList?.listID ?? UUID().uuidString
     }
 }
+
+extension TasksListSection: Hashable {
+    
+    public var hashValue: Int {
+        Int(arc4random())
+    }
+    
+    public static func == (lhs: TasksListSection, rhs: TasksListSection) -> Bool {
+        lhs.identity == rhs.identity
+    }
+}

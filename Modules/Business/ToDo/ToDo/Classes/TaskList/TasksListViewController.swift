@@ -22,7 +22,7 @@ enum ListType {
     case other(Int)
 }
 
-class TasksListViewController: UIViewController, ViewController, UITableViewDelegate {
+class TasksListViewController: UIViewController, ViewController, UITableViewDataSource, UITableViewDelegate {
     
     typealias VM = TasksListViewModel
     var viewModel = TasksListViewModel()
@@ -39,38 +39,12 @@ class TasksListViewController: UIViewController, ViewController, UITableViewDele
     var requestSetTaskIsCompleted = PublishSubject<(TaskModel, Bool)>()
     var requestSetTaskIsCompletedCompleted = PublishSubject<(String, Bool)>()
     
-    private lazy var todoTable: TableView = {
+    lazy var todoTable: UITableView = {
         let table = TableView()
         table.backgroundColor = .clear
         table.separatorStyle = .none
-        table.sectionStyle = .squareCorner
+        table.dataSource = self
         table.delegate = self
-        
-        let datasource = RxTableViewSectionedAnimatedDataSource<TasksListSection>(
-            configureCell: { [weak self] _, tableView, indexPath, item in
-                guard let self = self else { return UITableViewCell() }
-                let cell = tableView.dequeueReusableCell(withIdentifier: TaskTableViewCell.reuseID, for: indexPath) as? TaskTableViewCell
-                cell?.tableView = tableView
-                
-                cell?.configData(with: item)
-                
-                cell?.checkBox.checkBoxSelectCallBack = { selected in
-                    if !Net.isReachableToServer() {
-                        Toast.show(text: "暂无网络连接", image: nil)
-                        return
-                    }
-                    self.didSelectCheckBox(with: item, selected: selected, cell: cell)
-                }
-                return cell ?? UITableViewCell()
-            })
-        
-        datasource.titleForHeaderInSection = { ds, index in
-            ds.sectionModels[index].taskList?.listName ?? ""
-        }
-        
-        rxSections
-            .bind(to: table.rx.items(dataSource: datasource))
-            .disposed(by: disposeBag)
         
         table.rx.didScroll.bind { [weak self] _ in
             self?.view.endEditing(true)
@@ -119,10 +93,14 @@ class TasksListViewController: UIViewController, ViewController, UITableViewDele
                 return self?.configTableDatas(with: sections) ?? []
             }
             .subscribe(onNext: { [weak self] sections in
-                self?.sections = sections
                 self?.rxSections.onNext(sections)
             })
             .disposed(by: disposeBag)
+        
+        rxSections.subscribe(onNext: { [weak self] sections in
+            self?.sections = sections
+            self?.todoTable.reloadData()
+        }).disposed(by: disposeBag)
     }
     
     func configTableDatas(with sections: [TasksListSection]?) -> [TasksListSection] {
@@ -185,9 +163,79 @@ class TasksListViewController: UIViewController, ViewController, UITableViewDele
     @objc
     func addToDo() {
         let defaultSelectedList = sections.first?.taskList
-        let newTaskController = AddTaskViewController(defaultList: defaultSelectedList)
+        let newTaskController = TaskDetailViewController.addTask(defaultList: defaultSelectedList)
         let navController = UINavigationController(rootViewController: newTaskController)
         present(navController, animated: true, completion: nil)
     }
     
+}
+
+extension TasksListViewController {
+    func numberOfSections(in tableView: UITableView) -> Int {
+        sections.count
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        sections[section].tasks?.count ?? 0
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let task = sections[indexPath.section].tasks?[indexPath.row] else { return UITableViewCell() }
+        
+        let cell = tableView.dequeueReusableCell(withIdentifier: TaskTableViewCell.reuseID, for: indexPath) as? TaskTableViewCell
+        cell?.tableView = tableView
+
+        cell?.configData(with: task)
+
+        cell?.checkBox.checkBoxSelectCallBack = { selected in
+            if !Net.isReachableToServer() {
+                Toast.show(text: "暂无网络连接", image: nil)
+                return
+            }
+            self.didSelectCheckBox(with: task, selected: selected, cell: cell)
+        }
+        return cell ?? UITableViewCell()
+    }
+    
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        sections[section].taskList?.listName ?? ""
+    }
+    
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        guard let task = sections[indexPath.section].tasks?[indexPath.row] else { return nil }
+        
+        let deleteAction = UIContextualAction(style: .destructive, title: "删除") { [weak self] action, view, completion in
+            let cancelAction = UIAlertAction(title: "取消", style: .cancel) { _ in
+                completion(false)
+            }
+            let confirmAction = UIAlertAction(title: "确定", style: .destructive) { _ in
+                TaskManager.shared.deleteTask(withTaskID: task.taskID ?? "")
+                completion(true)
+            }
+            let alertController = UIAlertController(title: "删除事项", message: "确定要删除吗", preferredStyle: .actionSheet)
+            alertController.addAction(cancelAction)
+            alertController.addAction(confirmAction)
+            self?.present(alertController, animated: true)
+        }
+        deleteAction.backgroundColor = .systemRed
+        
+        let importantActionTitle = (task.isImportant ?? false) ? "取消旗标" : "旗标"
+        let importantAction = UIContextualAction(style: .normal, title: importantActionTitle) { action, view, completion in
+            TaskManager.shared.setTaskIsImportant(forTaskId: task.taskID ?? "", isImportant: !(task.isImportant ?? false))
+            completion(true)
+        }
+        importantAction.backgroundColor = .systemOrange
+        
+        let editAction = UIContextualAction(style: .normal, title: "编辑") { [weak self] action, view, completion in
+            let editTaskController = TaskDetailViewController.editTask(defaultList: self?.sections.first?.taskList, originalTask: task)
+            let navController = UINavigationController(rootViewController: editTaskController)
+
+            self?.present(navController, animated: true)
+            completion(true)
+        }
+        editAction.backgroundColor = .systemBlue
+        
+        let configuration = UISwipeActionsConfiguration(actions: [deleteAction, importantAction, editAction])
+        return configuration
+    }
 }

@@ -49,6 +49,7 @@ class TaskConfigBaseTableViewCell: TableViewCell {
     }
     
     func configCell(with model: TaskConfigCellModel) {
+        textView?.text = model.textViewText
         textView?.placeholder = model.inputPlaceholder
         titleLabel?.text = model.titleLabelText
         iconImageView?.backgroundColor = model.iconColor

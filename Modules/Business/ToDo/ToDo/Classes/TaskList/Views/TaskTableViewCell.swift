@@ -69,6 +69,7 @@ class TaskTableViewCell: TableViewCell {
     private lazy var flag: UIImageView = {
         let imageView = UIImageView()
 //        imageView.image = UIImage(named: "")
+        imageView.backgroundColor = .systemOrange
         return imageView
     }()
 

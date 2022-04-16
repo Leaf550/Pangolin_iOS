@@ -15,8 +15,6 @@ public struct HomeModel: Codable {
 }
 
 public struct HomeData: Codable {
-//    public var todayCount, importantCount, allCount, completedCount: Int?
-//    public var today, important, all, completed: ListPageData?
     public var otherList: [ListPageData]?
 }
 

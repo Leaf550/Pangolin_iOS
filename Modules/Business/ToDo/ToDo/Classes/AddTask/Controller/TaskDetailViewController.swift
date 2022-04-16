@@ -1,5 +1,5 @@
 //
-//  AddTaskViewController.swift
+//  TaskDetailViewController.swift
 //  Account
 //
 //  Created by 方昱恒 on 2022/2/27.
@@ -13,7 +13,7 @@ import PGFoundation
 import Persistence
 import Provider
 
-class AddTaskViewController: UIViewController, ViewController, UITableViewDataSource, UITableViewDelegate {
+class TaskDetailViewController: UIViewController, ViewController, UITableViewDataSource, UITableViewDelegate {
     
     typealias VM = AddTaskViewModel
  
@@ -40,6 +40,21 @@ class AddTaskViewController: UIViewController, ViewController, UITableViewDataSo
     private lazy var isImportantValue = BehaviorSubject<Bool>(value: false)
     private lazy var listValue = BehaviorSubject<TaskList?>(value: cellConfigureData.selectedList)
     
+    private var defaultTask: TaskModel?
+    
+    static func addTask(defaultList: TaskList?) -> TaskDetailViewController {
+        let controller = TaskDetailViewController(defaultList: defaultList)
+        controller.title = "新建事项"
+        return controller
+    }
+    
+    static func editTask(defaultList: TaskList?, originalTask: TaskModel?) -> TaskDetailViewController {
+        let controller = TaskDetailViewController(defaultList: defaultList)
+        controller.title = "修改事项"
+        controller.defaultTask = originalTask
+        return controller
+    }
+    
     init(defaultList: TaskList?) {
         super.init(nibName: nil, bundle: nil)
         
@@ -53,7 +68,6 @@ class AddTaskViewController: UIViewController, ViewController, UITableViewDataSo
     }
     
     override func viewDidLoad() {
-        self.title = "新建事项"
         view.backgroundColor = .systemGroupedBackground
         
         isModalInPresentation = true
@@ -125,20 +139,20 @@ class AddTaskViewController: UIViewController, ViewController, UITableViewDataSo
     
 }
 
-extension AddTaskViewController {
+extension TaskDetailViewController {
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return cellConfigureData.defaultValue.count
+        return cellConfigureData.defaultValue(task: defaultTask).count
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return cellConfigureData.defaultValue[section].count
+        return cellConfigureData.defaultValue(task: defaultTask)[section].count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         var cell: TaskConfigBaseTableViewCell?
-        let allCellModels = cellConfigureData.defaultValue[indexPath.section]
-        let cellModel = cellConfigureData.defaultValue[indexPath.section][indexPath.row]
+        let allCellModels = cellConfigureData.defaultValue(task: defaultTask)[indexPath.section]
+        let cellModel = cellConfigureData.defaultValue(task: defaultTask)[indexPath.section][indexPath.row]
         
         switch cellModel.type {
             case .input:
@@ -178,18 +192,18 @@ extension AddTaskViewController {
     
 }
 
-extension AddTaskViewController {
+extension TaskDetailViewController {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        switch cellConfigureData.defaultValue[indexPath.section][indexPath.row].type {
+        switch cellConfigureData.defaultValue(task: defaultTask)[indexPath.section][indexPath.row].type {
             case .navigation:
                 guard let selectedList = self.cellConfigureData.selectedList else { return }
                 let controller = ChooseGroupViewController(selected: selectedList)
                 controller.groupListSubject.onNext(self.cellConfigureData.savedTaskLists ?? [])
                 controller.didSelectList = { [weak self] selectedList in
-                    self?.cellConfigureData.defaultValue[indexPath.section][indexPath.row].currentValueLabelText = selectedList.listName
+                    self?.cellConfigureData.defaultValue(task: self?.defaultTask)[indexPath.section][indexPath.row].currentValueLabelText = selectedList.listName
                     let color = TasksGroupIconColor(rawValue: selectedList.listColor ?? 0) ?? .blue
-                    self?.cellConfigureData.defaultValue[indexPath.section][indexPath.row].indicatorViewColor = TasksGroupIconColorImpl.plainColor(with: color)
+                    self?.cellConfigureData.defaultValue(task: self?.defaultTask)[indexPath.section][indexPath.row].indicatorViewColor = TasksGroupIconColorImpl.plainColor(with: color)
                     tableView.reloadData()
                     self?.cellConfigureData.selectedList = selectedList
                     self?.listValue.onNext(selectedList)
