@@ -10,7 +10,6 @@ import PGFoundation
 import SnapKit
 import RxSwift
 import RxCocoa
-import RxDataSources
 import UIComponents
 
 class ChooseGroupViewController: UIViewController {
