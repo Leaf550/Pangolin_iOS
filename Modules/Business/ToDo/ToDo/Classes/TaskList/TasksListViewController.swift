@@ -107,7 +107,7 @@ class TasksListViewController: UIViewController, ViewController, UITableViewData
         []
     }
     
-    func didSelectCheckBox(with task: TaskModel, selected: Bool, cell: TaskTableViewCell?) {
+    func didSelectCheckBox(with task: TaskModel, selected: Bool, sender: CheckBox, cell: TaskTableViewCell?) {
         
     }
     
@@ -187,12 +187,11 @@ extension TasksListViewController {
 
         cell?.configData(with: task)
 
-        cell?.checkBox.checkBoxSelectCallBack = { selected in
+        cell?.checkBox.checkBoxSelectCallBack = { [weak self] selected, sender in
             if !Net.isReachableToServer() {
                 Toast.show(text: "暂无网络连接", image: nil)
-                return
             }
-            self.didSelectCheckBox(with: task, selected: selected, cell: cell)
+            self?.didSelectCheckBox(with: task, selected: selected, sender: sender, cell: cell)
         }
         return cell ?? UITableViewCell()
     }

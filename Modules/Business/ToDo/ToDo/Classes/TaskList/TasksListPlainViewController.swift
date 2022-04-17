@@ -26,7 +26,7 @@ class TasksListPlainViewController: TasksListViewController {
         return sections ?? []
     }
     
-    override func didSelectCheckBox(with task: TaskModel, selected: Bool, cell: TaskTableViewCell?) {
+    override func didSelectCheckBox(with task: TaskModel, selected: Bool, sender: CheckBox, cell: TaskTableViewCell?) {
         cell?.contentView.alpha = 0.5
         cell?.contentView.isUserInteractionEnabled = false
         
@@ -42,6 +42,7 @@ class TasksListPlainViewController: TasksListViewController {
                 
                 if !succeeded {
                     Toast.show(text: "请求失败", image: nil)
+                    sender.isSelected = !selected
                     return
                 }
                 if let listIndex = self?.listIndex,

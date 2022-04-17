@@ -12,9 +12,9 @@ import RxCocoa
 
 public class CheckBox: UIView {
     
-    public var checkBoxSelectCallBack: (_ selected: Bool) -> Void = { _ in }
+    public var checkBoxSelectCallBack: (_ selected: Bool, _ sender: CheckBox) -> Void = { _, _ in }
         
-    private var isSelected: Bool = false {
+    public var isSelected: Bool = false {
         didSet {
             selectView.isHidden = !isSelected
             selectView.backgroundColor = isSelected ? selectedColor : unSelectedColor
@@ -66,7 +66,7 @@ public class CheckBox: UIView {
         tap.rx.event.bind { [weak self] _ in
             guard let self = self else { return }
             self.setSelect(!self.isSelected)
-            self.checkBoxSelectCallBack(self.isSelected)
+            self.checkBoxSelectCallBack(self.isSelected, self)
         }.disposed(by: disposeBag)
         
         self.addGestureRecognizer(tap)
