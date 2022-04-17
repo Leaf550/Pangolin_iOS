@@ -7,10 +7,14 @@
 
 import UIKit
 import UIComponents
+import RxSwift
+import RxCocoa
 
 class TaskSwitchTableViewCell: TaskConfigBaseTableViewCell {
     
     static var reuseID: String = NSStringFromClass(TaskSwitchTableViewCell.self)
+    
+    private lazy var disposeBag = DisposeBag()
     
     override func setUpSubViews() {
         iconImageView = UIImageView()
@@ -20,7 +24,17 @@ class TaskSwitchTableViewCell: TaskConfigBaseTableViewCell {
         titleLabel?.textColor = .label
         titleLabel?.font = .textFont(for: .body, weight: .regular)
         
+        datePicker = UIDatePicker()
+        datePicker?.timeZone = TimeZone.current
+        datePicker?.locale = Locale(identifier: "zh_CN")
+        
         `switch` = UISwitch()
+        `switch`?.rx.isOn.subscribe(onNext: { [weak self] isOn in
+            if let contentType = self?.contentType,
+               contentType == .date || contentType == .time {
+                self?.datePicker?.isHidden = !isOn
+            }
+        }).disposed(by: disposeBag)
         
         if let titleLabel = titleLabel {
             contentView.addSubview(titleLabel)
@@ -30,6 +44,9 @@ class TaskSwitchTableViewCell: TaskConfigBaseTableViewCell {
         }
         if let `switch` = `switch` {
             contentView.addSubview(`switch`)
+        }
+        if let datePicker = datePicker {
+            contentView.addSubview(datePicker)
         }
         
         titleLabel?.snp.makeConstraints { make in
@@ -41,16 +58,27 @@ class TaskSwitchTableViewCell: TaskConfigBaseTableViewCell {
             make.centerY.equalToSuperview()
         }
         
-        iconImageView?.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(16)
-            make.top.equalToSuperview().offset(14)
-            make.bottom.equalToSuperview().offset(-14)
-            make.width.height.equalTo(29)
+        if let iconImageView = iconImageView,
+           let `switch` = `switch`,
+           let datePicker = datePicker {
+            iconImageView.snp.makeConstraints { make in
+                make.leading.equalToSuperview().offset(16)
+                make.top.equalToSuperview().offset(14)
+                make.width.height.equalTo(29)
+                make.bottom.equalToSuperview().offset(-14)
+            }
+            
+            datePicker.snp.makeConstraints { make in
+                make.trailing.equalTo(`switch`.snp.leading).offset(-14)
+                make.centerY.equalTo(`switch`)
+            }
         }
         
-        `switch`?.snp.makeConstraints { make in
-            make.trailing.equalToSuperview().offset(-14)
-            make.centerY.equalToSuperview()
+        if let `switch` = `switch` {
+            `switch`.snp.makeConstraints { make in
+                make.trailing.equalToSuperview().offset(-14)
+                make.centerY.equalToSuperview()
+            }
         }
         
         contentView.addSubview(separateLine)

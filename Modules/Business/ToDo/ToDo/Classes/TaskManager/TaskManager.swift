@@ -197,12 +197,36 @@ class TaskManager {
         return subject
     }()
     
+    private lazy var addTaskAction: PublishSubject<(TaskModel, String)> = {
+        let subject = PublishSubject<(TaskModel, String)>()
+        subject
+            .withLatestFrom(homeModel) { ($0.0, $0.1, $1) }
+            .map { task, listId, homeModel -> HomeModel? in
+                var homeModel = homeModel
+                for pageIndex in 0 ..< (homeModel?.data?.otherList?.count ?? 0) {
+                    if var taskList = homeModel?.data?.otherList?[pageIndex].sections?[0].taskList,
+                       taskList.listID == listId {
+                        homeModel?.data?.otherList?[pageIndex].sections?[0].tasks?.append(task)
+                    }
+                }
+                return homeModel
+            }
+            .bind(to: homeModel)
+            .disposed(by: disposeBag)
+        
+        return subject
+    }()
+    
     func deleteTask(withTaskID taskID: String) {
         deleteTaskAction.onNext(taskID)
     }
     
     func setTaskIsImportant(forTaskId taskId: String, isImportant: Bool) {
         setImportantAction.onNext((taskId, isImportant))
+    }
+    
+    func addTask(task: TaskModel, toListID listID: String) {
+        addTaskAction.onNext((task, listID))
     }
     
 }

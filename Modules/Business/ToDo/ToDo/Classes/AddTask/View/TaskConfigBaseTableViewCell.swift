@@ -8,18 +8,22 @@
 import UIKit
 import UIComponents
 import SnapKit
+import RxSwift
 
 class TaskConfigBaseTableViewCell: TableViewCell {
+    var contentType: AddTaskCellContent?
     
     var textView: TextView?
     var titleLabel: UILabel?
     var iconImageView: UIImageView?
     var `switch`: UISwitch?
+    var datePicker: UIDatePicker?
     var currentValueLabel: UILabel?
     var indicatorView: UIView?
     var arrowImageView: UIImageView?
     
     var tableView: UITableView?
+    var baseCellDisposeBag = DisposeBag()
     
     lazy var separateLine: UIView = {
         let line = UIView()
@@ -40,6 +44,11 @@ class TaskConfigBaseTableViewCell: TableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        baseCellDisposeBag = DisposeBag()
+    }
+    
     func setIsSeparateLineHidden(_ hidden: Bool) {
         separateLine.isHidden = hidden
     }
@@ -49,6 +58,7 @@ class TaskConfigBaseTableViewCell: TableViewCell {
     }
     
     func configCell(with model: TaskConfigCellModel) {
+        contentType = model.content
         textView?.text = model.textViewText
         textView?.placeholder = model.inputPlaceholder
         titleLabel?.text = model.titleLabelText
@@ -57,6 +67,17 @@ class TaskConfigBaseTableViewCell: TableViewCell {
         `switch`?.isOn = model.switchStatus ?? false
         currentValueLabel?.text = model.currentValueLabelText
         indicatorView?.backgroundColor = model.indicatorViewColor
+        if model.content == .date {
+            datePicker?.datePickerMode = .date
+            datePicker?.isHidden = !(`switch`?.isOn ?? false)
+            datePicker?.date = Date(timeIntervalSince1970: model.date ?? Date().timeIntervalSince1970)
+        } else if model.content == .time {
+            datePicker?.datePickerMode = .time
+            datePicker?.isHidden = !(`switch`?.isOn ?? false)
+            datePicker?.date = Date(timeIntervalSince1970: model.time ?? Date().timeIntervalSince1970)
+        } else {
+            datePicker?.isHidden = true
+        }
     }
     
 }

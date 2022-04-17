@@ -37,4 +37,6 @@ public enum RequestPath: String {
     case home               = "/home"
     // 完成（取消完成）任务
     case taskCompleted      = "/taskCompleted"
+    // 编辑任务
+    case editTask           = "/editTask"
 }

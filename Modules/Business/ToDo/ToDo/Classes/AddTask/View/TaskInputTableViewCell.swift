@@ -19,7 +19,6 @@ class TaskInputTableViewCell: TaskConfigBaseTableViewCell {
     
     override func setUpSubViews() {
         textView = TextView()
-        textView?.placeholder = "test"
         textView?.backgroundColor = .clear
         textView?.font = .textFont(for: .body, weight: .regular)
         textView?.textColor = .label

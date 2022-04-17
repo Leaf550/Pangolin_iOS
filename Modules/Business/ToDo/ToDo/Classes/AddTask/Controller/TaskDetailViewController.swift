@@ -13,15 +13,23 @@ import PGFoundation
 import Persistence
 import Provider
 
+enum TaskEditMode {
+    case newTask
+    case editTask
+}
+
 class TaskDetailViewController: UIViewController, ViewController, UITableViewDataSource, UITableViewDelegate {
     
     typealias VM = AddTaskViewModel
  
     var viewModel: VM = AddTaskViewModel()
     
-    private lazy var cellConfigureData = TaskConfigCellModel()
-    
     var disposeBag = DisposeBag()
+    
+    private lazy var cellConfigureData = TaskConfigCellModel()
+    private var taskEditMode: TaskEditMode?
+    
+    private lazy var indicator = UIActivityIndicatorView(style: .medium)
     
     private lazy var tableView: UITableView = {
         let table = UITableView(frame: .zero, style: .grouped)
@@ -33,24 +41,23 @@ class TaskDetailViewController: UIViewController, ViewController, UITableViewDat
         return table
     }()
     
-    private lazy var titleValue = BehaviorSubject<String?>(value: nil)
-    private lazy var commentValue = BehaviorSubject<String?>(value: nil)
-    private lazy var dateValue = BehaviorSubject<Double?>(value: nil)
-    private lazy var timeValue = BehaviorSubject<Double?>(value: nil)
-    private lazy var isImportantValue = BehaviorSubject<Bool>(value: false)
+    private lazy var taskValue = BehaviorSubject<TaskModel?>(value: defaultTask)
     private lazy var listValue = BehaviorSubject<TaskList?>(value: cellConfigureData.selectedList)
     
     private var defaultTask: TaskModel?
     
     static func addTask(defaultList: TaskList?) -> TaskDetailViewController {
         let controller = TaskDetailViewController(defaultList: defaultList)
-        controller.title = "新建事项"
+        controller.taskEditMode = .newTask
+        if let data = "{}".data(using: .utf8) {
+            controller.defaultTask = try? JSONDecoder().decode(TaskModel.self, from: data)
+        }
         return controller
     }
     
     static func editTask(defaultList: TaskList?, originalTask: TaskModel?) -> TaskDetailViewController {
         let controller = TaskDetailViewController(defaultList: defaultList)
-        controller.title = "修改事项"
+        controller.taskEditMode = .editTask
         controller.defaultTask = originalTask
         return controller
     }
@@ -69,6 +76,11 @@ class TaskDetailViewController: UIViewController, ViewController, UITableViewDat
     
     override func viewDidLoad() {
         view.backgroundColor = .systemGroupedBackground
+        if taskEditMode == .newTask {
+            title = "新建事项"
+        } else if taskEditMode == .editTask {
+            title = "编辑事项"
+        }
         
         isModalInPresentation = true
         
@@ -83,26 +95,45 @@ class TaskDetailViewController: UIViewController, ViewController, UITableViewDat
     
     func bindViewModel() {
         let data = Observable.combineLatest(
-            titleValue.map { $0 ?? "" },
-            commentValue,
-            dateValue.map { Int64(($0 ?? 0) * 1000) },
-            timeValue.map { Int64(($0 ?? 0) * 1000) },
-            isImportantValue,
+            taskValue,
             listValue.map { $0?.listID ?? "" }
         )
         
         navigationItem.rightBarButtonItem?.rx
             .tap
             .withLatestFrom(data) { $1 }
-            .filter { $0 != "" && $5 != "" }
-            .bind(to: viewModel.input.completeButtonTap)
+            .filter { (task, listID) in
+                task?.title != nil && task?.title != "" && listID != ""
+            }
+            .map { [weak self] (task, listID) in
+                self?.indicator.startAnimating()
+                return (task, listID, self?.taskEditMode ?? .newTask)
+            }
+            .bind(to: viewModel.input.taskEditCompleted)
             .disposed(by: disposeBag)
         
         let output = viewModel.transformToOutput()
         
         output.uploadResult
-            .subscribe(onNext: { isSuccess in
-                print(isSuccess)
+            .subscribe(onNext: { [weak self] uploadedTask, listId in
+                self?.indicator.stopAnimating()
+                if uploadedTask == nil {
+                    Toast.show(text: "网络错误")
+                } else {
+                    if self?.taskEditMode == .newTask {
+                        if let uploadedTask = uploadedTask,
+                           let listId = listId {
+                            TaskManager.shared.addTask(task: uploadedTask, toListID: listId)
+                        }
+                    } else {
+                        if let uploadedTask = uploadedTask,
+                           let listId = listId {
+                            TaskManager.shared.deleteTask(withTaskID: uploadedTask.taskID ?? "")
+                            TaskManager.shared.addTask(task: uploadedTask, toListID: listId)
+                        }
+                    }
+                    self?.dismiss(animated: true, completion: nil)
+                }
             })
             .disposed(by: disposeBag)
     }
@@ -118,22 +149,25 @@ class TaskDetailViewController: UIViewController, ViewController, UITableViewDat
             self.dismiss(animated: true, completion: nil)
         }.disposed(by: disposeBag)
         
-        rightButton.rx.tap.bind {
-            self.dismiss(animated: true, completion: nil)
-        }.disposed(by: disposeBag)
-        
         Observable.combineLatest(
-            titleValue,
+            taskValue,
             listValue
-        ) { $0 != nil && $0 != "" && $1 != nil }
-        .bind(to: rightButton.rx.isEnabled)
-        .disposed(by: disposeBag)
+        ) { $0?.title != nil && $0?.title != "" && $1 != nil }
+            .bind(to: rightButton.rx.isEnabled)
+            .disposed(by: disposeBag)
     }
     
     private func setUpSubViews() {
         view.addSubview(tableView)
+        view.addSubview(indicator)
+        
         tableView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
+        }
+        
+        indicator.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.centerY.equalToSuperview().offset(-50)
         }
     }
     
@@ -166,25 +200,96 @@ extension TaskDetailViewController {
         cell?.setIsSeparateLineHidden(indexPath.row == allCellModels.count - 1)
         cell?.configCell(with: cellModel)
         
+        guard let cellDisposeBag = cell?.baseCellDisposeBag else { return UITableViewCell() }
+        
         switch cellModel.content {
             case .title:
                 cell?.textView?.rx
                     .text
-                    .bind(to: titleValue)
-                    .disposed(by: disposeBag)
+                    .withLatestFrom(taskValue) { ($0, $1) }
+                    .map { title, task -> TaskModel? in
+                        var task = task
+                        task?.title = title
+                        return task
+                    }
+                    .bind(to: taskValue)
+                    .disposed(by: cellDisposeBag)
             case .comment:
                 cell?.textView?.rx
                     .text
-                    .bind(to: commentValue)
-                    .disposed(by: disposeBag)
-            case .date: break
-            case .time: break
+                    .withLatestFrom(taskValue) { ($0, $1) }
+                    .map { comment, task -> TaskModel? in
+                        var task = task
+                        task?.comment = comment
+                        return task
+                    }
+                    .bind(to: taskValue)
+                    .disposed(by: cellDisposeBag)
+            case .date:
+                if let isOn = cell?.switch?.rx.isOn,
+                   let date = cell?.datePicker?.rx.date {
+                    Observable.combineLatest(isOn, date)
+                        .withLatestFrom(taskValue) { ($0, $1) }
+                        .map { (isOnAndDate, task) -> TaskModel? in
+                            let isOn = isOnAndDate.0
+                            let date = isOnAndDate.1
+                            var task = task
+                            if isOn == false {
+                                task?.date = nil
+                                task?.time = nil
+                            } else {
+                                let today = (Int(date.timeIntervalSince1970) / (24 * 60 * 60)) * 24 * 60 * 60 + 24 * 60 * 60 - 8 * 60 * 60
+                                task?.date = Double(today) > 0 ? Double(today) : 0
+                            }
+                            return task
+                        }
+                        .bind(to: taskValue)
+                        .disposed(by: cellDisposeBag)
+                }
+            case .time:
+                if let isSwitchEnable = cell?.switch?.rx.isEnabled {
+                    taskValue
+                        .map { task in
+                            let shouldEnable = task?.date != nil
+                            if !shouldEnable {
+                                cell?.`switch`?.isOn = false
+                                cell?.datePicker?.isHidden = true
+                            }
+                            return shouldEnable
+                        }
+                        .bind(to: isSwitchEnable)
+                        .disposed(by: cellDisposeBag)
+                }
+                if let isOn = cell?.switch?.rx.isOn,
+                   let date = cell?.datePicker?.rx.date {
+                    Observable.combineLatest(isOn, date)
+                        .withLatestFrom(taskValue) { ($0, $1) }
+                        .map { (isOnAndTime, task) -> TaskModel? in
+                            let isOn = isOnAndTime.0
+                            let time = isOnAndTime.1
+                            var task = task
+                            if isOn == false {
+                                task?.time = nil
+                            } else {
+                                let timeStamp = Int(time.timeIntervalSince1970)
+                                task?.time = Double(timeStamp) > 0 ? Double(timeStamp) : 0
+                            }
+                            return task
+                        }
+                        .bind(to: taskValue)
+                        .disposed(by: cellDisposeBag)
+                }
             case .important:
-                cell?.switch?.rx
-                    .isOn
-                    .bind(to: isImportantValue)
-                    .disposed(by: disposeBag)
-            case .list: break
+                cell?.`switch`?.rx.isOn
+                    .withLatestFrom(taskValue) { isOn, task -> TaskModel? in
+                        var task = task
+                        task?.isImportant = isOn
+                        return task
+                    }
+                    .bind(to: taskValue)
+                    .disposed(by: cellDisposeBag)
+            case .list:
+                break
         }
         
         return cell ?? UITableViewCell()

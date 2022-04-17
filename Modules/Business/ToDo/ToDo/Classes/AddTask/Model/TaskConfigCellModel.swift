@@ -34,6 +34,8 @@ class TaskConfigCellModel {
     var iconColor: UIColor?
     var iconImage: UIImage?
     var switchStatus: Bool?
+    var date: Double?
+    var time: Double?
     var currentValueLabelText: String?
     var indicatorViewColor: UIColor?
     
@@ -71,11 +73,11 @@ class TaskConfigCellModel {
                 inputCellModel(inputPlaceholder: "备注", textViewText: task?.comment, content: .comment)
             ],
             [
-                switchCellModel(iconColor: .systemRed, content: .date, iconImage: nil, title: "日期", switchStatus: task?.date == nil),
-                switchCellModel(iconColor: .systemBlue, content: .time, iconImage: nil, title: "时间", switchStatus: task?.time == nil)
+                switchCellModel(iconColor: .systemRed, content: .date, iconImage: nil, title: "日期", switchStatus: task?.date != nil, date: task?.date, time: task?.time),
+                switchCellModel(iconColor: .systemBlue, content: .time, iconImage: nil, title: "时间", switchStatus: task?.time != nil, date: task?.date, time: task?.time)
             ],
             [
-                switchCellModel(iconColor: .systemOrange, content: .important, iconImage: nil, title: "重要", switchStatus: task?.isImportant ?? false)
+                switchCellModel(iconColor: .systemOrange, content: .important, iconImage: nil, title: "重要", switchStatus: task?.isImportant ?? false, date: task?.date, time: task?.time)
             ]
         ]
     }
@@ -88,6 +90,8 @@ class TaskConfigCellModel {
          iconColor: UIColor?,
          iconImage: UIImage?,
          switchStatus: Bool?,
+         date: Double?,
+         time: Double?,
          currentValueLabelText: String?,
          indicatorViewColor: UIColor?) {
         self.type = type
@@ -98,6 +102,8 @@ class TaskConfigCellModel {
         self.iconColor = iconColor
         self.iconImage = iconImage
         self.switchStatus = switchStatus
+        self.date = date
+        self.time = time
         self.currentValueLabelText = currentValueLabelText
         self.indicatorViewColor = indicatorViewColor
     }
@@ -116,6 +122,8 @@ class TaskConfigCellModel {
                             iconColor: nil,
                             iconImage: nil,
                             switchStatus: nil,
+                            date: nil,
+                            time: nil,
                             currentValueLabelText: nil,
                             indicatorViewColor: nil)
     }
@@ -124,7 +132,9 @@ class TaskConfigCellModel {
                          content: AddTaskCellContent,
                          iconImage: UIImage?,
                          title: String,
-                         switchStatus: Bool) -> TaskConfigCellModel {
+                         switchStatus: Bool,
+                         date: Double?,
+                         time: Double?) -> TaskConfigCellModel {
         TaskConfigCellModel(type: .switch,
                             content: content,
                             textViewText: nil,
@@ -133,6 +143,8 @@ class TaskConfigCellModel {
                             iconColor: iconColor,
                             iconImage: iconImage,
                             switchStatus: switchStatus,
+                            date: date,
+                            time: time,
                             currentValueLabelText: nil,
                             indicatorViewColor: nil)
     }
@@ -149,6 +161,8 @@ class TaskConfigCellModel {
                             iconColor: nil,
                             iconImage: nil,
                             switchStatus: nil,
+                            date: nil,
+                            time: nil,
                             currentValueLabelText: currentValue,
                             indicatorViewColor: indicatorViewColor)
     }
