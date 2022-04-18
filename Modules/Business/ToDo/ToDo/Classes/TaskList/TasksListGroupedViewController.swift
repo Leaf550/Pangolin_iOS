@@ -95,5 +95,9 @@ class TasksListGroupedViewController: TasksListViewController {
             }).disposed(by: completeTaskDisposeBag)
         
     }
+    
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        sections[section].taskList?.listName ?? ""
+    }
 
 }

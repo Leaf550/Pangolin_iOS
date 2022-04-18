@@ -59,6 +59,16 @@ class TasksListViewController: UIViewController, ViewController, UITableViewData
         return table
     }()
     
+    lazy var emptyListLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .tertiaryLabel
+        label.font = .textFont(for: .title3, weight: .regular)
+        label.isHidden = true
+        label.text = "没有提醒事项"
+        
+        return label
+    }()
+    
     init(titleColor: TasksGroupIconColor,
          title: String,
          listType: ListType) {
@@ -105,6 +115,11 @@ class TasksListViewController: UIViewController, ViewController, UITableViewData
         
         rxSections.subscribe(onNext: { [weak self] sections in
             self?.sections = sections
+            var count = 0
+            for section in sections {
+                count += section.tasks?.count ?? 0
+            }
+            self?.emptyListLabel.isHidden = count != 0
             self?.todoTable.reloadData()
         }).disposed(by: disposeBag)
     }
@@ -173,7 +188,12 @@ class TasksListViewController: UIViewController, ViewController, UITableViewData
         view.addSubview(indicator)
         indicator.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
-            make.centerY.equalToSuperview().offset(-50)
+            make.centerY.equalToSuperview().offset(-30)
+        }
+        
+        view.addSubview(emptyListLabel)
+        emptyListLabel.snp.makeConstraints { make in
+            make.center.equalToSuperview()
         }
         
         let buttonItem = UIBarButtonItem(title: "新建", style: .plain, target: self, action: #selector(addToDo))
@@ -214,10 +234,6 @@ extension TasksListViewController {
             self?.didSelectCheckBox(with: task, selected: selected, sender: sender, cell: cell)
         }
         return cell ?? UITableViewCell()
-    }
-    
-    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        sections[section].taskList?.listName ?? ""
     }
     
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
