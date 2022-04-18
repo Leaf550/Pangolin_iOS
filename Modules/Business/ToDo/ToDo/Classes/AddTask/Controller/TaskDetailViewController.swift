@@ -238,7 +238,14 @@ extension TaskDetailViewController {
                                 task?.date = nil
                                 task?.time = nil
                             } else {
-                                let today = (Int(date.timeIntervalSince1970) / (24 * 60 * 60)) * 24 * 60 * 60 + 24 * 60 * 60 - 8 * 60 * 60
+                                let today = (Int(date.timeIntervalSince1970 + 8 * 3600) / (24 * 3600)) * 24 * 3600 - 8 * 3600
+                                if let originDate = task?.date,
+                                   let originTime = task?.time {
+                                    let originDay = (Int(originDate + 8 * 3600) / (24 * 3600)) * 24 * 3600 - 8 * 3600
+                                    let diff = today - originDay
+                                    let newTime = originTime + Double(diff)
+                                    task?.time = newTime
+                                }
                                 task?.date = Double(today) > 0 ? Double(today) : 0
                             }
                             return task
