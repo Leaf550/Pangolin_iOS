@@ -125,7 +125,13 @@ class AddTaskViewModel: ViewModel {
                 .configBody(requestBody)
                 .post { json in
                     if (json as? [String : Any])?["status"] as? Int == 200 {
-                        observer.onNext((task, listId))
+                        if let dataJson = (json as? [String : Any])?["data"],
+                           let data = try? JSONSerialization.data(withJSONObject: dataJson),
+                           let newTask = try? JSONDecoder().decode(TaskModel.self, from: data) {
+                            observer.onNext((newTask, listId))
+                        } else {
+                            observer.onNext((nil, nil))
+                        }
                     } else {
                         observer.onNext((nil, nil))
                     }

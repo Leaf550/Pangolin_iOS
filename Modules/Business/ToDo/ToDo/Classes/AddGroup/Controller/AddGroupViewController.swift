@@ -73,7 +73,8 @@ class AddGroupViewController: UIViewController, ViewController, UITableViewDataS
         output.uploadCompleted
             .subscribe(onNext: { [weak self] result in
                 switch result {
-                    case .success:
+                    case .success(let newList):
+                        TaskManager.shared.addTaskList(taskList: newList)
                         self?.dismiss(animated: true, completion: nil)
                     case .failed:
                         Toast.show(text: "上传失败", image: nil)

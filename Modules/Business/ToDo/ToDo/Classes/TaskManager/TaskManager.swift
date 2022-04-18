@@ -217,6 +217,32 @@ class TaskManager {
         return subject
     }()
     
+    private lazy var addTaskListAction: PublishSubject<TaskList> = {
+        let subject = PublishSubject<TaskList>()
+        subject
+            .withLatestFrom(homeModel) { ($0, $1) }
+            .map { taskList, homeModel -> HomeModel? in
+                var homeModel = homeModel
+                
+                guard let data = "{}".data(using: .utf8) else { return homeModel }
+                guard var listPage = try? JSONDecoder().decode(ListPageData.self, from: data) else {
+                    return homeModel
+                }
+                guard var section = try? JSONDecoder().decode(TasksListSection.self, from: data) else { return homeModel
+                }
+                section.taskList = taskList
+                listPage.sections = [TasksListSection]()
+                listPage.sections?.append(section)
+                homeModel?.data?.otherList?.append(listPage)
+                
+                return homeModel
+            }
+            .bind(to: homeModel)
+            .disposed(by: disposeBag)
+        
+        return subject
+    }()
+    
     func deleteTask(withTaskID taskID: String) {
         deleteTaskAction.onNext(taskID)
     }
@@ -227,6 +253,10 @@ class TaskManager {
     
     func addTask(task: TaskModel, toListID listID: String) {
         addTaskAction.onNext((task, listID))
+    }
+    
+    func addTaskList(taskList: TaskList) {
+        addTaskListAction.onNext(taskList)
     }
     
 }

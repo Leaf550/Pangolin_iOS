@@ -177,11 +177,6 @@ class HomeViewController: UIViewController, ViewController {
     }
     
     func bindViewModel() {
-        rx.methodInvoked(#selector(beginRefresh))
-            .map { _ in Void() }
-            .bind(to: viewModel.input.onHomeRefresh)
-            .disposed(by: disposeBag)
-        
         let output = viewModel.transformToOutput()
         
         output.homeModel
@@ -234,7 +229,7 @@ class HomeViewController: UIViewController, ViewController {
     
     @objc
     private func beginRefresh() {
-        
+        viewModel.input.onHomeRefresh.onNext(Void())
     }
     
     private func setUpSubView() {
