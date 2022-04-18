@@ -45,12 +45,14 @@ class TasksListGroupedViewController: TasksListViewController {
     var requestCompleteDisposable: Disposable?
     
     override func didSelectCheckBox(with task: TaskModel, selected: Bool, sender: CheckBox, cell: TaskTableViewCell?) {
+        self.completeTaskDisposeBag = DisposeBag()
+        
         cell?.contentView.alpha = 0.5
         cell?.contentView.isUserInteractionEnabled = false
         
         requestSetTaskIsCompleted.onNext((task, selected))
         
-        requestCompleteDisposable = requestSetTaskIsCompletedCompleted
+        requestSetTaskIsCompletedFinished
             .withLatestFrom(TaskManager.shared.homeModel) { ($0.0, $0.1, $1) }
             .subscribe(onNext: { [weak self] (taskId, succeeded, homeModel) in
                 guard let currentId = task.taskID, currentId == taskId else { return }
@@ -90,7 +92,7 @@ class TasksListGroupedViewController: TasksListViewController {
                 TaskManager.shared.homeModel.onNext(homeModel)
                 
                 self?.requestCompleteDisposable?.dispose()
-            })
+            }).disposed(by: completeTaskDisposeBag)
         
     }
 

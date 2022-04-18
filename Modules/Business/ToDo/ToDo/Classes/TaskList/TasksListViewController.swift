@@ -36,7 +36,14 @@ class TasksListViewController: UIViewController, ViewController, UITableViewData
     var sections: [TasksListSection] = []
     
     var requestSetTaskIsCompleted = PublishSubject<(TaskModel, Bool)>()
-    var requestSetTaskIsCompletedCompleted = PublishSubject<(String, Bool)>()
+    var requestSetTaskIsCompletedFinished = PublishSubject<(String, Bool)>()
+    var completeTaskDisposeBag = DisposeBag()
+    
+    var requestDeleteTask = PublishSubject<String>()
+    var requestDeleteTaskFinished = PublishSubject<(String, Bool)>()
+    var deleteDisposeBag = DisposeBag()
+    
+    lazy var indicator = UIActivityIndicatorView(style: .medium)
     
     lazy var todoTable: UITableView = {
         let table = TableView()
@@ -136,13 +143,21 @@ class TasksListViewController: UIViewController, ViewController, UITableViewData
     
     func bindViewModel() {
         requestSetTaskIsCompleted
-            .bind(to: viewModel.input.updateTaskIsCompleted)
+            .bind(to: viewModel.input.setTaskIsCompleted)
+            .disposed(by: disposeBag)
+        
+        requestDeleteTask
+            .bind(to: viewModel.input.deleteTask)
             .disposed(by: disposeBag)
         
         let output = viewModel.transformToOutput()
         
-        output.updateCompleted
-            .bind(to: requestSetTaskIsCompletedCompleted)
+        output.setTaskCompletedFinished
+            .bind(to: requestSetTaskIsCompletedFinished)
+            .disposed(by: disposeBag)
+        
+        output.deleteTaskFinished
+            .bind(to: requestDeleteTaskFinished)
             .disposed(by: disposeBag)
         
     }
@@ -153,6 +168,12 @@ class TasksListViewController: UIViewController, ViewController, UITableViewData
         view.addSubview(todoTable)
         todoTable.snp.makeConstraints { make in
             make.edges.equalToSuperview()
+        }
+        
+        view.addSubview(indicator)
+        indicator.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.centerY.equalToSuperview().offset(-50)
         }
         
         let buttonItem = UIBarButtonItem(title: "新建", style: .plain, target: self, action: #selector(addToDo))
@@ -200,6 +221,8 @@ extension TasksListViewController {
     }
     
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        self.deleteDisposeBag = DisposeBag()
+        
         guard let task = sections[indexPath.section].tasks?[indexPath.row] else { return nil }
         
         let deleteAction = UIContextualAction(style: .destructive, title: "删除") { [weak self] action, view, completion in
@@ -207,8 +230,18 @@ extension TasksListViewController {
                 completion(false)
             }
             let confirmAction = UIAlertAction(title: "确定", style: .destructive) { _ in
-                TaskManager.shared.deleteTask(withTaskID: task.taskID ?? "")
-                completion(true)
+                self?.indicator.startAnimating()
+                self?.requestDeleteTask.onNext(task.taskID ?? "")
+                
+                self?.requestDeleteTaskFinished
+                    .subscribe(onNext: { (taskId, succeeded) in
+                        if succeeded {
+                            TaskManager.shared.deleteTask(withTaskID: taskId)
+                        }
+                        self?.indicator.stopAnimating()
+                        completion(true)
+                    })
+                    .disposed(by: self?.deleteDisposeBag ?? DisposeBag())
             }
             let alertController = UIAlertController(title: "删除事项", message: "确定要删除吗", preferredStyle: .actionSheet)
             alertController.addAction(cancelAction)
