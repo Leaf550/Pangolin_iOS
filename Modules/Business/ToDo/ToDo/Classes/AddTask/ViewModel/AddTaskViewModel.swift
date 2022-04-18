@@ -107,7 +107,8 @@ class AddTaskViewModel: ViewModel {
         Observable<(TaskModel?, String?)>.create { observer in
             var requestBody = [String : String]()
             requestBody["title"] = task?.title ?? ""
-            if let comment = task?.comment {
+            if let comment = task?.comment,
+                comment != "" {
                 requestBody["comment"] = comment
             }
             if let date = task?.date {
