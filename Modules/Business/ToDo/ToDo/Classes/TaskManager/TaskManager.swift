@@ -207,6 +207,9 @@ class TaskManager {
                     if var taskList = homeModel?.data?.otherList?[pageIndex].sections?[0].taskList,
                        taskList.listID == listId {
                         homeModel?.data?.otherList?[pageIndex].sections?[0].tasks?.append(task)
+                        let sortedTask = homeModel?.data?.otherList?[pageIndex].sections?[0].tasks?
+                            .sorted { ($0.createTime ?? 0) < ($1.createTime ?? 0) }
+                        homeModel?.data?.otherList?[pageIndex].sections?[0].tasks = sortedTask
                     }
                 }
                 return homeModel
