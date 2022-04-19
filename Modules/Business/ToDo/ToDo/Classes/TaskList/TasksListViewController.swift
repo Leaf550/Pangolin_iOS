@@ -12,6 +12,7 @@ import RxSwift
 import RxCocoa
 import SnapKit
 import Net
+import Router
 
 enum ListType {
     case today
@@ -42,6 +43,8 @@ class TasksListViewController: UIViewController, ViewController, UITableViewData
     var requestDeleteTask = PublishSubject<String>()
     var requestDeleteTaskFinished = PublishSubject<(String, Bool)>()
     var deleteDisposeBag = DisposeBag()
+    
+    private var isShowingNewPostAlart = false
     
     lazy var indicator = UIActivityIndicatorView(style: .medium)
     
@@ -140,6 +143,48 @@ class TasksListViewController: UIViewController, ViewController, UITableViewData
         super.viewDidLoad()
         
         todoTable.register(TaskTableViewCell.self, forCellReuseIdentifier: TaskTableViewCell.reuseID)
+        
+        requestSetTaskIsCompletedFinished
+            .withLatestFrom(TaskManager.shared.homeModel) { ($0.0, $0.1, $1) }
+            .withLatestFrom(requestSetTaskIsCompleted) {
+                ($0.0, $0.1, $0.2, $1.1)
+            }
+            .map { (taskId, succeeded, homeModel, completed) -> (TaskModel?, Bool, Bool) in
+                var targetTask: TaskModel? = nil
+                for list in homeModel?.data?.otherList ?? [] {
+                    var has: Bool = false
+                    for task in list.sections?[0].tasks ?? [] {
+                        if task.taskID == taskId {
+                            targetTask = task
+                            has = true
+                            break
+                        }
+                    }
+                    if has {
+                        break
+                    }
+                }
+
+                return (targetTask, succeeded, completed)
+            }
+            .subscribe(onNext: { [weak self] task, succeeded, completed in
+                if !succeeded
+                    || task == nil
+                    || (self?.isShowingNewPostAlart ?? false
+                    || !completed) {
+                    return
+                }
+                let confirmAction = UIAlertAction(title: "好", style: .default) { _ in
+                    Router.open(url: "pangolin://newPost/", userInfo: task)
+                }
+                let cancelAction = UIAlertAction(title: "取消", style: .cancel, handler: nil)
+                let alertMessage = "恭喜你完成了\(task?.title ?? " ? ")，去分享一下吧～"
+                let alertController = UIAlertController(title: "分享一下", message: alertMessage, preferredStyle: .alert)
+                alertController.addAction(cancelAction)
+                alertController.addAction(confirmAction)
+                self?.present(alertController, animated: true)
+
+            }).disposed(by: disposeBag)
         
         setUpSubviews()
         bindViewModel()

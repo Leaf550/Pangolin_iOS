@@ -48,8 +48,8 @@ class BBSTableViewCell: UITableViewCell {
         return label
     }()
     
-    private lazy var todoView: UIView = {
-        let view = UIView()
+    private lazy var todoView: BBSToDoView = {
+        let view = BBSToDoView()
         view.backgroundColor = .systemGreen
         
         return view

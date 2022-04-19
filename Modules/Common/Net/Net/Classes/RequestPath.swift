@@ -43,4 +43,6 @@ public enum RequestPath: String {
     case deleteTask         = "/deleteTask"
     // BBS首页
     case bbsHome            = "/getAllBBSPost"
+    // 发布帖子
+    case createPost         = "/createBBSPost"
 }
