@@ -20,7 +20,7 @@ class TopTasksListView: UIView {
     private let disposeBag = DisposeBag()
     
     lazy var todayList: TopTasksView = {
-        let icon = TasksGroupTinyIcon(image: UIImage(), color: .blue)
+        let icon = TasksGroupTinyIcon(image: UIImage(named: "calendar") ?? UIImage(), color: .blue)
         let block = TopTasksView(icon: icon, name: "今天", number: 0)
         let tap = UITapGestureRecognizer()
         tap.rx.event.bind(to: todayTapped).disposed(by: disposeBag)
@@ -30,7 +30,7 @@ class TopTasksListView: UIView {
     }()
     
     lazy var importantList: TopTasksView = {
-        let icon = TasksGroupTinyIcon(image: UIImage(), color: .orange)
+        let icon = TasksGroupTinyIcon(image: UIImage(named: "flag") ?? UIImage(), color: .orange)
         let block = TopTasksView(icon: icon, name: "重要", number: 0)
         let tap = UITapGestureRecognizer()
         tap.rx.event.bind(to: importantTapped).disposed(by: disposeBag)
@@ -40,7 +40,7 @@ class TopTasksListView: UIView {
     }()
     
     lazy var allList: TopTasksView = {
-        let icon = TasksGroupTinyIcon(image: UIImage(), color: .gray)
+        let icon = TasksGroupTinyIcon(image: UIImage(named: "drawer") ?? UIImage(), color: .gray)
         let block = TopTasksView(icon: icon, name: "全部", number: 0)
         let tap = UITapGestureRecognizer()
         tap.rx.event.bind(to: allTapped).disposed(by: disposeBag)
@@ -50,7 +50,7 @@ class TopTasksListView: UIView {
     }()
     
     lazy var completedList: TopTasksView = {
-        let icon = TasksGroupTinyIcon(image: UIImage(), color: .green)
+        let icon = TasksGroupTinyIcon(image: UIImage(named: "complete") ?? UIImage(), color: .green)
         let block = TopTasksView(icon: icon, name: "已完成", number: 0)
         let tap = UITapGestureRecognizer()
         tap.rx.event.bind(to: completedTapped).disposed(by: disposeBag)

@@ -140,7 +140,7 @@ extension AddGroupViewController {
         
         cell?.didSelectImage = { [weak self] imageName in
             let titleCell = tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? GroupTitleTableViewCell
-            titleCell?.groupIcon?.image = UIImage(named: imageName) ?? UIImage()
+            titleCell?.groupIcon?.image = UIImage(named: imageName + "large") ?? UIImage()
             self?.imageName = imageName
         }
         

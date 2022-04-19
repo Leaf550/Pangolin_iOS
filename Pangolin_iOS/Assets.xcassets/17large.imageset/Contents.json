@@ -5,12 +5,11 @@
       "scale" : "1x"
     },
     {
-      "filename" : "duigou-2.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "duigou.png",
+      "filename" : "17large@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

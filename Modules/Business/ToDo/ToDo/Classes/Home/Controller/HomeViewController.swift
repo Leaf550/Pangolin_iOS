@@ -46,6 +46,8 @@ class HomeViewController: UIViewController, ViewController {
                     partialResult + ((task.isCompleted ?? false) ? 0 : 1 )
                 })
                 cell.numberLabel.text = String(unCompletedCount ?? 0)
+                let imageName = section?.taskList?.imageName ?? "0"
+                cell.iconImage = UIImage(named: "\(imageName)medium") ?? UIImage()
                 cell.iconColor = TasksGroupIconColor(rawValue: section?.taskList?.listColor ?? 0) ?? .blue
                 let numberOfRows = table.numberOfRows(inSection: 0)
                 cell.hasSeparateLine = (row != numberOfRows - 1)

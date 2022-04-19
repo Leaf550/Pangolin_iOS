@@ -11,8 +11,6 @@ class GroupIconTableViewCell: GroupConfigBaseTableViewCell, UICollectionViewData
     
     static var reuseID: String = NSStringFromClass(GroupIconTableViewCell.self)
     
-    private let iconImageNames: [String] = [String](repeating: "", count: 24)
-    
     private var isFirst = true
     
     override func setUpSubViews() {
@@ -42,7 +40,7 @@ extension GroupIconTableViewCell {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         var cell: GroupIconImageCollectionViewCell?
         cell = collectionView.dequeueReusableCell(withReuseIdentifier: GroupIconImageCollectionViewCell.reuseID, for: indexPath) as? GroupIconImageCollectionViewCell
-//        cell?.image = UIImage(named: iconImageNames[indexPath.item])
+        cell?.image = UIImage(named: "\(indexPath.item)medium")
         if isFirst {
             cell?.setCellSelected(true)
             isFirst = false
@@ -56,7 +54,7 @@ extension GroupIconTableViewCell {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         selectedIndex = indexPath.item
-        didSelectImage("tick")
+        didSelectImage("\(indexPath.item)")
     }
     
 }
