@@ -13,8 +13,11 @@ import Hybrid
 // URL Query参数类型
 public typealias RouterURLQueryType = [String : String]
 
+// 路由跳转时传递的参数
+public typealias RouterRequestUserInfo = Any
+
 // 路由注册回调。参数：URL Query参数；返回值：UI界面
-public typealias RouterInitializerType = (RouterURLQueryType?) -> UIViewController
+public typealias RouterInitializerType = (RouterURLQueryType?, RouterRequestUserInfo?) -> UIViewController
 
 // 路由拦截器类型，每当路由器打开一个URL，都会首先执行一下拦截器。
 // 参数：URL；返回值：是否拦截当前路由跳转，如返回`continue`，则继续跳转。
@@ -89,6 +92,7 @@ public class Router {
     
     // 用Router打开URL
     public static func open(url: String,
+                            userInfo: RouterRequestUserInfo?,
                             completion: @escaping RouterOpenCompletion = { _ in }) {
         guard interceptor(url) == .continue else {
             completion(.intercepted)
@@ -102,37 +106,38 @@ public class Router {
         
         switch urlScheme {
             case .http, .https:
-                openWebPage(url: url, completion: completion)
+                openWebPage(url: url, userInfo: userInfo, completion: completion)
             case .pangolin:
-                openNativePage(url: url, completion: completion)
+                openNativePage(url: url, userInfo: userInfo, completion: completion)
         }
     }
     
     // 用Router获取对应URL的页面
-    public static func viewController(forURL url: String) -> UIViewController? {
+    public static func viewController(forURL url: String, userInfo: RouterRequestUserInfo?) -> UIViewController? {
         guard interceptor(url) == .continue else {
             return nil
         }
         
-        return viewControllerWithoutIntercepter(forURL: url)
+        return viewControllerWithoutIntercepter(forURL: url, userInfo: userInfo)
     }
     
     private static func urlWithoutQuery(url: String) -> String {
         String(url.split(separator: Character("?")).first ?? "")
     }
     
-    private static func viewControllerWithoutIntercepter(forURL url: String) -> UIViewController? {
+    private static func viewControllerWithoutIntercepter(forURL url: String, userInfo: RouterRequestUserInfo?) -> UIViewController? {
         guard let entrance = routeMap[urlWithoutQuery(url: url)] else {
             return nil
         }
         
         let urlQueries = URLHelper.queryItemsForURL(url: url)
-        let targetVC = entrance.initializer(urlQueries)
+        let targetVC = entrance.initializer(urlQueries, userInfo)
         
         return targetVC
     }
     
     private static func openWebPage(url: String,
+                                    userInfo: RouterRequestUserInfo?,
                                     completion: @escaping RouterOpenCompletion) {
         guard let _ = URL(string: url) else {
             completion(.badRequest)
@@ -152,10 +157,11 @@ public class Router {
         }
         
         // 若http、https协议头URL被注册为了native页面，则打开注册的native页面。
-        openNativePage(url: url, completion: completion)
+        openNativePage(url: url, userInfo: userInfo, completion: completion)
     }
     
     private static func openNativePage(url: String,
+                                       userInfo: RouterRequestUserInfo?,
                                        completion: @escaping RouterOpenCompletion) {
         guard let _ = URL(string: url) else {
             completion(.badRequest)
@@ -167,7 +173,7 @@ public class Router {
             return
         }
         
-        guard let targetVC = viewControllerWithoutIntercepter(forURL: url) else { return }
+        guard let targetVC = viewControllerWithoutIntercepter(forURL: url, userInfo: userInfo) else { return }
         
         let animated = entrance.animated
         let animationStyle = entrance.animationStyle
