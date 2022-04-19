@@ -10,6 +10,7 @@ import UIComponents
 import SnapKit
 import RxSwift
 import RxCocoa
+import Provider
 
 class NewPostViewController: UIViewController, ViewController {
     
@@ -84,6 +85,8 @@ class NewPostViewController: UIViewController, ViewController {
                 switch result {
                     case .succeeded:
                         self?.dismiss(animated: true)
+                        let todoService = PGProviderManager.shared.provider { ToDoProvider.self }
+                        todoService?.setTaskShared(taskId: self?.task.taskID ?? "")
                     case .duplicateShare:
                         Toast.show(text: "已经分享过了...")
                     case .error:

@@ -171,7 +171,8 @@ class TasksListViewController: UIViewController, ViewController, UITableViewData
                 if !succeeded
                     || task == nil
                     || (self?.isShowingNewPostAlart ?? false
-                    || !completed) {
+                    || !completed
+                    || task?.shared ?? false) {
                     return
                 }
                 let confirmAction = UIAlertAction(title: "好", style: .default) { _ in

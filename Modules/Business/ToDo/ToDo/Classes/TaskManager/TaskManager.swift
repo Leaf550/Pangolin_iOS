@@ -22,7 +22,16 @@ class TaskManager {
         persistenceService?.getHomeModel()
     }
     
-    lazy var homeModel: BehaviorSubject<HomeModel?> = BehaviorSubject<HomeModel?>(value: persistedHomeModel)
+    lazy var homeModel: BehaviorSubject<HomeModel?> = {
+        let subject = BehaviorSubject<HomeModel?>(value: persistedHomeModel)
+        subject.subscribe(onNext: { [weak self] homeModel in
+            guard let homeModel = homeModel else { return }
+            _ = self?.persistenceService?.saveHomeModel(homeModel)
+        })
+        .disposed(by: disposeBag)
+        
+        return subject
+    }()
     
     lazy var todayPageData: BehaviorSubject<ListPageData?> = {
         let subject = BehaviorSubject<ListPageData?>(value: nil)
@@ -246,6 +255,34 @@ class TaskManager {
         return subject
     }()
     
+    private lazy var sharedTaskAction: PublishSubject<String> = {
+        let publish = PublishSubject<String>()
+        publish
+            .withLatestFrom(homeModel) { ($0, $1) }
+            .map { taskId, homeModel -> HomeModel? in
+                var homeModel = homeModel
+                for listIndex in 0 ..< (homeModel?.data?.otherList?.count ?? 0) {
+                    var has = false
+                    for taskIndex in 0 ..< (homeModel?.data?.otherList?[listIndex].sections?[0].tasks?.count ?? 0) {
+                        if taskId == (homeModel?.data?.otherList?[listIndex].sections?[0].tasks?[taskIndex].taskID ?? "") {
+                            homeModel?.data?.otherList?[listIndex].sections?[0].tasks?[taskIndex].shared = true
+                            has = true
+                            break
+                        }
+                    }
+                    if has {
+                        break
+                    }
+                }
+                
+                return homeModel
+            }
+            .bind(to: homeModel)
+            .disposed(by: disposeBag)
+        
+        return publish
+    }()
+    
     func deleteTask(withTaskID taskID: String) {
         deleteTaskAction.onNext(taskID)
     }
@@ -260,6 +297,10 @@ class TaskManager {
     
     func addTaskList(taskList: TaskList) {
         addTaskListAction.onNext(taskList)
+    }
+    
+    func shareTask(taskId: String) {
+        sharedTaskAction.onNext(taskId)
     }
     
 }

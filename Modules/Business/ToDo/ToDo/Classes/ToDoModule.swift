@@ -28,4 +28,8 @@ extension ToDoModule: ToDoProvider {
         HomeViewController()
     }
     
+    func setTaskShared(taskId: String) -> Void {
+        TaskManager.shared.shareTask(taskId: taskId)
+    }
+    
 }
