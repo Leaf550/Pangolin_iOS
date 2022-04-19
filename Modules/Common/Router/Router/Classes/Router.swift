@@ -17,7 +17,7 @@ public typealias RouterURLQueryType = [String : String]
 public typealias RouterRequestUserInfo = Any
 
 // 路由注册回调。参数：URL Query参数；返回值：UI界面
-public typealias RouterInitializerType = (RouterURLQueryType?, RouterRequestUserInfo?) -> UIViewController
+public typealias RouterInitializerType = (RouterURLQueryType?, RouterRequestUserInfo?) -> UIViewController?
 
 // 路由拦截器类型，每当路由器打开一个URL，都会首先执行一下拦截器。
 // 参数：URL；返回值：是否拦截当前路由跳转，如返回`continue`，则继续跳转。
