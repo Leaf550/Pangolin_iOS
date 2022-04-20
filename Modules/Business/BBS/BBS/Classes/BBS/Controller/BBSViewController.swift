@@ -28,7 +28,7 @@ class BBSViewController: UIViewController, ViewController, UITableViewDataSource
     private lazy var tableView: UITableView = {
         let table = UITableView()
         table.register(BBSTableViewCell.self, forCellReuseIdentifier: BBSTableViewCell.reuseID)
-        table.backgroundColor = .systemBackground
+        table.backgroundColor = .systemGroupedBackground
         table.addSubview(refreshControl)
         
         table.dataSource = self
@@ -62,7 +62,7 @@ class BBSViewController: UIViewController, ViewController, UITableViewDataSource
     }
     
     private func setUpSubViews() {
-        self.title = "xxx社区"
+        title = "社区"
         navigationController?.navigationBar.prefersLargeTitles = true
         view.backgroundColor = .systemBackground
         

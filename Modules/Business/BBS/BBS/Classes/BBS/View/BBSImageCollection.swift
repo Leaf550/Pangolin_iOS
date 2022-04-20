@@ -12,7 +12,7 @@ import SnapKit
 
 class BBSImageCollection: UIView, UICollectionViewDataSource {
      
-    static var imageWidth = (Screen.screenWidth - 24) / 4.0 - 3
+    static var imageWidth = (Screen.screenWidth - 40) / 4.0 - 3
     
     private lazy var imageCollection: UICollectionView = {
         let flowLayout = UICollectionViewFlowLayout()

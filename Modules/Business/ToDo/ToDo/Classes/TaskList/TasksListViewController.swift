@@ -144,49 +144,6 @@ class TasksListViewController: UIViewController, ViewController, UITableViewData
         
         todoTable.register(TaskTableViewCell.self, forCellReuseIdentifier: TaskTableViewCell.reuseID)
         
-        requestSetTaskIsCompletedFinished
-            .withLatestFrom(TaskManager.shared.homeModel) { ($0.0, $0.1, $1) }
-            .withLatestFrom(requestSetTaskIsCompleted) {
-                ($0.0, $0.1, $0.2, $1.1)
-            }
-            .map { (taskId, succeeded, homeModel, completed) -> (TaskModel?, Bool, Bool) in
-                var targetTask: TaskModel? = nil
-                for list in homeModel?.data?.otherList ?? [] {
-                    var has: Bool = false
-                    for task in list.sections?[0].tasks ?? [] {
-                        if task.taskID == taskId {
-                            targetTask = task
-                            has = true
-                            break
-                        }
-                    }
-                    if has {
-                        break
-                    }
-                }
-
-                return (targetTask, succeeded, completed)
-            }
-            .subscribe(onNext: { [weak self] task, succeeded, completed in
-                if !succeeded
-                    || task == nil
-                    || (self?.isShowingNewPostAlart ?? false
-                    || !completed
-                    || task?.shared ?? false) {
-                    return
-                }
-                let confirmAction = UIAlertAction(title: "好", style: .default) { _ in
-                    Router.open(url: "pangolin://newPost/", userInfo: task)
-                }
-                let cancelAction = UIAlertAction(title: "取消", style: .cancel, handler: nil)
-                let alertMessage = "恭喜你完成了\(task?.title ?? " ? ")，去分享一下吧～"
-                let alertController = UIAlertController(title: "分享一下", message: alertMessage, preferredStyle: .alert)
-                alertController.addAction(cancelAction)
-                alertController.addAction(confirmAction)
-                self?.present(alertController, animated: true)
-
-            }).disposed(by: disposeBag)
-        
         setUpSubviews()
         bindViewModel()
     }
@@ -287,6 +244,14 @@ extension TasksListViewController {
         
         guard let task = sections[indexPath.section].tasks?[indexPath.row] else { return nil }
         
+        let shareAction = UIContextualAction(style: .normal, title: "分享") { [weak self] action, view, completion in
+            if (self?.isShowingNewPostAlart ?? false) {
+                return
+            }
+            Router.open(url: "pangolin://newPost/", userInfo: task)
+        }
+        shareAction.backgroundColor = .systemGreen
+        
         let deleteAction = UIContextualAction(style: .destructive, title: "删除") { [weak self] action, view, completion in
             let cancelAction = UIAlertAction(title: "取消", style: .cancel) { _ in
                 completion(false)
@@ -328,7 +293,13 @@ extension TasksListViewController {
         }
         editAction.backgroundColor = .systemBlue
         
-        let configuration = UISwipeActionsConfiguration(actions: [deleteAction, importantAction, editAction])
+        var actions = [deleteAction, importantAction, editAction]
+        if task.isCompleted ?? false &&
+            !(task.shared ?? false) {
+            actions.append(shareAction)
+        }
+        
+        let configuration = UISwipeActionsConfiguration(actions: actions)
         return configuration
     }
 }

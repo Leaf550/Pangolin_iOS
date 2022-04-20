@@ -37,14 +37,13 @@ class NewPostViewController: UIViewController, ViewController {
         text.font = .textFont(for: .caption0, weight: .regular)
         text.layer.cornerRadius = 6
         text.clipsToBounds = true
-        text.placeholder = "说点什么吧"
+        text.placeholder = "说点什么吧..."
         
         return text
     }()
     
     private lazy var todoView: BBSToDoView = {
         let todo = BBSToDoView()
-        todo.backgroundColor = .green
         
         return todo
     }()
@@ -66,6 +65,10 @@ class NewPostViewController: UIViewController, ViewController {
         bindViewModel()
         setUpSubViews()
         setUpNavagationBarButton()
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        self.view.endEditing(true)
     }
     
     func bindViewModel() {
@@ -127,6 +130,8 @@ class NewPostViewController: UIViewController, ViewController {
         view.addSubview(todoView)
         view.addSubview(indicator)
         
+        todoView.configViews(with: task)
+        
         postContentHintLabel.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(20)
             make.top.equalToSuperview().offset(64)
@@ -135,14 +140,13 @@ class NewPostViewController: UIViewController, ViewController {
         textView.snp.makeConstraints { make in
             make.leading.equalToSuperview().offset(20)
             make.trailing.equalToSuperview().offset(-20)
-            make.top.equalTo(postContentHintLabel.snp.bottom).offset(5)
+            make.top.equalTo(postContentHintLabel.snp.bottom).offset(10)
             make.height.equalTo(100)
         }
         
         todoView.snp.makeConstraints { make in
             make.leading.trailing.equalTo(textView)
             make.top.equalTo(textView.snp.bottom).offset(20)
-            make.height.equalTo(120)
         }
         
         indicator.snp.makeConstraints { make in

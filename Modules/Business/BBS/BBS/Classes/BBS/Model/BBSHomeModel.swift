@@ -24,14 +24,14 @@ struct BBSPost: Codable {
     let postID: String?
     let author: UserImpl?
     let createTime: Int?
-    let content, taskID: String?
+    let content: String?
+    let task: TaskModel?
     let praiseCount: Int?
     let commentList: [BBSComment]?
 
     enum CodingKeys: String, CodingKey {
         case postID = "postId"
-        case author, createTime, content
-        case taskID = "taskId"
+        case author, createTime, content, task
         case praiseCount, commentList
     }
 }

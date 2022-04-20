@@ -50,7 +50,6 @@ class BBSTableViewCell: UITableViewCell {
     
     private lazy var todoView: BBSToDoView = {
         let view = BBSToDoView()
-        view.backgroundColor = .systemGreen
         
         return view
     }()
@@ -64,7 +63,7 @@ class BBSTableViewCell: UITableViewCell {
     
     private lazy var commentButton: UIView = {
         let button = UIButton(type: .system)
-        button.backgroundColor = .secondarySystemBackground
+        button.backgroundColor = .secondarySystemGroupedBackground
         button.layer.cornerRadius = 4
         
         let commentLabel = UILabel()
@@ -100,12 +99,25 @@ class BBSTableViewCell: UITableViewCell {
         
         let formatter = DateFormatter()
         formatter.locale = Locale.init(identifier: "zh_CN")
-        let timestamp = Double((post.createTime ?? 0) / 1000)
+        let timestamp = Double((post.createTime ?? 0))
         formatter.dateFormat = postDateFormatString(timeIntervalSince1970: timestamp)
         timeLabel.text = formatter.string(from: Date(timeIntervalSince1970: timestamp))
         
         if let commentList = post.commentList {
             replyView.configViews(with: commentList)
+        }
+        
+        todoView.configViews(with: post.task)
+        if post.task == nil {
+            todoView.isHidden = true
+            imageCollection?.snp.updateConstraints { make in
+                make.top.equalTo(todoView.snp.bottom).offset(-30)
+            }
+        } else {
+            todoView.isHidden = false
+            imageCollection?.snp.updateConstraints { make in
+                make.top.equalTo(todoView.snp.bottom).offset(20)
+            }
         }
     }
     
@@ -132,7 +144,7 @@ class BBSTableViewCell: UITableViewCell {
     }
     
     private func setUpSubViews() {
-        contentView.backgroundColor = .systemBackground
+        contentView.backgroundColor = .systemGroupedBackground
         
         contentView.addSubview(avatarImageView)
         contentView.addSubview(nicknameLabel)
@@ -170,15 +182,16 @@ class BBSTableViewCell: UITableViewCell {
         }
         
         todoView.snp.makeConstraints { make in
-            make.leading.trailing.equalTo(contentLabel)
-            make.top.equalTo(contentLabel.snp.bottom).offset(6)
-            make.height.equalTo(120)
+            make.leading.equalToSuperview().offset(20)
+            make.trailing.equalToSuperview().offset(-20)
+            make.top.equalTo(contentLabel.snp.bottom).offset(20)
         }
         
         if let imageCollection = imageCollection {
             imageCollection.snp.makeConstraints { make in
-                make.leading.trailing.equalTo(contentLabel)
-                make.top.equalTo(todoView.snp.bottom).offset(6)
+                make.leading.equalToSuperview().offset(20)
+                make.trailing.equalToSuperview().offset(-20)
+                make.top.equalTo(todoView.snp.bottom).offset(20)
                 make.height.equalTo(BBSImageCollection.imageWidth)
             }
         }
@@ -187,7 +200,7 @@ class BBSTableViewCell: UITableViewCell {
             if let imageCollection = imageCollection {
                 make.top.equalTo(imageCollection.snp.bottom).offset(6)
             } else {
-                make.top.equalTo(todoView.snp.bottom).offset(6)
+                make.top.equalTo(todoView.snp.bottom).offset(20)
             }
             make.trailing.equalTo(contentLabel)
             make.width.height.equalTo(20)
