@@ -104,10 +104,11 @@ class TaskTableViewCell: TableViewCell {
             }
             dateString += " "
             if dateTimestamp < Date().timeIntervalSince1970
-                && !Calendar.current.isDateInToday(date) {
+                && !Calendar.current.isDateInToday(date)
+                && !(model.isCompleted ?? false) {
                 dateLabel.textColor = .systemRed
             } else {
-                dateLabel.textColor = .label
+                dateLabel.textColor = .secondaryLabel
             }
         }
         
@@ -117,10 +118,11 @@ class TaskTableViewCell: TableViewCell {
             formater.dateFormat = "HH:mm"
             dateString += formater.string(from: date)
             
-            if time < Date().timeIntervalSince1970 {
+            if time < Date().timeIntervalSince1970
+                && !(model.isCompleted ?? false) {
                 dateLabel.textColor = .systemRed
             } else {
-                dateLabel.textColor = .label
+                dateLabel.textColor = .secondaryLabel
             }
         }
         
