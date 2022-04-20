@@ -11,8 +11,9 @@ import SnapKit
 import RxSwift
 import RxCocoa
 import Provider
+import Gallery
 
-class NewPostViewController: UIViewController, ViewController {
+class NewPostViewController: UIViewController, ViewController, GalleryControllerDelegate {
     
     typealias VM = NewPostViewModel
     
@@ -35,6 +36,7 @@ class NewPostViewController: UIViewController, ViewController {
     private lazy var textView: TextView = {
         let text = TextView()
         text.font = .textFont(for: .caption0, weight: .regular)
+        text.backgroundColor = .secondarySystemGroupedBackground
         text.layer.cornerRadius = 6
         text.clipsToBounds = true
         text.placeholder = "说点什么吧..."
@@ -42,10 +44,34 @@ class NewPostViewController: UIViewController, ViewController {
         return text
     }()
     
-    private lazy var todoView: BBSToDoView = {
-        let todo = BBSToDoView()
+    private lazy var todoView = BBSToDoView()
+    
+    private lazy var imageCollection: BBSImageCollection = {
+        let collection = BBSImageCollection()
+        collection.controller = self
         
-        return todo
+        return collection
+    }()
+    
+    private lazy var gallery: GalleryController = {
+        let gal = GalleryController()
+        Config.tabsToShow = [.imageTab, .cameraTab]
+        gal.modalPresentationStyle = .fullScreen
+        gal.delegate = self
+        return gal
+    }()
+    
+    private lazy var addImagesButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("编辑图片", for: .normal)
+        button.setTitleColor(.link, for: .normal)
+        button.titleLabel?.font = .textFont(for: .caption0, weight: .regular)
+        button.rx.tap.bind { [weak self] _ in
+            guard let gallery = self?.gallery else { return }
+            self?.present(gallery, animated: true)
+        }.disposed(by: disposeBag)
+        
+        return button
     }()
     
     private let completeButtonTapAction = PublishSubject<Void>()
@@ -128,6 +154,8 @@ class NewPostViewController: UIViewController, ViewController {
         view.addSubview(postContentHintLabel)
         view.addSubview(textView)
         view.addSubview(todoView)
+        view.addSubview(imageCollection)
+        view.addSubview(addImagesButton)
         view.addSubview(indicator)
         
         todoView.configViews(with: task)
@@ -149,9 +177,49 @@ class NewPostViewController: UIViewController, ViewController {
             make.top.equalTo(textView.snp.bottom).offset(20)
         }
         
+        imageCollection.snp.makeConstraints { make in
+            make.leading.trailing.equalTo(todoView)
+            make.top.equalTo(todoView.snp.bottom).offset(30)
+        }
+        
+        addImagesButton.snp.makeConstraints { make in
+            make.leading.equalTo(todoView)
+            make.top.equalTo(imageCollection.snp.bottom).offset(20)
+        }
+        
         indicator.snp.makeConstraints { make in
             make.center.equalToSuperview()
         }
     }
 
+}
+
+extension NewPostViewController {
+    
+    func galleryController(_ controller: GalleryController, didSelectImages images: [Image]) {
+        Image.resolve(images: images) { [weak self] images in
+            var actualImages = [UIImage]()
+            for image in images {
+                if let image = image {
+                    actualImages.append(image)
+                }
+            }
+            
+            self?.imageCollection.images = actualImages
+        }
+        controller.dismiss(animated: true)
+    }
+    
+    func galleryController(_ controller: GalleryController, didSelectVideo video: Video) {
+        
+    }
+    
+    func galleryController(_ controller: GalleryController, requestLightbox images: [Image]) {
+        
+    }
+    
+    func galleryControllerDidCancel(_ controller: GalleryController) {
+        controller.dismiss(animated: true)
+    }
+    
 }

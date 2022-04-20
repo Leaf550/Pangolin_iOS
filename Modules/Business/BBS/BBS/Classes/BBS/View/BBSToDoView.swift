@@ -13,14 +13,14 @@ class BBSToDoView: UIView {
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.font = .textFont(for: .title3, weight: .regular)
+        label.font = .textFont(for: .body, weight: .regular)
         
         return label
     }()
     
     private lazy var commentLabel: UILabel = {
         let label = UILabel()
-        label.font = .textFont(for: .body, weight: .regular)
+        label.font = .textFont(for: .caption0, weight: .regular)
         label.textColor = .secondaryLabel
         
         return label

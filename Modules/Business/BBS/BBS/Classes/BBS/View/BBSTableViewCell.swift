@@ -192,7 +192,6 @@ class BBSTableViewCell: UITableViewCell {
                 make.leading.equalToSuperview().offset(20)
                 make.trailing.equalToSuperview().offset(-20)
                 make.top.equalTo(todoView.snp.bottom).offset(20)
-                make.height.equalTo(BBSImageCollection.imageWidth)
             }
         }
         
