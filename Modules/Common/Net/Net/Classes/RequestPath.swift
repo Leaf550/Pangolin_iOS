@@ -45,4 +45,6 @@ public enum RequestPath: String {
     case bbsHome            = "/getAllBBSPost"
     // 发布帖子
     case createPost         = "/createBBSPost"
+    // 上传帖子图片
+    case uploadBBSImage     = "/upLoadImage/bbs"
 }

@@ -19,7 +19,7 @@ public class Net {
     private var header: [String : String]? = [
         "Authorization" : PGProviderManager.shared.provider { PersistenceProvider.self }?.getToken() ?? ""
     ]
-    private var body: [String : String]? = nil
+    private var body: [String : Any]? = nil
     private var interceptor: RequestInterceptor? = nil
     private var request: DataRequest?
     
@@ -42,7 +42,7 @@ public class Net {
     }
     
     @discardableResult
-    public func configBody(_ body: [String : String]) -> Self {
+    public func configBody(_ body: [String : Any]) -> Self {
         self.body = body
         return self
     }
@@ -64,6 +64,16 @@ public class Net {
     public func post(completion: @escaping (Any) -> Void,
                      error: @escaping (Error) -> Void) -> Self {
         request(method: .post, interceptor: interceptor, completion: completion, error: error)
+        return self
+    }
+    
+    @discardableResult
+    public func upload(
+        multipartFormData: @escaping (MultipartFormData) -> Void,
+        completion: @escaping (Any) -> Void,
+        error: @escaping (Error) -> Void
+    ) -> Self {
+        upload(multipartFormData: multipartFormData, method: .post, interceptor: interceptor, completion: completion, error: error)
         return self
     }
     
@@ -98,6 +108,26 @@ public class Net {
                    interceptor: interceptor,
                    requestModifier: { $0.timeoutInterval = 5 })
             .responseJSON { response in
+            switch response.result {
+                case .success(let json):
+                    completion(json)
+                case .failure(let err):
+                    error(err)
+            }
+        }
+    }
+    
+    private func upload(multipartFormData: @escaping (MultipartFormData) -> Void,
+                        method: HTTPMethod,
+                        interceptor: RequestInterceptor?,
+                        completion: @escaping (Any) -> Void,
+                        error: @escaping (Error) -> Void) {
+        let requestHeaders = header == nil ? nil : HTTPHeaders(header ?? [:])
+        request = AF.upload(multipartFormData: multipartFormData,
+                  to: url,
+                  method: method,
+                  headers: requestHeaders)
+        .responseJSON { response in
             switch response.result {
                 case .success(let json):
                     completion(json)

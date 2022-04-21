@@ -12,6 +12,7 @@ import RxSwift
 import RxCocoa
 import Provider
 import Gallery
+import UIKit
 
 class NewPostViewController: UIViewController, ViewController, GalleryControllerDelegate {
     
@@ -22,6 +23,8 @@ class NewPostViewController: UIViewController, ViewController, GalleryController
     var disposeBag = DisposeBag()
     
     private var task: TaskModel
+    
+    private var selectedImage: [UIImage]?
     
     private lazy var indicator = UIActivityIndicatorView(style: .medium)
     
@@ -101,7 +104,7 @@ class NewPostViewController: UIViewController, ViewController, GalleryController
         completeButtonTapAction
             .map { [weak self] _ in
                 self?.indicator.startAnimating()
-                return (self?.textView.text, self?.task.taskID)
+                return (self?.selectedImage, self?.textView.text, self?.task.taskID)
             }
             .bind(to: viewModel.input.sendNewPostAction)
             .disposed(by: disposeBag)
@@ -206,6 +209,7 @@ extension NewPostViewController {
             }
             
             self?.imageCollection.images = actualImages
+            self?.selectedImage = actualImages
         }
         controller.dismiss(animated: true)
     }
