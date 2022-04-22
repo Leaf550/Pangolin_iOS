@@ -31,6 +31,23 @@ class BBSImageCollection: UIView, UICollectionViewDataSource, UICollectionViewDe
         }
     }
     
+    var imageUrls = [String]() {
+        didSet {
+            self.imageCollection.reloadData()
+            if imageUrls.count == 0 {
+                self.imageCollection.snp.remakeConstraints { make in
+                    make.edges.equalTo(self)
+                    make.height.equalTo(0)
+                }
+            } else {
+                self.imageCollection.snp.remakeConstraints { make in
+                    make.edges.equalTo(self)
+                    make.height.equalTo(BBSImageCollection.imageWidth)
+                }
+            }
+        }
+    }
+    
     static var horizontalPadding: CGFloat = 20
      
     static var imageWidth = (Screen.screenWidth - horizontalPadding * 2) / 4.0 - 3
@@ -70,18 +87,30 @@ class BBSImageCollection: UIView, UICollectionViewDataSource, UICollectionViewDe
 extension BBSImageCollection {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        images.count > 4 ? 4 : images.count
+        if images.count == 0 {
+            return imageUrls.count > 4 ? 4 : imageUrls.count
+        }
+        if imageUrls.count == 0 {
+            return images.count > 4 ? 4 : images.count
+        }
+        return 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: BBSImageCollectionCell.reuserID, for: indexPath) as? BBSImageCollectionCell
         
-        cell?.image = images[indexPath.row]
+        if images.count == 0 {
+            cell?.imageView.sd_setImage(with: URL(string: imageUrls[indexPath.row]))
+        }
+        if imageUrls.count == 0 {
+            cell?.imageView.image = images[indexPath.row]
+        }
         
         return cell ?? UICollectionViewCell()
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let images = ((collectionView.visibleCells as? [BBSImageCollectionCell]) ?? []).reversed().map { $0.imageView.image ?? UIImage() }
         let largeImageController = LargeImageController(images: images, startAt: indexPath.item)
         
         controller?.present(largeImageController, animated: true)

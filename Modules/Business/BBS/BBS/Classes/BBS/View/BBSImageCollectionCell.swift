@@ -12,13 +12,7 @@ class BBSImageCollectionCell: UICollectionViewCell {
     
     static let reuserID: String = NSStringFromClass(BBSImageCollectionCell.self)
     
-    var image: UIImage? {
-        didSet {
-            imageView.image = image
-        }
-    }
-    
-    private lazy var imageView: UIImageView = {
+    lazy var imageView: UIImageView = {
         let view = UIImageView()
         view.contentMode = .scaleAspectFill
         view.layer.cornerRadius = 4

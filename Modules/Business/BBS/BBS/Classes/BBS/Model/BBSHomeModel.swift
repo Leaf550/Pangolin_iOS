@@ -28,11 +28,12 @@ struct BBSPost: Codable {
     let task: TaskModel?
     let praiseCount: Int?
     let commentList: [BBSComment]?
+    let imageUrls: [String]?
 
     enum CodingKeys: String, CodingKey {
         case postID = "postId"
         case author, createTime, content, task
-        case praiseCount, commentList
+        case praiseCount, commentList, imageUrls
     }
 }
 

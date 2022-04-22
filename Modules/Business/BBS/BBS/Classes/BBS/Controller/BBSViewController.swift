@@ -88,6 +88,7 @@ extension BBSViewController {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: BBSTableViewCell.reuseID, for: indexPath) as? BBSTableViewCell
         
+        cell?.controller = self
         if let post = bbsHomeModel?.data?.posts?[indexPath.row] {
             cell?.configViews(with: post)
         }

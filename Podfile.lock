@@ -17,6 +17,7 @@ PODS:
     - Router
     - RxCocoa
     - RxSwift
+    - SDWebImage
     - UIComponents
   - Differentiator (5.0.0)
   - Gallery (2.4.0)
@@ -49,6 +50,9 @@ PODS:
   - RxRelay (6.2.0):
     - RxSwift (= 6.2.0)
   - RxSwift (6.2.0)
+  - SDWebImage (5.0.0):
+    - SDWebImage/Core (= 5.0.0)
+  - SDWebImage/Core (5.0.0)
   - SnapKit (5.0.1)
   - Starter (0.0.1):
     - PGFoundation
@@ -87,6 +91,7 @@ DEPENDENCIES:
   - RxCocoa (= 6.2.0)
   - RxDataSources (= 5.0)
   - RxSwift (= 6.2.0)
+  - SDWebImage (= 5.0)
   - SnapKit (= 5.0.1)
   - Starter (from `Modules/Business/Starter`)
   - Toast-Swift (= 5.0.1)
@@ -105,6 +110,7 @@ SPEC REPOS:
     - RxDataSources
     - RxRelay
     - RxSwift
+    - SDWebImage
     - SnapKit
     - Toast-Swift
 
@@ -137,7 +143,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Account: 5d43290fac2bcbc676781dd8161af9489543e555
   Alamofire: f3b09a368f1582ab751b3fff5460276e0d2cf5c9
-  BBS: fa74637b302394641a30156867b61054d1eede2d
+  BBS: 991c48d6926397d9cf74e2895cb37cfc1d49c5b1
   Differentiator: e8497ceab83c1b10ca233716d547b9af21b9344d
   Gallery: b7fc1aeb68a39ad6d2c423574750196bf9b25e5c
   Hybrid: f939efddf0a5e3cd6b48961abebdb98cba6add40
@@ -152,6 +158,7 @@ SPEC CHECKSUMS:
   RxDataSources: aa47cc1ed6c500fa0dfecac5c979b723542d79cf
   RxRelay: e72dbfd157807478401ef1982e1c61c945c94b2f
   RxSwift: d356ab7bee873611322f134c5f9ef379fa183d8f
+  SDWebImage: 5de80a0302de9e377e62f47d2fa1304efff0e55f
   SnapKit: 97b92857e3df3a0c71833cce143274bf6ef8e5eb
   Starter: dd0337154aa84ff0d149946af8510d6a4a66c5a9
   Toast-Swift: 9b6a70f28b3bf0b96c40d46c0c4b9d6639846711
@@ -159,6 +166,6 @@ SPEC CHECKSUMS:
   UIComponents: b1d741cba7e3a8a53b9ee7c9449e8c642d73fd05
   Util: 9269aba84bf203b4ea0604aeb60088d757e3e87e
 
-PODFILE CHECKSUM: 3da4a11662c17a66436d8609abd86b9f4aa8afd9
+PODFILE CHECKSUM: f97a7088a58588cce7d9b6747088cbe724208de7
 
 COCOAPODS: 1.10.1

@@ -73,6 +73,10 @@ class BBSToDoView: UIView {
     private func setUpSubviews() {
         backgroundColor = .secondarySystemGroupedBackground
         layer.cornerRadius = 8
+        layer.shadowOffset = .zero
+        layer.shadowColor = UIColor.darkGray.cgColor
+        layer.shadowRadius = 20
+        layer.shadowOpacity = 0.05
         
         addSubview(titleLabel)
         addSubview(commentLabel)

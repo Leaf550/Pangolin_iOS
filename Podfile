@@ -32,6 +32,7 @@ def thirdPartPods
   pod 'Toast-Swift', '5.0.1', :inhibit_warnings => true
   pod 'MMKV', '1.2.11', :inhibit_warnings => true
   pod 'Gallery', '2.4.0', :inhibit_warnings => true
+  pod 'SDWebImage', '5.0', :inhibit_warnings => true
 end
 
 target 'Pangolin_iOS' do

@@ -29,5 +29,6 @@ BBS: Add long description of the pod here.
   s.dependency 'RxSwift'
   s.dependency 'RxCocoa'
   s.dependency 'Gallery'
+  s.dependency 'SDWebImage'
   
 end

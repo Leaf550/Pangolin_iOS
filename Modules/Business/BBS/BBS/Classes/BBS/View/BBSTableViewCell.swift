@@ -9,10 +9,13 @@ import UIKit
 import UIComponents
 import Util
 import SnapKit
+import SDWebImage
 
 class BBSTableViewCell: UITableViewCell {
     
     static let reuseID: String = NSStringFromClass(BBSTableViewCell.self)
+    
+    weak var controller: UIViewController?
     
     private lazy var avatarImageView: UIImageView = {
         let avatar = UIImageView()
@@ -81,7 +84,11 @@ class BBSTableViewCell: UITableViewCell {
     
     lazy var replyView = BBSReplyView()
     
-    lazy var imageCollection: BBSImageCollection? = BBSImageCollection()
+    lazy var imageCollection: BBSImageCollection? = {
+        let collection = BBSImageCollection()
+        
+        return collection
+    }()
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -119,6 +126,9 @@ class BBSTableViewCell: UITableViewCell {
                 make.top.equalTo(todoView.snp.bottom).offset(20)
             }
         }
+        
+        imageCollection?.imageUrls = post.imageUrls ?? []
+        imageCollection?.controller = self.controller
     }
     
     private func postDateFormatString(timeIntervalSince1970 timestamp: Double) -> String {
@@ -177,8 +187,8 @@ class BBSTableViewCell: UITableViewCell {
         
         contentLabel.snp.makeConstraints { make in
             make.top.equalTo(avatarImageView.snp.bottom).offset(10)
-            make.leading.equalToSuperview().offset(12)
-            make.trailing.equalToSuperview().offset(-12)
+            make.leading.equalToSuperview().offset(20)
+            make.trailing.equalToSuperview().offset(-20)
         }
         
         todoView.snp.makeConstraints { make in
