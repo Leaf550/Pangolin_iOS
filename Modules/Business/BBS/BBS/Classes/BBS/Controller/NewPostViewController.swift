@@ -39,7 +39,7 @@ class NewPostViewController: UIViewController, ViewController, GalleryController
     private lazy var textView: TextView = {
         let text = TextView()
         text.font = .textFont(for: .caption0, weight: .regular)
-        text.backgroundColor = .secondarySystemGroupedBackground
+        text.backgroundColor = .secondarySystemBackground
         text.layer.cornerRadius = 6
         text.clipsToBounds = true
         text.placeholder = "说点什么吧..."
@@ -151,7 +151,7 @@ class NewPostViewController: UIViewController, ViewController, GalleryController
     }
     
     private func setUpSubViews() {
-        view.backgroundColor = .systemGroupedBackground
+        view.backgroundColor = .systemBackground
         title = "发布帖子"
         
         view.addSubview(postContentHintLabel)

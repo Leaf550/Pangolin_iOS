@@ -28,7 +28,7 @@ class BBSViewController: UIViewController, ViewController, UITableViewDataSource
     private lazy var tableView: UITableView = {
         let table = UITableView()
         table.register(BBSTableViewCell.self, forCellReuseIdentifier: BBSTableViewCell.reuseID)
-        table.backgroundColor = .systemGroupedBackground
+        table.backgroundColor = .systemBackground
         table.addSubview(refreshControl)
         
         table.dataSource = self

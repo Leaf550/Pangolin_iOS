@@ -66,7 +66,7 @@ class BBSTableViewCell: UITableViewCell {
     
     private lazy var commentButton: UIView = {
         let button = UIButton(type: .system)
-        button.backgroundColor = .secondarySystemGroupedBackground
+        button.backgroundColor = .secondarySystemBackground
         button.layer.cornerRadius = 4
         
         let commentLabel = UILabel()
@@ -154,7 +154,7 @@ class BBSTableViewCell: UITableViewCell {
     }
     
     private func setUpSubViews() {
-        contentView.backgroundColor = .systemGroupedBackground
+        contentView.backgroundColor = .systemBackground
         
         contentView.addSubview(avatarImageView)
         contentView.addSubview(nicknameLabel)

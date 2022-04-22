@@ -71,7 +71,7 @@ class BBSToDoView: UIView {
     }
     
     private func setUpSubviews() {
-        backgroundColor = .secondarySystemGroupedBackground
+        backgroundColor = .secondarySystemBackground
         layer.cornerRadius = 8
         layer.shadowOffset = .zero
         layer.shadowColor = UIColor.darkGray.cgColor
