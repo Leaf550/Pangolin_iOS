@@ -11,6 +11,7 @@ import Net
 
 struct BBSViewModelInput: ViewModelInput {
     let bbsHomeRefresh = PublishSubject<Void>()
+    let bbsPostPraise = PublishSubject<String>()
 }
 
 struct BBSViewModelOutput: ViewModelOutput {
@@ -34,6 +35,12 @@ class BBSViewModel: ViewModel {
                 self?.requestAllBBSPosts() ?? Observable<BBSHomeModel?>.never()
             }
             .bind(to: output.bbsHomeRefreshCompleted)
+            .disposed(by: disposeBag)
+        
+        input.bbsPostPraise
+            .subscribe(onNext: { [weak self] postId in
+                self?.reqeustPraise(postId: postId)
+            })
             .disposed(by: disposeBag)
         
         return output
@@ -62,6 +69,15 @@ class BBSViewModel: ViewModel {
                 net.cancel()
             }
         }
+    }
+    
+    private func reqeustPraise(postId: String) {
+        _ = Net.build()
+            .configPath(.praisePost)
+            .configBody([
+                "postId" : postId
+            ])
+            .get { _ in } error: { _ in }
     }
     
 }

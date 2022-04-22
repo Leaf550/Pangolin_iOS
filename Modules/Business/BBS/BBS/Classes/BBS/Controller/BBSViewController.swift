@@ -93,6 +93,10 @@ extension BBSViewController {
             cell?.configViews(with: post)
         }
         
+        cell?.didPraise = { [weak self] postId in
+            self?.viewModel.input.bbsPostPraise.onNext(postId)
+        }
+        
         return cell ?? UITableViewCell()
     }
     

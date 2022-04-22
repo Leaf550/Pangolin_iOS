@@ -10,12 +10,18 @@ import UIComponents
 import Util
 import SnapKit
 import SDWebImage
+import RxSwift
+import RxCocoa
 
 class BBSTableViewCell: UITableViewCell {
     
     static let reuseID: String = NSStringFromClass(BBSTableViewCell.self)
     
     weak var controller: UIViewController?
+    var post: BBSPost?
+    var didPraise: (String) -> Void = { _ in }
+    
+    private var disposeBag = DisposeBag()
     
     private lazy var avatarImageView: UIImageView = {
         let avatar = UIImageView()
@@ -59,9 +65,26 @@ class BBSTableViewCell: UITableViewCell {
     
     private lazy var praiseButton: UIButton = {
         let button = UIButton(type: .system)
-        button.backgroundColor = .systemPink
+        button.setImage(UIImage(named: "praise"), for: .normal)
+        button.setImage(UIImage(named: "praise_light"), for: .selected)
+        button.tintColor = .clear
+        
+        button.rx.tap.bind { [weak self] _ in
+            if !button.isSelected {
+                button.isSelected = true
+                self?.praiseCount += 1
+                self?.didPraise(self?.post?.postID ?? "")
+            }
+        }.disposed(by: disposeBag)
         
         return button
+    }()
+    
+    private lazy var praiseCountLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .secondaryLabel
+        
+        return label
     }()
     
     private lazy var commentButton: UIView = {
@@ -89,6 +112,12 @@ class BBSTableViewCell: UITableViewCell {
         
         return collection
     }()
+    
+    private lazy var praiseCount: Int = 0 {
+        didSet {
+            self.praiseCountLabel.text = "\(praiseCount)"
+        }
+    }
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -101,6 +130,8 @@ class BBSTableViewCell: UITableViewCell {
     }
     
     func configViews(with post: BBSPost) {
+        self.post = post
+        
         contentLabel.text = post.content
         nicknameLabel.text = post.author?.username
         
@@ -129,6 +160,9 @@ class BBSTableViewCell: UITableViewCell {
         
         imageCollection?.imageUrls = post.imageUrls ?? []
         imageCollection?.controller = self.controller
+        
+        praiseCount = post.praiseCount ?? 0
+        praiseButton.isSelected = post.isPraised ?? false
     }
     
     private func postDateFormatString(timeIntervalSince1970 timestamp: Double) -> String {
@@ -165,6 +199,7 @@ class BBSTableViewCell: UITableViewCell {
             contentView.addSubview(imageCollection)
         }
         contentView.addSubview(praiseButton)
+        contentView.addSubview(praiseCountLabel)
         contentView.addSubview(replyView)
         contentView.addSubview(commentButton)
         
@@ -211,8 +246,13 @@ class BBSTableViewCell: UITableViewCell {
             } else {
                 make.top.equalTo(todoView.snp.bottom).offset(20)
             }
-            make.trailing.equalTo(contentLabel)
+            make.trailing.equalTo(praiseCountLabel.snp.leading).offset(-3)
             make.width.height.equalTo(20)
+        }
+        
+        praiseCountLabel.snp.makeConstraints { make in
+            make.centerY.equalTo(praiseButton)
+            make.trailing.equalTo(contentLabel)
         }
 
         replyView.snp.makeConstraints { make in
