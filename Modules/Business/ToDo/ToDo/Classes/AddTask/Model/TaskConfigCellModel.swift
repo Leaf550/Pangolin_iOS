@@ -9,6 +9,7 @@ import PGFoundation
 import Persistence
 import Provider
 import UIComponents
+import UIKit
 
 enum AddTaskCellType {
     case input
@@ -73,11 +74,11 @@ class TaskConfigCellModel {
                 inputCellModel(inputPlaceholder: "备注", textViewText: task?.comment, content: .comment)
             ],
             [
-                switchCellModel(iconColor: .systemRed, content: .date, iconImage: nil, title: "日期", switchStatus: task?.date != nil, date: task?.date, time: task?.time),
-                switchCellModel(iconColor: .systemBlue, content: .time, iconImage: nil, title: "时间", switchStatus: task?.time != nil, date: task?.date, time: task?.time)
+                switchCellModel(iconColor: .systemRed, content: .date, iconImage: UIImage(named: "calendar"), title: "日期", switchStatus: task?.date != nil, date: task?.date, time: task?.time),
+                switchCellModel(iconColor: .systemBlue, content: .time, iconImage: UIImage(named: "clock"), title: "时间", switchStatus: task?.time != nil, date: task?.date, time: task?.time)
             ],
             [
-                switchCellModel(iconColor: .systemOrange, content: .important, iconImage: nil, title: "重要", switchStatus: task?.isImportant ?? false, date: task?.date, time: task?.time)
+                switchCellModel(iconColor: .systemOrange, content: .important, iconImage: UIImage(named: "flag"), title: "重要", switchStatus: task?.isImportant ?? false, date: task?.date, time: task?.time)
             ]
         ]
     }

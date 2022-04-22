@@ -17,8 +17,11 @@ class TaskSwitchTableViewCell: TaskConfigBaseTableViewCell {
     private lazy var disposeBag = DisposeBag()
     
     override func setUpSubViews() {
+        imageBackground = UIView()
+        imageBackground?.layer.cornerRadius = 6
+        
         iconImageView = UIImageView()
-        iconImageView?.layer.cornerRadius = 6
+        iconImageView?.tintColor = .white
         
         titleLabel = UILabel()
         titleLabel?.textColor = .label
@@ -39,8 +42,10 @@ class TaskSwitchTableViewCell: TaskConfigBaseTableViewCell {
         if let titleLabel = titleLabel {
             contentView.addSubview(titleLabel)
         }
-        if let iconImageView = iconImageView {
-            contentView.addSubview(iconImageView)
+        if let imageBackground = imageBackground,
+           let iconImageView = iconImageView {
+            contentView.addSubview(imageBackground)
+            imageBackground.addSubview(iconImageView)
         }
         if let `switch` = `switch` {
             contentView.addSubview(`switch`)
@@ -58,14 +63,20 @@ class TaskSwitchTableViewCell: TaskConfigBaseTableViewCell {
             make.centerY.equalToSuperview()
         }
         
-        if let iconImageView = iconImageView,
+        if let imageBackground = imageBackground,
+           let iconImageView = iconImageView,
            let `switch` = `switch`,
            let datePicker = datePicker {
-            iconImageView.snp.makeConstraints { make in
+            imageBackground.snp.makeConstraints { make in
                 make.leading.equalToSuperview().offset(16)
                 make.top.equalToSuperview().offset(14)
                 make.width.height.equalTo(29)
                 make.bottom.equalToSuperview().offset(-14)
+            }
+            
+            iconImageView.snp.makeConstraints { make in
+                make.width.height.equalTo(20)
+                make.center.equalToSuperview()
             }
             
             datePicker.snp.makeConstraints { make in

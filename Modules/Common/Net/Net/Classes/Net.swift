@@ -11,7 +11,7 @@ import Provider
 
 public class Net {
     
-    static var host: RequestHost = .cqupt5g
+    static var host: RequestHost = .develop
     
     private var host: RequestHost = Net.host
     private var path: RequestPath = .root

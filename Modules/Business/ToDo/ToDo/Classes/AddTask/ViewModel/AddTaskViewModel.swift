@@ -111,11 +111,13 @@ class AddTaskViewModel: ViewModel {
                 comment != "" {
                 requestBody["comment"] = comment
             }
-            if let date = task?.date {
+            if let date = task?.date,
+               date != 0 {
                 requestBody["date"] = String(Int64(date))
             }
             if let _ = task?.date,
-               let time = task?.time {
+               let time = task?.time,
+               time != 0 {
                 requestBody["time"] = String(Int64(time))
             }
             requestBody["isImportant"] = (task?.isImportant ?? false) ? "1" : "0"
