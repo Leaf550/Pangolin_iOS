@@ -21,7 +21,7 @@ class AddGroupViewController: UIViewController, ViewController, UITableViewDataS
     
     private var listName: String?
     private var color: TasksGroupIconColor = .red
-    private var imageName: String = "default"
+    private var imageName: String = "0"
     
     private lazy var tableView: TableView = {
         let table = TableView()
