@@ -54,18 +54,18 @@ extension StarterModule {
         
         if let homeVC = toDoService.getToDoViewController() {
             let home = UINavigationController(rootViewController: homeVC)
-            home.tabBarItem = UITabBarItem(title: "home", image: nil, selectedImage: nil)
+            home.tabBarItem = UITabBarItem(title: "任务", image: UIImage(named: "todoListTab_off"), selectedImage: UIImage(named: "todoListTab_on"))
             controllers.append(home)
         }
         
         if let bbsVC = bbsService.getBBSViewController() {
             let bbs = UINavigationController(rootViewController: bbsVC)
-            bbs.tabBarItem = UITabBarItem(title: "xxx社区", image: nil, selectedImage: nil)
+            bbs.tabBarItem = UITabBarItem(title: "社区", image: UIImage(named: "bbsTab_off"), selectedImage: UIImage(named: "bbsTab_on"))
             controllers.append(bbs)
         }
-        
+
         let testVC = TestViewController()
-        testVC.tabBarItem = UITabBarItem(title: "test", image: nil, selectedImage: nil)
+        testVC.tabBarItem = UITabBarItem(title: "我的", image: UIImage(named: "user_off"), selectedImage: UIImage(named: "user_on"))
         controllers.append(testVC)
         
         tabBarController.viewControllers = controllers

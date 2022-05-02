@@ -25,7 +25,7 @@ class BBSTableViewCell: UITableViewCell {
     
     private lazy var avatarImageView: UIImageView = {
         let avatar = UIImageView()
-        avatar.backgroundColor = .gray
+        avatar.image = UIImage(named: "avatar")
         
         return avatar
     }()
