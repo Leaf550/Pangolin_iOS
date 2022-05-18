@@ -33,8 +33,8 @@ PODS:
     - MMKV
     - PGFoundation
     - Provider
-  - PGFoundation (0.0.1):
-    - RxSwift
+  - PGFoundation (0.1.2):
+    - RxSwift (= 6.2.0)
   - Provider (0.0.1):
     - PGFoundation
   - Router (0.0.1):
@@ -85,7 +85,7 @@ DEPENDENCIES:
   - MMKV (= 1.2.11)
   - Net (from `Modules/Common/Net`)
   - Persistence (from `Modules/Common/Persistence`)
-  - PGFoundation (from `Modules/Common/PGFoundation`)
+  - PGFoundation (= 0.1.2)
   - Provider (from `Modules/Common/Provider`)
   - Router (from `Modules/Common/Router`)
   - RxCocoa (= 6.2.0)
@@ -100,6 +100,8 @@ DEPENDENCIES:
   - Util (from `Modules/Common/Util`)
 
 SPEC REPOS:
+  https://github.com/fyhNB/PGPodRepo.git:
+    - PGFoundation
   trunk:
     - Alamofire
     - Differentiator
@@ -125,8 +127,6 @@ EXTERNAL SOURCES:
     :path: Modules/Common/Net
   Persistence:
     :path: Modules/Common/Persistence
-  PGFoundation:
-    :path: Modules/Common/PGFoundation
   Provider:
     :path: Modules/Common/Provider
   Router:
@@ -151,7 +151,7 @@ SPEC CHECKSUMS:
   MMKVCore: df0565f6b58463604731a68ba6cd89bc0b2d1d55
   Net: 4ec17e99f8a3f3fcb77067d64f95ca28838f13f8
   Persistence: b073d6c8b6d12cf707e7adbdacff36e556b5545f
-  PGFoundation: 3a2a2acad8436e8f8e48a2e8a57ea4ab894c39ef
+  PGFoundation: 04c2c887711393665a771a21adfd8052fd1e9e9d
   Provider: 5a3bedf02e8d1287d7b1da661ca97b440b540491
   Router: d9dfb27ee05c3f6beef3cf1d820d730c87c62a7b
   RxCocoa: 4baf94bb35f2c0ab31bc0cb9f1900155f646ba42
@@ -166,6 +166,6 @@ SPEC CHECKSUMS:
   UIComponents: b1d741cba7e3a8a53b9ee7c9449e8c642d73fd05
   Util: 9269aba84bf203b4ea0604aeb60088d757e3e87e
 
-PODFILE CHECKSUM: f97a7088a58588cce7d9b6747088cbe724208de7
+PODFILE CHECKSUM: d98c965e15558d3bff8c2e444aaea2bea626ed4c
 
 COCOAPODS: 1.10.1
