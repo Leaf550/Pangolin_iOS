@@ -14,10 +14,16 @@ class ToDoModule: PGModule {
     
     func runModule() {
         PGProviderManager.shared.registerProvider({ ToDoProvider.self }, self)
+        registUserSignObserver()
     }
     
     deinit {
         PGProviderManager.shared.deregisterProvider({ ToDoProvider.self })
+    }
+    
+    private func registUserSignObserver() {
+        let accountService = PGProviderManager.shared.provider { AccountProvider.self }
+        accountService?.registUserSignObserver(self)
     }
 
 }
@@ -30,6 +36,14 @@ extension ToDoModule: ToDoProvider {
     
     func setTaskShared(taskId: String) -> Void {
         TaskManager.shared.shareTask(taskId: taskId)
+    }
+    
+}
+
+extension ToDoModule: UserSignObserver {
+    
+    func userDidSignOut() {
+        TaskManager.shared.homeModel.onNext(nil)
     }
     
 }

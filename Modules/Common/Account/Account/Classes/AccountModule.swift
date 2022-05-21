@@ -12,6 +12,8 @@ class AccountModule: PGModule {
     
     public static var shared: PGModule = AccountModule()
     
+    var signObservers = [UserSignObserver]()
+    
     private let persistenceService = PGProviderManager.shared.provider { PersistenceProvider.self }
     
     func runModule() {
@@ -51,6 +53,13 @@ extension AccountModule: AccountProvider {
     
     func logout() {
         UserManager.shared.clearUserInfo()
+        for signObserver in signObservers {
+            signObserver.userDidSignOut()
+        }
+    }
+    
+    func registUserSignObserver(_ observer: UserSignObserver) {
+        signObservers.append(observer)
     }
     
 }
