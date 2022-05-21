@@ -38,6 +38,9 @@ PODS:
   - Net (0.0.1):
     - Alamofire
     - Provider
+  - Notification (0.0.1):
+    - PGFoundation
+    - Provider
   - Persistence (0.0.1):
     - MMKV
     - PGFoundation
@@ -94,6 +97,7 @@ DEPENDENCIES:
   - Mine (from `Modules/Business/Mine`)
   - MMKV (= 1.2.11)
   - Net (from `Modules/Common/Net`)
+  - Notification (from `Modules/Common/Notification`)
   - Persistence (from `Modules/Common/Persistence`)
   - PGFoundation (from `Modules/Common/PGFoundation`)
   - Provider (from `Modules/Common/Provider`)
@@ -135,6 +139,8 @@ EXTERNAL SOURCES:
     :path: Modules/Business/Mine
   Net:
     :path: Modules/Common/Net
+  Notification:
+    :path: Modules/Common/Notification
   Persistence:
     :path: Modules/Common/Persistence
   PGFoundation:
@@ -163,6 +169,7 @@ SPEC CHECKSUMS:
   MMKV: 217b643c181c3d2f71983206ca1972d0a6e99881
   MMKVCore: df0565f6b58463604731a68ba6cd89bc0b2d1d55
   Net: 4ec17e99f8a3f3fcb77067d64f95ca28838f13f8
+  Notification: c797a261af1b644a722039281fb2f0f95555c16c
   Persistence: b073d6c8b6d12cf707e7adbdacff36e556b5545f
   PGFoundation: 3a2a2acad8436e8f8e48a2e8a57ea4ab894c39ef
   Provider: 5a3bedf02e8d1287d7b1da661ca97b440b540491
@@ -179,6 +186,6 @@ SPEC CHECKSUMS:
   UIComponents: b1d741cba7e3a8a53b9ee7c9449e8c642d73fd05
   Util: 9269aba84bf203b4ea0604aeb60088d757e3e87e
 
-PODFILE CHECKSUM: 0231bea9ab89f8e0573cebc5d5d6668808419005
+PODFILE CHECKSUM: a31381caa39345fe7322ddec7f89e0126684784e
 
 COCOAPODS: 1.10.1

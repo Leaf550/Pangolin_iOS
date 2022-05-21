@@ -14,6 +14,7 @@ def developmentPods
   pod 'UIComponents', :path => 'Modules/Common/UIComponents'
   pod 'Account', :path => 'Modules/Common/Account'
   pod 'Persistence', :path => 'Modules/Common/Persistence'
+  pod 'Notification', :path => 'Modules/Common/Notification'
   
   # business
   pod 'Starter', :path => 'Modules/Business/Starter'

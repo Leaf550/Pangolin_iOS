@@ -16,7 +16,8 @@ class TaskManager {
     
     private let disposeBag = DisposeBag()
     
-    var persistenceService = PGProviderManager.shared.provider(forProtocol: { PersistenceProvider.self })
+    let persistenceService = PGProviderManager.shared.provider(forProtocol: { PersistenceProvider.self })
+    let notificationService = PGProviderManager.shared.provider { NotificationProvider.self }
     
     var persistedHomeModel: HomeModel? {
         persistenceService?.getHomeModel()
@@ -25,8 +26,12 @@ class TaskManager {
     lazy var homeModel: BehaviorSubject<HomeModel?> = {
         let subject = BehaviorSubject<HomeModel?>(value: persistedHomeModel)
         subject.subscribe(onNext: { [weak self] homeModel in
-            guard let homeModel = homeModel else { return }
+            guard let homeModel = homeModel else {
+                self?.notificationService?.deleteAllNotification()
+                return
+            }
             _ = self?.persistenceService?.saveHomeModel(homeModel)
+            self?.configNotifications(withHomeModel: homeModel)
         })
         .disposed(by: disposeBag)
         
@@ -301,6 +306,17 @@ class TaskManager {
     
     func shareTask(taskId: String) {
         sharedTaskAction.onNext(taskId)
+    }
+    
+    private func configNotifications(withHomeModel homeModel: HomeModel) {
+        for pageData in homeModel.data?.otherList ?? [] {
+            for section in pageData.sections ?? [] {
+                for task in section.tasks ?? [] {
+                    notificationService?.deleteTaskNotification(task)
+                    notificationService?.addTaskNotification(task: task)
+                }
+            }
+        }
     }
     
 }
