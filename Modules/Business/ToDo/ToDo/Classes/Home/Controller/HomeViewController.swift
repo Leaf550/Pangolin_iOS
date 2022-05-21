@@ -28,6 +28,16 @@ class HomeViewController: UIViewController, ViewController {
         return refresh
     }()
     
+    private lazy var emptyLabel: UILabel = {
+        let label = UILabel()
+        label.text = "暂无数据"
+        label.font = .textFont(for: .body, weight: .regular)
+        label.textColor = .secondaryLabel
+        label.isHidden = true
+        
+        return label
+    }()
+    
     private lazy var listsTableView: TableView = {
         let table = TableView(frame: .zero, style: .grouped)
         table.backgroundColor = .clear
@@ -37,9 +47,15 @@ class HomeViewController: UIViewController, ViewController {
         table.addSubview(refreshControl)
         
         TaskManager.shared.homeModel
-            .map { $0?.data?.otherList ?? [] }
+            .map { [weak self] (homeModel) -> [ListPageData] in
+                let datasource = homeModel?.data?.otherList ?? []
+                self?.emptyLabel.isHidden = datasource.count != 0
+                
+                return datasource
+            }
             .bind(to: table.rx.items(cellIdentifier: TasksGroupTableViewCell.reuseID, cellType: TasksGroupTableViewCell.self)) { [weak self] row, data, cell in
                 guard let self = self else { return }
+                
                 let section = data.sections?.first
                 cell.titleLabel.text = section?.taskList?.listName ?? ""
                 let unCompletedCount = section?.tasks?.reduce(0, { partialResult, task in
@@ -237,9 +253,15 @@ class HomeViewController: UIViewController, ViewController {
         view.backgroundColor = .systemGroupedBackground
         
         view.addSubview(listsTableView)
+        listsTableView.addSubview(emptyLabel)
+        
         listsTableView.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(Screen.statusBarHeight)
             make.leading.trailing.bottom.equalToSuperview()
+        }
+        
+        emptyLabel.snp.makeConstraints { make in
+            make.center.equalToSuperview()
         }
     }
     
