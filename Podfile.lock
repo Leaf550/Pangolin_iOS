@@ -23,6 +23,15 @@ PODS:
   - Gallery (2.4.0)
   - Hybrid (0.0.1):
     - Util
+  - Mine (0.0.1):
+    - Net
+    - PGFoundation
+    - Provider
+    - RxCocoa
+    - RxSwift
+    - SnapKit
+    - UIComponents
+    - Util
   - MMKV (1.2.11):
     - MMKVCore (~> 1.2.11)
   - MMKVCore (1.2.12)
@@ -82,6 +91,7 @@ DEPENDENCIES:
   - BBS (from `Modules/Business/BBS`)
   - Gallery (= 2.4.0)
   - Hybrid (from `Modules/Common/Hybrid`)
+  - Mine (from `Modules/Business/Mine`)
   - MMKV (= 1.2.11)
   - Net (from `Modules/Common/Net`)
   - Persistence (from `Modules/Common/Persistence`)
@@ -121,6 +131,8 @@ EXTERNAL SOURCES:
     :path: Modules/Business/BBS
   Hybrid:
     :path: Modules/Common/Hybrid
+  Mine:
+    :path: Modules/Business/Mine
   Net:
     :path: Modules/Common/Net
   Persistence:
@@ -147,6 +159,7 @@ SPEC CHECKSUMS:
   Differentiator: e8497ceab83c1b10ca233716d547b9af21b9344d
   Gallery: b7fc1aeb68a39ad6d2c423574750196bf9b25e5c
   Hybrid: f939efddf0a5e3cd6b48961abebdb98cba6add40
+  Mine: f0a8a4c408919cfb17150b2aacaacbb045b081eb
   MMKV: 217b643c181c3d2f71983206ca1972d0a6e99881
   MMKVCore: df0565f6b58463604731a68ba6cd89bc0b2d1d55
   Net: 4ec17e99f8a3f3fcb77067d64f95ca28838f13f8
@@ -166,6 +179,6 @@ SPEC CHECKSUMS:
   UIComponents: b1d741cba7e3a8a53b9ee7c9449e8c642d73fd05
   Util: 9269aba84bf203b4ea0604aeb60088d757e3e87e
 
-PODFILE CHECKSUM: f97a7088a58588cce7d9b6747088cbe724208de7
+PODFILE CHECKSUM: 0231bea9ab89f8e0573cebc5d5d6668808419005
 
 COCOAPODS: 1.10.1

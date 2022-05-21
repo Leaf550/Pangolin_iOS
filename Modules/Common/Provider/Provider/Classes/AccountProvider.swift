@@ -15,6 +15,8 @@ public protocol AccountProvider: PGProvider {
                                     loginCompletion: ((Bool) -> Void)?)
     func getToken() -> String?
     func getUser() -> User?
+    func isLogined() -> Bool
+    func logout()
     
 }
 

@@ -182,9 +182,8 @@ class HomeViewController: UIViewController, ViewController {
         
         output.homeModel
             .filter({ [weak self] model in
-                print("test --- ")
                 if model == nil {
-                    Toast.show(text: "网络错误，仅可浏览", image: nil)
+                    Toast.show(text: "网络错误", image: nil)
                 }
                 self?.refreshControl.endRefreshing()
                 return model != nil

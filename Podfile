@@ -19,6 +19,7 @@ def developmentPods
   pod 'Starter', :path => 'Modules/Business/Starter'
   pod 'ToDo', :path => 'Modules/Business/ToDo'
   pod 'BBS', :path => 'Modules/Business/BBS'
+  pod 'Mine', :path => 'Modules/Business/Mine'
   
 end
 

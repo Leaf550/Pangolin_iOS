@@ -22,15 +22,6 @@ class AccountModule: PGModule {
         PGProviderManager.shared.deregisterProvider({ AccountProvider.self })
     }
     
-    func applicationWillFinishLaunching() {
-        if let token = persistenceService?.getToken() {
-            UserManager.shared.token = token
-        }
-        if let user: UserImpl = persistenceService?.getUser() {
-            UserManager.shared.user = user
-        }
-    }
-    
 }
 
 extension AccountModule: AccountProvider {
@@ -54,5 +45,12 @@ extension AccountModule: AccountProvider {
         UserManager.shared.getUser()
     }
     
+    func isLogined() -> Bool {
+        UserManager.shared.isLogined
+    }
+    
+    func logout() {
+        UserManager.shared.clearUserInfo()
+    }
     
 }

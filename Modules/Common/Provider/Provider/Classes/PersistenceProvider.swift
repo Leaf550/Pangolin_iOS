@@ -8,6 +8,8 @@
 import PGFoundation
 
 public protocol PersistenceProvider: PGProvider {
+    // Remove
+    func removeValuesInAccountStored()
     
     // User
     func saveUser<U: User & Codable>(_ user: U) -> Bool

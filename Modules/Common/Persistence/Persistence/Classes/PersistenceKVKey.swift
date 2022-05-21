@@ -11,4 +11,5 @@ class PersistenceKVKey {
     static var userKVKey        = "userKVKey"
     static var tokenKVKey       = "tokenKVKey"
     static var homeModelKVKey   = "homeModelKVKey"
+    static var accountStoredKey = "accountStoredKey"
 }
