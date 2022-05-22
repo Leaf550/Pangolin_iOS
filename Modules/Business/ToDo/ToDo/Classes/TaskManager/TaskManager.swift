@@ -313,7 +313,9 @@ class TaskManager {
             for section in pageData.sections ?? [] {
                 for task in section.tasks ?? [] {
                     notificationService?.deleteTaskNotification(task)
-                    notificationService?.addTaskNotification(task: task)
+                    if !(task.isCompleted ?? false) {
+                        notificationService?.addTaskNotification(task: task)
+                    }
                 }
             }
         }
