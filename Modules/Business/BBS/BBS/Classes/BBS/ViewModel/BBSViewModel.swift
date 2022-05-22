@@ -12,10 +12,13 @@ import Net
 struct BBSViewModelInput: ViewModelInput {
     let bbsHomeRefresh = PublishSubject<Void>()
     let bbsPostPraise = PublishSubject<String>()
+    // PostID, TargetUserID, content
+    let bbsPostReply = PublishSubject<(String, String?, String)>()
 }
 
 struct BBSViewModelOutput: ViewModelOutput {
     let bbsHomeRefreshCompleted = PublishSubject<BBSHomeModel?>()
+    let createNewReplyFinished = PublishSubject<Void>()
 }
 
 class BBSViewModel: ViewModel {
@@ -42,6 +45,14 @@ class BBSViewModel: ViewModel {
                 self?.reqeustPraise(postId: postId)
             })
             .disposed(by: disposeBag)
+        
+        input.bbsPostReply
+            .flatMapLatest { [weak self] (postID, targetUserID, content) in
+                self?.requestCreateReply(postID: postID, targetUserID: targetUserID, content: content) ?? Observable<Void>.never()
+            }
+            .bind(to: output.createNewReplyFinished)
+            .disposed(by: disposeBag)
+            
         
         return output
     }
@@ -78,6 +89,28 @@ class BBSViewModel: ViewModel {
                 "postId" : postId
             ])
             .get { _ in } error: { _ in }
+    }
+    
+    private func requestCreateReply(postID: String, targetUserID: String?, content: String) -> Observable<Void> {
+        Observable<Void>.create { observer in
+            var requestBody = [
+                "postId" : postID,
+                "content" : content
+            ]
+            if let targetUserID = targetUserID {
+                requestBody["targetUserId"] = targetUserID
+            }
+            let net = Net.build()
+                .configPath(.createComment)
+                .configBody(requestBody)
+                .post { _ in
+                    observer.onNext(Void())
+                } error: { _ in }
+            
+            return Disposables.create {
+                net.cancel()
+            }
+        }
     }
     
 }

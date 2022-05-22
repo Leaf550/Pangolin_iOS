@@ -54,6 +54,12 @@ class BBSViewController: UIViewController, ViewController, UITableViewDataSource
                 self?.tableView.reloadData()
             })
             .disposed(by: disposeBag)
+        
+        output.createNewReplyFinished
+            .subscribe(onNext: { [weak self] _ in
+                self?.onRefresh()
+            })
+            .disposed(by: disposeBag)
     }
     
     @objc
@@ -97,16 +103,11 @@ extension BBSViewController {
             self?.viewModel.input.bbsPostPraise.onNext(postId)
         }
         
+        cell?.didEditReply = { [weak self] postID, targetUserID, content in
+            self?.viewModel.input.bbsPostReply.onNext((postID, targetUserID, content))
+        }
+        
         return cell ?? UITableViewCell()
     }
     
-}
-
-
-struct UserImpl: Codable, User {
-    var sub: String?
-    var username: String?
-    var level: Int?
-    var experience: Int?
-    var exp: Int?
 }

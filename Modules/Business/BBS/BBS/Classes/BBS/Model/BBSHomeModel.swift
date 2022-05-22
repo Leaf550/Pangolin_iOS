@@ -53,3 +53,13 @@ struct BBSComment: Codable {
         case sourceUser, targetUser, createTime, content
     }
 }
+
+struct UserImpl: Codable, User {
+    var sub: String?
+    var uid: String?
+    var username: String?
+    var level: Int?
+    var experience: Int?
+    var exp: Int?
+}
+

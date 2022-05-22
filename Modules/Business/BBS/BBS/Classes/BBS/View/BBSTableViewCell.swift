@@ -12,6 +12,8 @@ import SnapKit
 import SDWebImage
 import RxSwift
 import RxCocoa
+import PGFoundation
+import Provider
 
 class BBSTableViewCell: UITableViewCell {
     
@@ -20,6 +22,9 @@ class BBSTableViewCell: UITableViewCell {
     weak var controller: UIViewController?
     var post: BBSPost?
     var didPraise: (String) -> Void = { _ in }
+    var didEditReply: (_ postID: String,
+                       _ targetUserID: String?,
+                       _ content: String) -> Void = { _, _, _  in }
     
     private var disposeBag = DisposeBag()
     
@@ -91,6 +96,12 @@ class BBSTableViewCell: UITableViewCell {
         let button = UIButton(type: .system)
         button.backgroundColor = .secondarySystemBackground
         button.layer.cornerRadius = 4
+        button.rx.tap.bind { [weak self] in
+            if let post = self?.post {
+                self?.replyPopUp(post: post, comment: nil)
+            }
+            
+        }.disposed(by: disposeBag)
         
         let commentLabel = UILabel()
         commentLabel.font = .textFont(for: .caption0, weight: .regular)
@@ -105,7 +116,16 @@ class BBSTableViewCell: UITableViewCell {
         return button
     }()
     
-    lazy var replyView = BBSReplyView()
+    lazy var replyView: BBSReplyView = {
+        let view = BBSReplyView()
+        view.didSelectReplyView = { [weak self] comment in
+            if let post = self?.post {
+                self?.replyPopUp(post: post, comment: comment)
+            }
+        }
+        
+        return view
+    }()
     
     lazy var imageCollection: BBSImageCollection? = {
         let collection = BBSImageCollection()
@@ -163,6 +183,44 @@ class BBSTableViewCell: UITableViewCell {
         
         praiseCount = post.praiseCount ?? 0
         praiseButton.isSelected = post.isPraised ?? false
+    }
+    
+    private func replyPopUp(post: BBSPost?, comment: BBSComment?) {
+        guard let postID = post?.postID, checkLogin() else { return }
+        let title = "回复\((comment?.sourceUser?.username ?? (post?.author?.username ?? "...")))"
+        let popUp = UIAlertController(title: title, message: nil, preferredStyle: .alert)
+        popUp.addTextField()
+        let cancelAction = UIAlertAction(title: "取消", style: .cancel)
+        let confirmAction = UIAlertAction(title: "确定", style: .default) { [weak self] action in
+            if let replyText = popUp.textFields?.first?.text, !replyText.isEmpty {
+                self?.didEditReply(postID, comment?.sourceUser?.uid, replyText)
+            }
+        }
+        popUp.addAction(cancelAction)
+        popUp.addAction(confirmAction)
+        Responder.topViewController?.present(popUp, animated: true)
+    }
+    
+    private func checkLogin() -> Bool {
+        let accountService = PGProviderManager.shared.provider { AccountProvider.self }
+        if !(accountService?.isLogined() ?? false) {
+            let loginAlert = UIAlertController(title: "请先登录", message: "需要登录账号才能评论给哦～", preferredStyle: .alert)
+            
+            let cancelAction = UIAlertAction(title: "取消", style: .cancel)
+            let confirmAction = UIAlertAction(title: "确定", style: .default) { [weak self] action in
+                if let controller = self?.controller {
+                    accountService?.presentLoginViewController(from: controller, animated: true)
+                }
+            }
+            
+            loginAlert.addAction(cancelAction)
+            loginAlert.addAction(confirmAction)
+            Responder.topViewController?.present(loginAlert, animated: true)
+            
+            return false
+        }
+        
+        return true
     }
     
     private func postDateFormatString(timeIntervalSince1970 timestamp: Double) -> String {

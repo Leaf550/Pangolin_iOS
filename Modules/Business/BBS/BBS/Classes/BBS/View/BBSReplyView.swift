@@ -7,10 +7,17 @@
 
 import UIKit
 import PGFoundation
+import RxSwift
+import RxCocoa
 
 class BBSReplyView: UIView {
     
-    private var replies = [UIView]()
+    var didSelectReplyView: (BBSComment) -> Void = { _ in }
+    
+    private var replieViews = [UIView]()
+    private var comments = [BBSComment]()
+    
+    private var disposeBag = DisposeBag()
     
     override init(frame: CGRect) {
         super.init(frame: .zero)
@@ -21,11 +28,13 @@ class BBSReplyView: UIView {
     }
     
     func configViews(with comments: [BBSComment]) {
-        for reply in replies {
+        self.comments = comments
+        
+        for reply in replieViews {
             reply.snp.removeConstraints()
             reply.removeFromSuperview()
         }
-        replies = []
+        replieViews = []
         layoutIfNeeded()
         
         for comment in comments {
@@ -87,7 +96,6 @@ class BBSReplyView: UIView {
             )
         }
         
-        
         let replyView = UIView()
         addSubview(replyView)
         
@@ -102,26 +110,35 @@ class BBSReplyView: UIView {
             make.edges.equalToSuperview()
         }
         
-        replies.append(replyView)
+        replieViews.append(replyView)
         
-        for i in 0 ..< replies.count {
-            if replies.count == 1 {
-                replies[i].snp.remakeConstraints { make in
+        for i in 0 ..< replieViews.count {
+            let tap = UITapGestureRecognizer()
+            tap.rx.event.bind { [weak self] _ in
+                guard let self = self else { return }
+                self.didSelectReplyView(self.comments[i])
+            }.disposed(by: disposeBag)
+            
+            replieViews[i].gestureRecognizers?.removeAll()
+            replieViews[i].addGestureRecognizer(tap)
+            
+            if replieViews.count == 1 {
+                replieViews[i].snp.remakeConstraints { make in
                     make.edges.equalToSuperview()
                 }
             } else if i == 0 {
-                replies[i].snp.remakeConstraints { make in
+                replieViews[i].snp.remakeConstraints { make in
                     make.top.leading.trailing.equalToSuperview()
                 }
-            } else if i == replies.count - 1 {
-                replies[i].snp.remakeConstraints { make in
-                    make.top.equalTo(replies[i - 1].snp.bottom)
+            } else if i == replieViews.count - 1 {
+                replieViews[i].snp.remakeConstraints { make in
+                    make.top.equalTo(replieViews[i - 1].snp.bottom)
                     make.leading.trailing.equalToSuperview()
                     make.bottom.equalToSuperview()
                 }
             } else {
-                replies[i].snp.remakeConstraints { make in
-                    make.top.equalTo(replies[i - 1].snp.bottom)
+                replieViews[i].snp.remakeConstraints { make in
+                    make.top.equalTo(replieViews[i - 1].snp.bottom)
                     make.leading.trailing.equalToSuperview()
                 }
             }
