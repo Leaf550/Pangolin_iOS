@@ -13,7 +13,7 @@ public enum RequestHost: String {
     // 热点
     case hotPoint   = "http://172.20.10.4:8080"
     // 校园网
-    case cqupt5g    = "http://10.17.66.134:8080"
+    case cqupt5g    = "http://10.17.4.220:8080"
     // 生产环境
     case product    = ""
     // Mock环境
@@ -39,4 +39,16 @@ public enum RequestPath: String {
     case taskCompleted      = "/taskCompleted"
     // 编辑任务
     case editTask           = "/editTask"
+    // 删除任务
+    case deleteTask         = "/deleteTask"
+    // BBS首页
+    case bbsHome            = "/getAllBBSPost"
+    // 发布帖子
+    case createPost         = "/createBBSPost"
+    // 上传帖子图片
+    case uploadBBSImage     = "/upLoadImage/bbs"
+    // 点赞
+    case praisePost         = "/praisePost"
+    // 评论
+    case createComment      = "/createBBSComment"
 }

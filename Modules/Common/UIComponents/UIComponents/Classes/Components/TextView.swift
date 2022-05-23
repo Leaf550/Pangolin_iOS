@@ -69,7 +69,7 @@ public class TextView: UITextView {
         
         var placeholderRect = rect
         placeholderRect.origin.x = 5
-        placeholderRect.origin.y = (rect.height - placeholderSize.height) * 0.5
+        placeholderRect.origin.y = 8
         placeholderRect.size.width -= 2 * rect.origin.x
         
         NSString(string: placeholder ?? "").draw(in: placeholderRect, withAttributes: attrs)

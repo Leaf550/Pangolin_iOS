@@ -47,43 +47,42 @@ extension StarterModule {
             tabBarController.tabBar.scrollEdgeAppearance = tabBarController.tabBar.standardAppearance
         }
         
-        guard let toDoService = PGProviderManager.shared.provider(forProtocol: { ToDoProvider.self }) else { return }
+        guard let toDoService = PGProviderManager.shared.provider(forProtocol: { ToDoProvider.self }) else {
+            print("toDoService 获取失败")
+            return
+        }
+        
+        guard let bbsService = PGProviderManager.shared.provider(forProtocol: { BBSProvider.self }) else {
+            print("bbsService 获取失败")
+            return
+        }
+        
+        guard let mineService = PGProviderManager.shared.provider(forProtocol: { MineProvider.self }) else {
+            print("mineService 获取失败")
+            return
+        }
         
         var controllers = [UIViewController]()
         
-        let homeVC = toDoService.getToDoViewController()
-        let home = UINavigationController(rootViewController: homeVC)
-        home.tabBarItem = UITabBarItem(title: "home", image: nil, selectedImage: nil)
+        if let homeVC = toDoService.getToDoViewController() {
+            let home = UINavigationController(rootViewController: homeVC)
+            home.tabBarItem = UITabBarItem(title: "任务", image: UIImage(named: "todoListTab_off"), selectedImage: UIImage(named: "todoListTab_on"))
+            controllers.append(home)
+        }
         
-        let testVC = TestViewController()
-        testVC.tabBarItem = UITabBarItem(title: "test", image: nil, selectedImage: nil)
+        if let bbsVC = bbsService.getBBSViewController() {
+            let bbs = UINavigationController(rootViewController: bbsVC)
+            bbs.tabBarItem = UITabBarItem(title: "社区", image: UIImage(named: "bbsTab_off"), selectedImage: UIImage(named: "bbsTab_on"))
+            controllers.append(bbs)
+        }
         
-        controllers.append(home)
-        controllers.append(testVC)
+        if let mineVC = mineService.getMineViewController() {
+            let mine = UINavigationController(rootViewController: mineVC)
+            mine.tabBarItem = UITabBarItem(title: "我的", image: UIImage(named: "user_off"), selectedImage: UIImage(named: "user_on"))
+            controllers.append(mine)
+        }
         
         tabBarController.viewControllers = controllers
     }
 
-}
-
-fileprivate class TestViewController: UIViewController {
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        view.backgroundColor = .systemBackground
-        
-        let button = UIButton(type: .system)
-        button.setTitle("登录", for: .normal)
-        button.frame = CGRect(x: 100, y: 100, width: 100, height: 40)
-        button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
-        view.addSubview(button)
-    }
-    
-    @objc
-    func buttonTapped() {
-        let accountService = PGProviderManager.shared.provider { AccountProvider.self }
-        accountService?.presentLoginViewController(from: self, animated: true)
-    }
-    
 }

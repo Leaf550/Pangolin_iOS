@@ -13,7 +13,11 @@ public class PGModuleManager {
         "Starter.StarterModule",
         "Persistence.PersistenceModule",
         "Account.AccountModule",
+        "Notification.NotificationModule",
+        // -------------------------------
         "ToDo.ToDoModule",
+        "BBS.BBSModule",
+        "Mine.MineModule",
     ]
     
     private var modules = [PGModule]()

@@ -27,10 +27,19 @@ class UserManager {
         return timestamp > Double(exp)
     }
     
-    var token: String?
-    var user: UserImpl?
+    func clearUserInfo() {
+        persistenceProvider?.removeValuesInAccountStored()
+    }
     
     private let persistenceProvider = PGProviderManager.shared.provider { PersistenceProvider.self }
+    
+    var token: String? {
+        persistenceProvider?.getToken()
+    }
+    
+    var user: UserImpl? {
+        persistenceProvider?.getUser()
+    }
     
     func login(withToken token: String, completion: (UserImpl?, String?) -> Void) {
         guard !isLogined else {
@@ -39,8 +48,6 @@ class UserManager {
         }
         parseToken(token) { [weak self] user, message in
             if let user = user {
-                self?.token = token
-                self?.user = user
                 if self?.persistenceProvider?.saveUser(user) ?? false
                     && self?.persistenceProvider?.saveToken(token) ?? false {
                     completion(user, nil)
@@ -52,11 +59,6 @@ class UserManager {
                 completion(nil, message)
             }
         }
-    }
-    
-    func logout() {
-        self.token = nil
-        self.user = nil
     }
     
     private func parseToken(_ token: String, completion: (UserImpl?, String?) -> Void) {

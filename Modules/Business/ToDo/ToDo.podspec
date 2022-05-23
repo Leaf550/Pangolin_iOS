@@ -25,6 +25,7 @@ TODO: Add long description of the pod here.
   s.dependency 'UIComponents'
   s.dependency 'Net'
   s.dependency 'Persistence'
+  s.dependency 'Router'
   
   s.dependency 'RxSwift'
   s.dependency 'RxCocoa'

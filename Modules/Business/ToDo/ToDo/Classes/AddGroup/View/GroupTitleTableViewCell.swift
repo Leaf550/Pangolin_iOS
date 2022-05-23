@@ -21,7 +21,7 @@ class GroupTitleTableViewCell: GroupConfigBaseTableViewCell {
     override func setUpSubViews() {
         super.setUpSubViews()
         
-        groupIcon = TasksGroupLargeIcon(image: UIImage(), backgroundColor: .red)
+        groupIcon = TasksGroupLargeIcon(image: UIImage(named: "0large") ?? UIImage(), backgroundColor: .red)
         
         groupTitleTextTield = UITextField()
         groupTitleTextTield?.placeholder = "列表名称"

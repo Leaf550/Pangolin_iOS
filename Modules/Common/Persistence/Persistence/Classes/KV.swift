@@ -29,7 +29,7 @@ public enum KVStoreField {
 public class KV {
     
     private let mmkv = MMKV.default()
-    private static var storedInAccountField = [String]()
+//    private static var storedInAccountField = [String]()
     private var field: KVStoreField = .global
     private var key: String?
     
@@ -43,45 +43,64 @@ public class KV {
         mmkv?.clearAll()
     }
     
+    func getAllAccountStoredKey() -> [String] {
+        guard let data = self.data(forKey: PersistenceKVKey.accountStoredKey) else {
+            return []
+        }
+        let keys = (try? JSONSerialization.jsonObject(with: data)) as? [String]
+        
+        return keys ?? []
+    }
+    
+    func appendAccountStoredKey(_ key: String) {
+        var stored = getAllAccountStoredKey()
+        if stored.contains(key) {
+            return
+        }
+        stored.append(key)
+        let data = try? JSONSerialization.data(withJSONObject: stored)
+        _ = KV(field: .global).setData(data!, forKey: PersistenceKVKey.accountStoredKey)
+    }
+    
     // MARK: - Set
     public func set(_ value: Bool, forKey key: String) -> Bool {
         if field == .account {
-            KV.storedInAccountField.append(key)
+            appendAccountStoredKey(key)
         }
         return ((mmkv?.set(value, forKey: key)) != nil)
     }
     
     public func set(_ value: UInt64, forKey key: String) -> Bool {
         if field == .account {
-            KV.storedInAccountField.append(key)
+            appendAccountStoredKey(key)
         }
         return ((mmkv?.set(value, forKey: key)) != nil)
     }
     
     public func set(_ value: UInt32, forKey key: String) -> Bool {
         if field == .account {
-            KV.storedInAccountField.append(key)
+            appendAccountStoredKey(key)
         }
         return ((mmkv?.set(value, forKey: key)) != nil)
     }
     
     public func set(_ value: Int64, forKey key: String) -> Bool {
         if field == .account {
-            KV.storedInAccountField.append(key)
+            appendAccountStoredKey(key)
         }
         return ((mmkv?.set(value, forKey: key)) != nil)
     }
     
     public func set(_ value: Int32, forKey key: String) -> Bool {
         if field == .account {
-            KV.storedInAccountField.append(key)
+            appendAccountStoredKey(key)
         }
         return ((mmkv?.set(value, forKey: key)) != nil)
     }
     
     public func set(_ value: Float, forKey key: String) -> Bool {
         if field == .account {
-            KV.storedInAccountField.append(key)
+            appendAccountStoredKey(key)
         }
         return ((mmkv?.set(value, forKey: key)) != nil)
     }
@@ -89,38 +108,38 @@ public class KV {
     
     public func set(_ value: Double, forKey key: String) -> Bool {
         if field == .account {
-            KV.storedInAccountField.append(key)
+            appendAccountStoredKey(key)
         }
         return ((mmkv?.set(value, forKey: key)) != nil)
     }
     
     public func set(_ value: String, forKey key: String) -> Bool {
         if field == .account {
-            KV.storedInAccountField.append(key)
+            appendAccountStoredKey(key)
         }
         return ((mmkv?.set(value, forKey: key)) != nil)
     }
     
     public func set(_ value: Date, forKey key: String) -> Bool {
         if field == .account {
-            KV.storedInAccountField.append(key)
+            appendAccountStoredKey(key)
         }
         return ((mmkv?.set(value, forKey: key)) != nil)
     }
     
-    public func set(_ value: Data, forKey key: String) -> Bool {
+    public func setData(_ value: Data, forKey key: String) -> Bool {
         if field == .account {
-            KV.storedInAccountField.append(key)
+            appendAccountStoredKey(key)
         }
         return ((mmkv?.set(value, forKey: key)) != nil)
     }
     
     public func set<T: Codable>(_ value: T, forKey key: String) -> Bool {
         if field == .account {
-            KV.storedInAccountField.append(key)
+            appendAccountStoredKey(key)
         }
         guard let data = try? JSONEncoder().encode(value) else { return false }
-        return set(data, forKey: key)
+        return setData(data, forKey: key)
     }
     
     // MARK: - Get

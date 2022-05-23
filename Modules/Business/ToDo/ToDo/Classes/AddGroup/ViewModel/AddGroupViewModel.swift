@@ -11,7 +11,7 @@ import UIComponents
 import Net
 
 enum NewGroupUploadResult {
-    case success
+    case success(TaskList)
     case failed
     case error
 }
@@ -58,8 +58,11 @@ class AddGroupViewModel: ViewModel {
                     "image_name" : imageName
                 ])
                 .post { json in
-                    if (json as? [String : Any])?["status"] as? Int == 200 {
-                        observer.onNext(.success)
+                    if (json as? [String : Any])?["status"] as? Int == 200,
+                       let dataJson = (json as? [String : Any])?["data"],
+                       let data = try? JSONSerialization.data(withJSONObject: dataJson),
+                       let newList = try? JSONDecoder().decode(TaskList.self, from: data) {
+                        observer.onNext(.success(newList))
                     } else {
                         observer.onNext(.failed)
                     }

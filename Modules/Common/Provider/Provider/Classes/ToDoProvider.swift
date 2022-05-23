@@ -8,5 +8,6 @@
 import UIKit
 
 public protocol ToDoProvider: PGProvider {
-    func getToDoViewController() -> UIViewController
+    func getToDoViewController() -> UIViewController?
+    func setTaskShared(taskId: String) -> Void
 }

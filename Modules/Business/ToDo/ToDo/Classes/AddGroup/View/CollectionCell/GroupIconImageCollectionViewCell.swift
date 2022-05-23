@@ -11,17 +11,26 @@ class GroupIconImageCollectionViewCell: GroupIconBaseCollectionViewCell {
     
     static let reuseID: String = NSStringFromClass(GroupIconImageCollectionViewCell.self)
     
+    private lazy var iconBackgroundView = UIView()
+    
     override func setUpSubViews() {
         imageView = UIImageView()
-        imageView?.backgroundColor = .tertiarySystemGroupedBackground
+        imageView?.tintColor = .darkGray
+        contentView.addSubview(iconBackgroundView)
         
-        contentView.addSubview(imageView ?? UIImageView())
+        iconBackgroundView.backgroundColor = .tertiarySystemGroupedBackground
+        iconBackgroundView.addSubview(imageView ?? UIImageView())
         
         contentView.layer.cornerRadius = (frame.width - 10) * 0.5 + 5
-        imageView?.layer.cornerRadius = (frame.width - 10) * 0.5
-        imageView?.snp.makeConstraints { make in
+        iconBackgroundView.layer.cornerRadius = (frame.width - 10) * 0.5
+        iconBackgroundView.snp.makeConstraints { make in
             make.top.leading.equalToSuperview().offset(5)
             make.bottom.trailing.equalToSuperview().offset(-5)
+        }
+        
+        imageView?.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+            make.width.height.equalTo(25)
         }
     }
     

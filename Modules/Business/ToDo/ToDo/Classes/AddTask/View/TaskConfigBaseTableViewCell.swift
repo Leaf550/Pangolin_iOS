@@ -15,6 +15,7 @@ class TaskConfigBaseTableViewCell: TableViewCell {
     
     var textView: TextView?
     var titleLabel: UILabel?
+    var imageBackground: UIView?
     var iconImageView: UIImageView?
     var `switch`: UISwitch?
     var datePicker: UIDatePicker?
@@ -62,7 +63,7 @@ class TaskConfigBaseTableViewCell: TableViewCell {
         textView?.text = model.textViewText
         textView?.placeholder = model.inputPlaceholder
         titleLabel?.text = model.titleLabelText
-        iconImageView?.backgroundColor = model.iconColor
+        imageBackground?.backgroundColor = model.iconColor
         iconImageView?.image = model.iconImage
         `switch`?.isOn = model.switchStatus ?? false
         currentValueLabel?.text = model.currentValueLabelText

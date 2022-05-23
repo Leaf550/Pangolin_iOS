@@ -181,6 +181,11 @@ class LoginViewController: UIViewController, ViewController, UITextFieldDelegate
                         self?.loginCompletion(true)
                     }
                 }
+                
+                let signObservers = (AccountModule.shared as? AccountModule)?.signObservers ?? []
+                for signObserver in signObservers {
+                    signObserver.userDidSignIn()
+                }
             })
             .disposed(by: disposeBag)
     }

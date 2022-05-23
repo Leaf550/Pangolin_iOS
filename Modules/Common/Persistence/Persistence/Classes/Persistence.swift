@@ -26,6 +26,14 @@ class PersistenceModule: PGModule {
 }
 
 extension PersistenceModule: PersistenceProvider {
+    // MARK: - Remove
+    func removeValuesInAccountStored() {
+        let keys = globalKV.getAllAccountStoredKey()
+        for key in keys {
+            globalKV.removeValue(forKey: key)
+        }
+        globalKV.removeValue(forKey: PersistenceKVKey.accountStoredKey)
+    }
     
     // MARK: - User
     func saveUser<U>(_ user: U) -> Bool where U : User, U : Decodable, U : Encodable {

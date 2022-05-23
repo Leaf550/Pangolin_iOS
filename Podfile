@@ -14,10 +14,13 @@ def developmentPods
   pod 'UIComponents', :path => 'Modules/Common/UIComponents'
   pod 'Account', :path => 'Modules/Common/Account'
   pod 'Persistence', :path => 'Modules/Common/Persistence'
+  pod 'Notification', :path => 'Modules/Common/Notification'
   
   # business
   pod 'Starter', :path => 'Modules/Business/Starter'
   pod 'ToDo', :path => 'Modules/Business/ToDo'
+  pod 'BBS', :path => 'Modules/Business/BBS'
+  pod 'Mine', :path => 'Modules/Business/Mine'
   
 end
 
@@ -30,6 +33,8 @@ def thirdPartPods
   pod 'RxDataSources', '5.0', :inhibit_warnings => true
   pod 'Toast-Swift', '5.0.1', :inhibit_warnings => true
   pod 'MMKV', '1.2.11', :inhibit_warnings => true
+  pod 'Gallery', '2.4.0', :inhibit_warnings => true
+  pod 'SDWebImage', '5.0', :inhibit_warnings => true
 end
 
 target 'Pangolin_iOS' do

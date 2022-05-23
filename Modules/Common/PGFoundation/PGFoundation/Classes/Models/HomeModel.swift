@@ -31,18 +31,19 @@ public struct TaskModel: Codable {
     public var uid: String?
     public var taskID, title: String?
     public var comment: String?
-    public var date, time: Double?
+    public var date, time, completeTime: Double?
     public var createTime, priority: Int?
     public var listID: String?
-    public var isCompleted, isImportant: Bool?
+    public var isCompleted, isImportant, shared: Bool?
 
     enum CodingKeys: String, CodingKey {
         case uid
         case taskID = "taskId"
-        case title, comment, date, time, createTime, priority
+        case title, comment, date, time, createTime, priority, completeTime
         case listID = "listId"
         case isCompleted = "completed"
         case isImportant = "important"
+        case shared = "shared"
     }
 }
 

@@ -28,6 +28,16 @@ class HomeViewController: UIViewController, ViewController {
         return refresh
     }()
     
+    private lazy var emptyLabel: UILabel = {
+        let label = UILabel()
+        label.text = "暂无数据"
+        label.font = .textFont(for: .body, weight: .regular)
+        label.textColor = .secondaryLabel
+        label.isHidden = true
+        
+        return label
+    }()
+    
     private lazy var listsTableView: TableView = {
         let table = TableView(frame: .zero, style: .grouped)
         table.backgroundColor = .clear
@@ -37,15 +47,23 @@ class HomeViewController: UIViewController, ViewController {
         table.addSubview(refreshControl)
         
         TaskManager.shared.homeModel
-            .map { $0?.data?.otherList ?? [] }
+            .map { [weak self] (homeModel) -> [ListPageData] in
+                let datasource = homeModel?.data?.otherList ?? []
+                self?.emptyLabel.isHidden = datasource.count != 0
+                
+                return datasource
+            }
             .bind(to: table.rx.items(cellIdentifier: TasksGroupTableViewCell.reuseID, cellType: TasksGroupTableViewCell.self)) { [weak self] row, data, cell in
                 guard let self = self else { return }
+                
                 let section = data.sections?.first
                 cell.titleLabel.text = section?.taskList?.listName ?? ""
                 let unCompletedCount = section?.tasks?.reduce(0, { partialResult, task in
                     partialResult + ((task.isCompleted ?? false) ? 0 : 1 )
                 })
                 cell.numberLabel.text = String(unCompletedCount ?? 0)
+                let imageName = section?.taskList?.imageName ?? "0"
+                cell.iconImage = UIImage(named: "\(imageName)medium") ?? UIImage()
                 cell.iconColor = TasksGroupIconColor(rawValue: section?.taskList?.listColor ?? 0) ?? .blue
                 let numberOfRows = table.numberOfRows(inSection: 0)
                 cell.hasSeparateLine = (row != numberOfRows - 1)
@@ -172,22 +190,16 @@ class HomeViewController: UIViewController, ViewController {
         
         setUpSubView()
         bindViewModel()
-        
         beginRefresh()
     }
     
     func bindViewModel() {
-        rx.methodInvoked(#selector(beginRefresh))
-            .map { _ in Void() }
-            .bind(to: viewModel.input.onHomeRefresh)
-            .disposed(by: disposeBag)
-        
         let output = viewModel.transformToOutput()
         
         output.homeModel
             .filter({ [weak self] model in
                 if model == nil {
-                    Toast.show(text: "网络错误，仅可浏览", image: nil)
+                    Toast.show(text: "网络错误", image: nil)
                 }
                 self?.refreshControl.endRefreshing()
                 return model != nil
@@ -234,16 +246,22 @@ class HomeViewController: UIViewController, ViewController {
     
     @objc
     private func beginRefresh() {
-        
+        viewModel.input.onHomeRefresh.onNext(Void())
     }
     
     private func setUpSubView() {
         view.backgroundColor = .systemGroupedBackground
         
         view.addSubview(listsTableView)
+        listsTableView.addSubview(emptyLabel)
+        
         listsTableView.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(Screen.statusBarHeight)
             make.leading.trailing.bottom.equalToSuperview()
+        }
+        
+        emptyLabel.snp.makeConstraints { make in
+            make.center.equalToSuperview()
         }
     }
     

@@ -238,8 +238,17 @@ extension TaskDetailViewController {
                                 task?.date = nil
                                 task?.time = nil
                             } else {
-                                let today = (Int(date.timeIntervalSince1970) / (24 * 60 * 60)) * 24 * 60 * 60 + 24 * 60 * 60 - 8 * 60 * 60
-                                task?.date = Double(today) > 0 ? Double(today) : 0
+                                // task.date 存储北京时间对应日期当天0点的时间戳
+                                // 加8个小时变成北京时间才能正确地抹掉小时和分钟。然后再把8个小时减回去（暂时不考虑国际化）。
+                                let newDate = (Int(date.timeIntervalSince1970 + 8 * 3600) / (24 * 3600)) * 24 * 3600 - 8 * 3600
+                                if let originDate = task?.date,
+                                   let originTime = task?.time {
+                                    let originDay = (Int(originDate + 8 * 3600) / (24 * 3600)) * 24 * 3600 - 8 * 3600
+                                    let diff = newDate - originDay
+                                    let newTime = originTime + Double(diff)
+                                    task?.time = newTime
+                                }
+                                task?.date = Double(newDate) > 0 ? Double(newDate) : 0
                             }
                             return task
                         }
@@ -272,7 +281,13 @@ extension TaskDetailViewController {
                                 task?.time = nil
                             } else {
                                 let timeStamp = Int(time.timeIntervalSince1970)
-                                task?.time = Double(timeStamp) > 0 ? Double(timeStamp) : 0
+                                let date = task?.date ?? 0
+                                if date == 0 || timeStamp == 0 {
+                                    task?.time = nil
+                                    return task
+                                }
+                                let newTimeStamp = (timeStamp + 8 * 3600) % (24 * 3600) + Int(date)
+                                task?.time = Double(newTimeStamp) > 0 ? Double(newTimeStamp) : 0
                             }
                             return task
                         }

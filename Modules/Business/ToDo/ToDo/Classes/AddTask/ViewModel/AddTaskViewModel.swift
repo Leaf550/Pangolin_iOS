@@ -107,14 +107,17 @@ class AddTaskViewModel: ViewModel {
         Observable<(TaskModel?, String?)>.create { observer in
             var requestBody = [String : String]()
             requestBody["title"] = task?.title ?? ""
-            if let comment = task?.comment {
+            if let comment = task?.comment,
+                comment != "" {
                 requestBody["comment"] = comment
             }
-            if let date = task?.date {
+            if let date = task?.date,
+               date != 0 {
                 requestBody["date"] = String(Int64(date))
             }
             if let _ = task?.date,
-               let time = task?.time {
+               let time = task?.time,
+               time != 0 {
                 requestBody["time"] = String(Int64(time))
             }
             requestBody["isImportant"] = (task?.isImportant ?? false) ? "1" : "0"
@@ -125,7 +128,13 @@ class AddTaskViewModel: ViewModel {
                 .configBody(requestBody)
                 .post { json in
                     if (json as? [String : Any])?["status"] as? Int == 200 {
-                        observer.onNext((task, listId))
+                        if let dataJson = (json as? [String : Any])?["data"],
+                           let data = try? JSONSerialization.data(withJSONObject: dataJson),
+                           let newTask = try? JSONDecoder().decode(TaskModel.self, from: data) {
+                            observer.onNext((newTask, listId))
+                        } else {
+                            observer.onNext((nil, nil))
+                        }
                     } else {
                         observer.onNext((nil, nil))
                     }

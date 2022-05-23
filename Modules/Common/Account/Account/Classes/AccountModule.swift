@@ -12,6 +12,8 @@ class AccountModule: PGModule {
     
     public static var shared: PGModule = AccountModule()
     
+    var signObservers = [UserSignObserver]()
+    
     private let persistenceService = PGProviderManager.shared.provider { PersistenceProvider.self }
     
     func runModule() {
@@ -20,15 +22,6 @@ class AccountModule: PGModule {
 
     deinit {
         PGProviderManager.shared.deregisterProvider({ AccountProvider.self })
-    }
-    
-    func applicationWillFinishLaunching() {
-        if let token = persistenceService?.getToken() {
-            UserManager.shared.token = token
-        }
-        if let user: UserImpl = persistenceService?.getUser() {
-            UserManager.shared.user = user
-        }
     }
     
 }
@@ -54,5 +47,19 @@ extension AccountModule: AccountProvider {
         UserManager.shared.getUser()
     }
     
+    func isLogined() -> Bool {
+        UserManager.shared.isLogined
+    }
+    
+    func logout() {
+        UserManager.shared.clearUserInfo()
+        for signObserver in signObservers {
+            signObserver.userDidSignOut()
+        }
+    }
+    
+    func registUserSignObserver(_ observer: UserSignObserver) {
+        signObservers.append(observer)
+    }
     
 }

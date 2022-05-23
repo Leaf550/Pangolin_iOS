@@ -16,13 +16,27 @@ class TaskManager {
     
     private let disposeBag = DisposeBag()
     
-    var persistenceService = PGProviderManager.shared.provider(forProtocol: { PersistenceProvider.self })
+    let persistenceService = PGProviderManager.shared.provider(forProtocol: { PersistenceProvider.self })
+    let notificationService = PGProviderManager.shared.provider { NotificationProvider.self }
     
     var persistedHomeModel: HomeModel? {
         persistenceService?.getHomeModel()
     }
     
-    lazy var homeModel: BehaviorSubject<HomeModel?> = BehaviorSubject<HomeModel?>(value: persistedHomeModel)
+    lazy var homeModel: BehaviorSubject<HomeModel?> = {
+        let subject = BehaviorSubject<HomeModel?>(value: persistedHomeModel)
+        subject.subscribe(onNext: { [weak self] homeModel in
+            guard let homeModel = homeModel else {
+                self?.notificationService?.deleteAllNotification()
+                return
+            }
+            _ = self?.persistenceService?.saveHomeModel(homeModel)
+            self?.configNotifications(withHomeModel: homeModel)
+        })
+        .disposed(by: disposeBag)
+        
+        return subject
+    }()
     
     lazy var todayPageData: BehaviorSubject<ListPageData?> = {
         let subject = BehaviorSubject<ListPageData?>(value: nil)
@@ -207,6 +221,9 @@ class TaskManager {
                     if var taskList = homeModel?.data?.otherList?[pageIndex].sections?[0].taskList,
                        taskList.listID == listId {
                         homeModel?.data?.otherList?[pageIndex].sections?[0].tasks?.append(task)
+                        let sortedTask = homeModel?.data?.otherList?[pageIndex].sections?[0].tasks?
+                            .sorted { ($0.createTime ?? 0) < ($1.createTime ?? 0) }
+                        homeModel?.data?.otherList?[pageIndex].sections?[0].tasks = sortedTask
                     }
                 }
                 return homeModel
@@ -215,6 +232,60 @@ class TaskManager {
             .disposed(by: disposeBag)
         
         return subject
+    }()
+    
+    private lazy var addTaskListAction: PublishSubject<TaskList> = {
+        let subject = PublishSubject<TaskList>()
+        subject
+            .withLatestFrom(homeModel) { ($0, $1) }
+            .map { taskList, homeModel -> HomeModel? in
+                var homeModel = homeModel
+                
+                guard let data = "{}".data(using: .utf8) else { return homeModel }
+                guard var listPage = try? JSONDecoder().decode(ListPageData.self, from: data) else {
+                    return homeModel
+                }
+                guard var section = try? JSONDecoder().decode(TasksListSection.self, from: data) else { return homeModel
+                }
+                section.taskList = taskList
+                listPage.sections = [TasksListSection]()
+                listPage.sections?.append(section)
+                homeModel?.data?.otherList?.append(listPage)
+                
+                return homeModel
+            }
+            .bind(to: homeModel)
+            .disposed(by: disposeBag)
+        
+        return subject
+    }()
+    
+    private lazy var sharedTaskAction: PublishSubject<String> = {
+        let publish = PublishSubject<String>()
+        publish
+            .withLatestFrom(homeModel) { ($0, $1) }
+            .map { taskId, homeModel -> HomeModel? in
+                var homeModel = homeModel
+                for listIndex in 0 ..< (homeModel?.data?.otherList?.count ?? 0) {
+                    var has = false
+                    for taskIndex in 0 ..< (homeModel?.data?.otherList?[listIndex].sections?[0].tasks?.count ?? 0) {
+                        if taskId == (homeModel?.data?.otherList?[listIndex].sections?[0].tasks?[taskIndex].taskID ?? "") {
+                            homeModel?.data?.otherList?[listIndex].sections?[0].tasks?[taskIndex].shared = true
+                            has = true
+                            break
+                        }
+                    }
+                    if has {
+                        break
+                    }
+                }
+                
+                return homeModel
+            }
+            .bind(to: homeModel)
+            .disposed(by: disposeBag)
+        
+        return publish
     }()
     
     func deleteTask(withTaskID taskID: String) {
@@ -227,6 +298,27 @@ class TaskManager {
     
     func addTask(task: TaskModel, toListID listID: String) {
         addTaskAction.onNext((task, listID))
+    }
+    
+    func addTaskList(taskList: TaskList) {
+        addTaskListAction.onNext(taskList)
+    }
+    
+    func shareTask(taskId: String) {
+        sharedTaskAction.onNext(taskId)
+    }
+    
+    private func configNotifications(withHomeModel homeModel: HomeModel) {
+        for pageData in homeModel.data?.otherList ?? [] {
+            for section in pageData.sections ?? [] {
+                for task in section.tasks ?? [] {
+                    notificationService?.deleteTaskNotification(task)
+                    if !(task.isCompleted ?? false) {
+                        notificationService?.addTaskNotification(task: task)
+                    }
+                }
+            }
+        }
     }
     
 }

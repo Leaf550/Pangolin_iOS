@@ -26,6 +26,7 @@ public class TasksGroupTinyIcon: UIView {
         let imageView = UIImageView()
         self.image.withTintColor(.white, renderingMode: .alwaysTemplate)
         imageView.image = self.image
+        imageView.tintColor = .white
         
         return imageView
     }()

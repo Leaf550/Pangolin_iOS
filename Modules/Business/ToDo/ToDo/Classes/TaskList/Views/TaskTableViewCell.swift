@@ -68,8 +68,7 @@ class TaskTableViewCell: TableViewCell {
     
     private lazy var flag: UIImageView = {
         let imageView = UIImageView()
-//        imageView.image = UIImage(named: "")
-        imageView.backgroundColor = .systemOrange
+        imageView.image = UIImage(named: "flag_orange")
         return imageView
     }()
 
@@ -93,25 +92,40 @@ class TaskTableViewCell: TableViewCell {
         
         var dateString = ""
         if let dateTimestamp = model.date {
-            let date = Date(timeIntervalSince1970: dateTimestamp * 0.001)
+            let date = Date(timeIntervalSince1970: dateTimestamp)
             if Calendar.current.isDateInToday(date) {
                 dateString += "今天"
             } else if Calendar.current.isDateInTomorrow(date) {
                 dateString += "明天"
             } else {
                 let formater = DateFormatter()
-                formater.dateFormat = "MMM-dd"
+                formater.dateFormat = "MM月dd日"
                 dateString += formater.string(from: date)
             }
             dateString += " "
+            if dateTimestamp < Date().timeIntervalSince1970
+                && !Calendar.current.isDateInToday(date)
+                && !(model.isCompleted ?? false) {
+                dateLabel.textColor = .systemRed
+            } else {
+                dateLabel.textColor = .secondaryLabel
+            }
         }
         
         if let time = model.time {
-            let date = Date(timeIntervalSince1970: time * 0.001)
+            let date = Date(timeIntervalSince1970: time)
             let formater = DateFormatter()
             formater.dateFormat = "HH:mm"
             dateString += formater.string(from: date)
+            
+            if time < Date().timeIntervalSince1970
+                && !(model.isCompleted ?? false) {
+                dateLabel.textColor = .systemRed
+            } else {
+                dateLabel.textColor = .secondaryLabel
+            }
         }
+        
         dateLabel.text = dateString
     }
     

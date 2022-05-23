@@ -12,6 +12,7 @@ import RxSwift
 import RxCocoa
 import SnapKit
 import Net
+import Router
 
 enum ListType {
     case today
@@ -36,7 +37,16 @@ class TasksListViewController: UIViewController, ViewController, UITableViewData
     var sections: [TasksListSection] = []
     
     var requestSetTaskIsCompleted = PublishSubject<(TaskModel, Bool)>()
-    var requestSetTaskIsCompletedCompleted = PublishSubject<(String, Bool)>()
+    var requestSetTaskIsCompletedFinished = PublishSubject<(String, Bool)>()
+    var completeTaskDisposeBag = DisposeBag()
+    
+    var requestDeleteTask = PublishSubject<String>()
+    var requestDeleteTaskFinished = PublishSubject<(String, Bool)>()
+    var deleteDisposeBag = DisposeBag()
+    
+    private var isShowingNewPostAlart = false
+    
+    lazy var indicator = UIActivityIndicatorView(style: .medium)
     
     lazy var todoTable: UITableView = {
         let table = TableView()
@@ -50,6 +60,16 @@ class TasksListViewController: UIViewController, ViewController, UITableViewData
         }.disposed(by: disposeBag)
         
         return table
+    }()
+    
+    lazy var emptyListLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .tertiaryLabel
+        label.font = .textFont(for: .title3, weight: .regular)
+        label.isHidden = true
+        label.text = "没有提醒事项"
+        
+        return label
     }()
     
     init(titleColor: TasksGroupIconColor,
@@ -98,6 +118,11 @@ class TasksListViewController: UIViewController, ViewController, UITableViewData
         
         rxSections.subscribe(onNext: { [weak self] sections in
             self?.sections = sections
+            var count = 0
+            for section in sections {
+                count += section.tasks?.count ?? 0
+            }
+            self?.emptyListLabel.isHidden = count != 0
             self?.todoTable.reloadData()
         }).disposed(by: disposeBag)
     }
@@ -136,13 +161,21 @@ class TasksListViewController: UIViewController, ViewController, UITableViewData
     
     func bindViewModel() {
         requestSetTaskIsCompleted
-            .bind(to: viewModel.input.updateTaskIsCompleted)
+            .bind(to: viewModel.input.setTaskIsCompleted)
+            .disposed(by: disposeBag)
+        
+        requestDeleteTask
+            .bind(to: viewModel.input.deleteTask)
             .disposed(by: disposeBag)
         
         let output = viewModel.transformToOutput()
         
-        output.updateCompleted
-            .bind(to: requestSetTaskIsCompletedCompleted)
+        output.setTaskCompletedFinished
+            .bind(to: requestSetTaskIsCompletedFinished)
+            .disposed(by: disposeBag)
+        
+        output.deleteTaskFinished
+            .bind(to: requestDeleteTaskFinished)
             .disposed(by: disposeBag)
         
     }
@@ -153,6 +186,17 @@ class TasksListViewController: UIViewController, ViewController, UITableViewData
         view.addSubview(todoTable)
         todoTable.snp.makeConstraints { make in
             make.edges.equalToSuperview()
+        }
+        
+        view.addSubview(indicator)
+        indicator.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.centerY.equalToSuperview().offset(-30)
+        }
+        
+        view.addSubview(emptyListLabel)
+        emptyListLabel.snp.makeConstraints { make in
+            make.center.equalToSuperview()
         }
         
         let buttonItem = UIBarButtonItem(title: "新建", style: .plain, target: self, action: #selector(addToDo))
@@ -195,20 +239,36 @@ extension TasksListViewController {
         return cell ?? UITableViewCell()
     }
     
-    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        sections[section].taskList?.listName ?? ""
-    }
-    
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        self.deleteDisposeBag = DisposeBag()
+        
         guard let task = sections[indexPath.section].tasks?[indexPath.row] else { return nil }
+        
+        let shareAction = UIContextualAction(style: .normal, title: "分享") { [weak self] action, view, completion in
+            if (self?.isShowingNewPostAlart ?? false) {
+                return
+            }
+            Router.open(url: "pangolin://newPost/", userInfo: task)
+        }
+        shareAction.backgroundColor = .systemGreen
         
         let deleteAction = UIContextualAction(style: .destructive, title: "删除") { [weak self] action, view, completion in
             let cancelAction = UIAlertAction(title: "取消", style: .cancel) { _ in
                 completion(false)
             }
             let confirmAction = UIAlertAction(title: "确定", style: .destructive) { _ in
-                TaskManager.shared.deleteTask(withTaskID: task.taskID ?? "")
-                completion(true)
+                self?.indicator.startAnimating()
+                self?.requestDeleteTask.onNext(task.taskID ?? "")
+                
+                self?.requestDeleteTaskFinished
+                    .subscribe(onNext: { (taskId, succeeded) in
+                        if succeeded {
+                            TaskManager.shared.deleteTask(withTaskID: taskId)
+                        }
+                        self?.indicator.stopAnimating()
+                        completion(true)
+                    })
+                    .disposed(by: self?.deleteDisposeBag ?? DisposeBag())
             }
             let alertController = UIAlertController(title: "删除事项", message: "确定要删除吗", preferredStyle: .actionSheet)
             alertController.addAction(cancelAction)
@@ -233,7 +293,13 @@ extension TasksListViewController {
         }
         editAction.backgroundColor = .systemBlue
         
-        let configuration = UISwipeActionsConfiguration(actions: [deleteAction, importantAction, editAction])
+        var actions = [deleteAction, importantAction, editAction]
+        if task.isCompleted ?? false &&
+            !(task.shared ?? false) {
+            actions.append(shareAction)
+        }
+        
+        let configuration = UISwipeActionsConfiguration(actions: actions)
         return configuration
     }
 }
