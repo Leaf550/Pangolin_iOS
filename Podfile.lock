@@ -21,8 +21,8 @@ PODS:
     - UIComponents
   - Differentiator (5.0.0)
   - Gallery (2.4.0)
-  - Hybrid (0.0.1):
-    - Util
+  - Hybrid (0.1.0):
+    - Util (= 0.1.0)
   - MMKV (1.2.11):
     - MMKVCore (~> 1.2.11)
   - MMKVCore (1.2.12)
@@ -37,9 +37,8 @@ PODS:
     - RxSwift (= 6.2.0)
   - Provider (0.0.1):
     - PGFoundation
-  - Router (0.0.1):
-    - Hybrid
-    - Util
+  - Router (0.1.0):
+    - Hybrid (= 0.1.0)
   - RxCocoa (6.2.0):
     - RxRelay (= 6.2.0)
     - RxSwift (= 6.2.0)
@@ -74,20 +73,20 @@ PODS:
     - SnapKit
     - Toast-Swift
     - Util
-  - Util (0.0.1)
+  - Util (0.1.0)
 
 DEPENDENCIES:
   - Account (from `Modules/Common/Account`)
   - Alamofire (= 5.4.4)
   - BBS (from `Modules/Business/BBS`)
   - Gallery (= 2.4.0)
-  - Hybrid (from `Modules/Common/Hybrid`)
+  - Hybrid (= 0.1.0)
   - MMKV (= 1.2.11)
   - Net (from `Modules/Common/Net`)
   - Persistence (from `Modules/Common/Persistence`)
   - PGFoundation (= 0.1.2)
   - Provider (from `Modules/Common/Provider`)
-  - Router (from `Modules/Common/Router`)
+  - Router (= 0.1.0)
   - RxCocoa (= 6.2.0)
   - RxDataSources (= 5.0)
   - RxSwift (= 6.2.0)
@@ -97,11 +96,14 @@ DEPENDENCIES:
   - Toast-Swift (= 5.0.1)
   - ToDo (from `Modules/Business/ToDo`)
   - UIComponents (from `Modules/Common/UIComponents`)
-  - Util (from `Modules/Common/Util`)
+  - Util (= 0.1.0)
 
 SPEC REPOS:
   https://github.com/fyhNB/PGPodRepo.git:
+    - Hybrid
     - PGFoundation
+    - Router
+    - Util
   trunk:
     - Alamofire
     - Differentiator
@@ -121,24 +123,18 @@ EXTERNAL SOURCES:
     :path: Modules/Common/Account
   BBS:
     :path: Modules/Business/BBS
-  Hybrid:
-    :path: Modules/Common/Hybrid
   Net:
     :path: Modules/Common/Net
   Persistence:
     :path: Modules/Common/Persistence
   Provider:
     :path: Modules/Common/Provider
-  Router:
-    :path: Modules/Common/Router
   Starter:
     :path: Modules/Business/Starter
   ToDo:
     :path: Modules/Business/ToDo
   UIComponents:
     :path: Modules/Common/UIComponents
-  Util:
-    :path: Modules/Common/Util
 
 SPEC CHECKSUMS:
   Account: 5d43290fac2bcbc676781dd8161af9489543e555
@@ -146,14 +142,14 @@ SPEC CHECKSUMS:
   BBS: 991c48d6926397d9cf74e2895cb37cfc1d49c5b1
   Differentiator: e8497ceab83c1b10ca233716d547b9af21b9344d
   Gallery: b7fc1aeb68a39ad6d2c423574750196bf9b25e5c
-  Hybrid: f939efddf0a5e3cd6b48961abebdb98cba6add40
+  Hybrid: 27f66b8d1ae5a2c5ea3ae7793c0f54294047dcc0
   MMKV: 217b643c181c3d2f71983206ca1972d0a6e99881
   MMKVCore: df0565f6b58463604731a68ba6cd89bc0b2d1d55
   Net: 4ec17e99f8a3f3fcb77067d64f95ca28838f13f8
   Persistence: b073d6c8b6d12cf707e7adbdacff36e556b5545f
   PGFoundation: 04c2c887711393665a771a21adfd8052fd1e9e9d
   Provider: 5a3bedf02e8d1287d7b1da661ca97b440b540491
-  Router: d9dfb27ee05c3f6beef3cf1d820d730c87c62a7b
+  Router: 7ce84e338628351a49d7c12dedf391ef66ed7bd7
   RxCocoa: 4baf94bb35f2c0ab31bc0cb9f1900155f646ba42
   RxDataSources: aa47cc1ed6c500fa0dfecac5c979b723542d79cf
   RxRelay: e72dbfd157807478401ef1982e1c61c945c94b2f
@@ -164,8 +160,8 @@ SPEC CHECKSUMS:
   Toast-Swift: 9b6a70f28b3bf0b96c40d46c0c4b9d6639846711
   ToDo: 5e900aae127eed5b13cd0b415aaaf2e2904c5920
   UIComponents: b1d741cba7e3a8a53b9ee7c9449e8c642d73fd05
-  Util: 9269aba84bf203b4ea0604aeb60088d757e3e87e
+  Util: c761ec789d1a813045c9eb36e79943a7dc27628d
 
-PODFILE CHECKSUM: d98c965e15558d3bff8c2e444aaea2bea626ed4c
+PODFILE CHECKSUM: 03652be24945eae085923c80e33d70eefd22baa9
 
 COCOAPODS: 1.10.1

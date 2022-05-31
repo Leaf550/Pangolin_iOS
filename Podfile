@@ -7,9 +7,6 @@ platform :ios, '13.0'
 def developmentPods
   # commom
   pod 'Provider', :path => 'Modules/Common/Provider'
-  pod 'Util', :path => 'Modules/Common/Util'
-  pod 'Router', :path => 'Modules/Common/Router'
-  pod 'Hybrid', :path => 'Modules/Common/Hybrid'
   pod 'Net', :path => 'Modules/Common/Net'
   pod 'UIComponents', :path => 'Modules/Common/UIComponents'
   pod 'Account', :path => 'Modules/Common/Account'
@@ -26,6 +23,9 @@ end
 def privatePods
   # commom
   pod 'PGFoundation', '0.1.2'
+  pod 'Util', '0.1.0'
+  pod 'Hybrid', '0.1.0'
+  pod 'Router', '0.1.0'
 end
 
 # 公网第三方库
