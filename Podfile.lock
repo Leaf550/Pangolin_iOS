@@ -25,7 +25,7 @@ PODS:
     - Util (= 0.1.0)
   - MMKV (1.2.11):
     - MMKVCore (~> 1.2.11)
-  - MMKVCore (1.2.12)
+  - MMKVCore (1.2.13)
   - Net (0.0.1):
     - Alamofire
     - Provider
@@ -99,12 +99,7 @@ DEPENDENCIES:
   - Util (= 0.1.0)
 
 SPEC REPOS:
-  https://github.com/fyhNB/PGPodRepo.git:
-    - Hybrid
-    - PGFoundation
-    - Router
-    - Util
-  trunk:
+  https://github.com/CocoaPods/Specs.git:
     - Alamofire
     - Differentiator
     - Gallery
@@ -117,6 +112,11 @@ SPEC REPOS:
     - SDWebImage
     - SnapKit
     - Toast-Swift
+  https://github.com/fyhNB/PGPodRepo.git:
+    - Hybrid
+    - PGFoundation
+    - Router
+    - Util
 
 EXTERNAL SOURCES:
   Account:
@@ -144,7 +144,7 @@ SPEC CHECKSUMS:
   Gallery: b7fc1aeb68a39ad6d2c423574750196bf9b25e5c
   Hybrid: 27f66b8d1ae5a2c5ea3ae7793c0f54294047dcc0
   MMKV: 217b643c181c3d2f71983206ca1972d0a6e99881
-  MMKVCore: df0565f6b58463604731a68ba6cd89bc0b2d1d55
+  MMKVCore: 3388952ded307e41b3ed8a05892736a236ed1b8e
   Net: 4ec17e99f8a3f3fcb77067d64f95ca28838f13f8
   Persistence: b073d6c8b6d12cf707e7adbdacff36e556b5545f
   PGFoundation: 04c2c887711393665a771a21adfd8052fd1e9e9d
