@@ -136,79 +136,79 @@ class SignUpViewController: UIViewController, ViewController, UITextFieldDelegat
         view.endEditing(true)
     }
     
-    func bindViewModel() {
-        usernameTextField.rx.text.orEmpty
-            .bind(to: viewModel.input.username)
-            .disposed(by: disposeBag)
-        
-        passwordTextField.rx.text.orEmpty
-            .bind(to: viewModel.input.password)
-            .disposed(by: disposeBag)
-        
-        repeatePasswordTextField.rx.text.orEmpty
-            .bind(to: viewModel.input.repeatedPassword)
-            .disposed(by: disposeBag)
-        
-        signUpButton.rx.tap
-            .bind(to: viewModel.input.signUpButtonTap)
-            .disposed(by: disposeBag)
-        
-        let output = viewModel.transformToOutput()
-        
-        output.usernameValied
-            .subscribe(onNext: { [weak self] valied in
-                self?.usernameWariningLabel.text = valied ? "" : "用户名长度需要在6～12位以内"
-            })
-            .disposed(by: disposeBag)
-        
-        output.passwordValied
-            .subscribe(onNext: { [weak self] valied in
-                self?.passwordWariningLabel.text = valied ? "" : "密码长度需要在6～16位以内"
-            })
-            .disposed(by: disposeBag)
-        
-        output.repeatePasswordValied
-            .subscribe(onNext: { [weak self] valied in
-                self?.repeatePasswordWariningLabel.text = valied ? "" : "两次输入的密码不一样哦～"
-            })
-            .disposed(by: disposeBag)
-        
-        output.signUpButtonEnabled
-            .asDriver()
-            .drive(signUpButton.rx.isEnabled)
-            .disposed(by: disposeBag)
-        
-        output.signUpResult
-            .subscribe(onNext: { [weak self] response in
-                guard let response = response else {
-                    Toast.show(text: "请求失败")
+func bindViewModel() {
+    usernameTextField.rx.text.orEmpty
+        .bind(to: viewModel.input.username)
+        .disposed(by: disposeBag)
+    
+    passwordTextField.rx.text.orEmpty
+        .bind(to: viewModel.input.password)
+        .disposed(by: disposeBag)
+    
+    repeatePasswordTextField.rx.text.orEmpty
+        .bind(to: viewModel.input.repeatePassword)
+        .disposed(by: disposeBag)
+    
+    signUpButton.rx.tap
+        .bind(to: viewModel.input.signUpButtonTap)
+        .disposed(by: disposeBag)
+    
+    let output = viewModel.transformToOutput()
+    
+    output.usernameValid
+        .subscribe(onNext: { [weak self] valid in
+            self?.usernameWariningLabel.text = valid ? "" : "用户名长度需要在6～12位以内"
+        })
+        .disposed(by: disposeBag)
+    
+    output.passwordValid
+        .subscribe(onNext: { [weak self] valid in
+            self?.passwordWariningLabel.text = valid ? "" : "密码长度需要在6～16位以内"
+        })
+        .disposed(by: disposeBag)
+    
+    output.repeatePasswordValid
+        .subscribe(onNext: { [weak self] valid in
+            self?.repeatePasswordWariningLabel.text = valid ? "" : "两次输入的密码不一样哦～"
+        })
+        .disposed(by: disposeBag)
+    
+    output.signUpButtonEnabled
+        .asDriver(onErrorJustReturn: false)
+        .drive(signUpButton.rx.isEnabled)
+        .disposed(by: disposeBag)
+    
+    output.signUpResult
+        .subscribe(onNext: { [weak self] response in
+            guard let response = response else {
+                Toast.show(text: "请求失败")
+                return
+            }
+            
+            if response.status == SignUpStatusCode.userExisted.rawValue {
+                Toast.show(text: "该用户名已经注册过了～")
+                return
+            }
+            
+            guard let token = response.data?.tokenString else {
+                Toast.show(text: "请求失败")
+                return
+            }
+            
+            UserManager.shared.login(withToken: token) { user, message in
+                guard user != nil else {
+                    // token无法解析
+                    Toast.show(text: message ?? "")
                     return
                 }
                 
-                if response.status == SignUpStatusCode.userExisted.rawValue {
-                    Toast.show(text: "该用户名已经注册过了～")
-                    return
+                self?.dismiss(animated: true) {
+                    self?.signUpCompletion(true)
                 }
-                
-                guard let token = response.data?.tokenString else {
-                    Toast.show(text: "请求失败")
-                    return
-                }
-                
-                UserManager.shared.login(withToken: token) { user, message in
-                    guard user != nil else {
-                        // token无法解析
-                        Toast.show(text: message ?? "")
-                        return
-                    }
-                    
-                    self?.dismiss(animated: true) {
-                        self?.signUpCompletion(true)
-                    }
-                }
-            })
-            .disposed(by: disposeBag)
-    }
+            }
+        })
+        .disposed(by: disposeBag)
+}
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         let charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_"

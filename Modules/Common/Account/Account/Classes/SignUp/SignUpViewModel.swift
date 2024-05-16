@@ -8,20 +8,19 @@
 import PGFoundation
 import Net
 import RxSwift
-import RxRelay
 
 struct SignUpViewModelInput: ViewModelInput {
-    let username = PublishRelay<String>()
-    let password = PublishRelay<String>()
-    let repeatedPassword = PublishRelay<String>()
-    let signUpButtonTap = PublishRelay<Void>()
+    let username = PublishSubject<String>()
+    let password = PublishSubject<String>()
+    let repeatePassword = PublishSubject<String>()
+    let signUpButtonTap = PublishSubject<Void>()
 }
 
 struct SignUpViewModelOutput: ViewModelOutput {
-    let usernameValied = BehaviorRelay<Bool>(value: true)
-    let passwordValied = BehaviorRelay<Bool>(value: true)
-    let repeatePasswordValied = BehaviorRelay<Bool>(value: true)
-    let signUpButtonEnabled = BehaviorRelay<Bool>(value: false)
+    let usernameValid = BehaviorSubject<Bool>(value: true)
+    let passwordValid = BehaviorSubject<Bool>(value: true)
+    let repeatePasswordValid = BehaviorSubject<Bool>(value: true)
+    let signUpButtonEnabled = BehaviorSubject<Bool>(value: false)
     let signUpResult = PublishSubject<SignUpResponse?>()
 }
 
@@ -39,26 +38,26 @@ class SignUpViewModel: ViewModel {
         
         input.username
             .map { $0.count == 0 || $0.count > 5 && $0.count < 13 }
-            .bind(to: output.usernameValied)
+            .bind(to: output.usernameValid)
             .disposed(by: disposeBag)
         
         input.password
             .map { $0.count == 0 || $0.count > 5 && $0.count < 17 }
-            .bind(to: output.passwordValied)
+            .bind(to: output.passwordValid)
             .disposed(by: disposeBag)
         
-        Observable.combineLatest(input.password, input.repeatedPassword)
+        Observable.combineLatest(input.password, input.repeatePassword)
             .map { $1.count == 0 || $0 == $1 }
-            .bind(to: output.repeatePasswordValied)
+            .bind(to: output.repeatePasswordValid)
             .disposed(by: disposeBag)
         
         Observable.combineLatest(
-            output.usernameValied,
-            output.passwordValied,
-            output.repeatePasswordValied,
+            output.usernameValid,
+            output.passwordValid,
+            output.repeatePasswordValid,
             input.username,
             input.password,
-            input.repeatedPassword)
+            input.repeatePassword)
             .map { $0 && $1 && $2 && $3.count != 0 && $4.count != 0 && $5.count != 0 }
             .bind(to: output.signUpButtonEnabled)
             .disposed(by: disposeBag)
